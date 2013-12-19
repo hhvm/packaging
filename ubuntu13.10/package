@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ "$#" -ne 1 ]; then
+        echo "$0 [version like 2.3.1]"
+        exit
+fi
+
+sudo chown -R root:root root
+sudo chown -R www-data:www-data root/var/log/hhvm/
+sudo chown -R www-data:www-data root/var/run/hhvm/
+
+mkdir -p staging/dists/saucy/pool
+mkdir -p staging/dists/saucy/main/binary-amd64
+dpkg -b root/ staging/dists/saucy/pool/hhvm_$1_amd64.deb
+
+cd staging
+dpkg-scanpackages . | gzip -9 > dists/saucy/main/binary-amd64/Packages.gz
+cd ..
+
+rsync -avz staging/ hiphop@dl.hhvm.com:data/ubuntu/
