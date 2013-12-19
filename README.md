@@ -1,6 +1,3 @@
 # HHVM Package Sources
 
-These are the sources for how we made the HHVM Packages. They are a bit clowny in that we compile the binary folling the normal distro instructions and then copy that into the fa
-ke tree.
-
-If anyone with packagaing experience wants to help out, please send pull requests.
+These are the sources for how we made the HHVM Packages. We compile the binary following the [standard instructions](https://github.com/facebook/hhvm/wiki#building-hhvm) for each distro, copy it into `root/usr/bin/hhvm` and then run `package`.
