@@ -16,7 +16,7 @@ Log {
   Access {
     * {
       File = /var/log/hhvm/access.log
-      Format = %h %l %u % t \”%r\” %>s %b
+      Format = %h %l %u % t \"%r\" %>s %b
     }
   }
 }
