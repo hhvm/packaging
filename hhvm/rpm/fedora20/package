@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ "$#" -ne 1 ]; then
+        echo "$0 [version like 2.3.1]"
+        exit
+fi
+
+QA_RPATHS=2 rpmbuild -ba rpmbuild/SPECS/hhvm.spec
+
+mkdir -p staging/20/x86_64
+cp rpmbuild/RPMS/x86_64/hhvm-$1-1.fc20.x86_64.rpm staging/20/x86_64
+createrepo staging/20/x86_64
+
+rsync -avz staging/ hiphop@dl.hhvm.com:data/fedora/
