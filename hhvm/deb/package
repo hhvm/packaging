@@ -1,0 +1,90 @@
+#!/bin/sh
+set -e
+
+if [ "$#" -le 2 ]; then
+	echo "$0 DISTRO_NAME RELEASE VERSION [SRC_DIR] [PACKAGE_DIR]"
+	echo "for example"
+	echo "$0 ubuntu precise 2.3.0"
+	exit
+fi
+
+DISTRO_NAME=$1
+RELEASE=$2
+DISTRO_DIR=$PWD/$RELEASE
+VERSION=$3
+SRC=$4
+SKELETON=$PWD/skeleton
+PACKAGE=$5
+
+if [ ! -d $DISTRO_DIR ]; then
+	echo "directory $DISTRO_DIR doesn't exist"
+	exit
+fi
+
+#TODO check that DISTRO_NAME exists on the remote server
+
+if [ -z "$SRC" -o ! -d "$SRC" ]; then
+	SRC=`mktemp -d`
+fi
+
+cd $SRC
+if [ ! -d $SRC/.git ]; then
+	git clone https://github.com/facebook/hhvm.git $SRC
+	git submodule update --init
+fi
+
+git checkout HHVM-$VERSION
+if ! grep -q $VERSION hphp/version; then
+	echo "$VERSION isn't in hphp/version"
+	exit
+fi
+if ! grep -q $VERSION hphp/system/idl/constants.idl.json; then
+	echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
+	exit
+fi
+
+CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SRC cmake .
+# TODO make this configurable
+#HPHP_HOME=$SRC make -j 8
+
+if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
+	echo "$SRC/hphp/hhvm/hhvm doesn't exist"
+	exit
+fi
+
+# TODO make thie skippable
+#hphp/hhvm/hhvm hphp/test/run all
+if [ $? -ne 0 ]; then
+	echo "Testing didn't succeed"
+	exit
+fi
+
+if [ -z "$PACKAGE" -o ! -d "$PACKAGE" ]; then
+	PACKAGE=`mktemp -d`
+fi
+echo "Packaging in $PACKAGE"
+cd $PACKAGE
+
+if [ ! -d $PACKAGE/root ]; then
+	mkdir $PACKAGE/root
+	cp -R $SKELETON/* $PACKAGE/root/
+	cp -R $DISTRO_DIR/* $PACKAGE/root/
+	perl -pi -e "s/Version: .*/Version: $VERSION/" $PACKAGE/root/DEBIAN/control
+
+	sudo chown -R root:root $PACKAGE/root
+	sudo chown -R www-data:www-data $PACKAGE/root/var/log/hhvm/
+	sudo chown -R www-data:www-data $PACKAGE/root/var/run/hhvm/
+fi
+
+dpkg -b $PACKAGE/root/ hhvm_${VERSION}_amd64.deb
+
+dpkg-sig -k 452A652F --sign builder $PACKAGE/hhvm_${VERSION}_amd64.deb
+
+rsync -avz hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/
+
+#TODO figure out how the -b options works
+cd $PACKAGE/staging
+reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
+cd -
+
+rsync -avz $PACKAGE/staging/ hiphop@dl.hhvm.com:data/$DISTRO_NAME/

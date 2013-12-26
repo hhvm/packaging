@@ -1,7 +1,0 @@
-#!/bin/sh 
-# hphp.postinst, runs ldconfig 
-set -e 
-
-if [ "$1" = "configure" ]; then
-  ldconfig
-fi
