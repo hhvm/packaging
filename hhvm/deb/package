@@ -45,7 +45,7 @@ fi
 
 CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SRC cmake .
 # TODO make this configurable
-#HPHP_HOME=$SRC make -j 8
+HPHP_HOME=$SRC make -j 8
 
 if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
 	echo "$SRC/hphp/hhvm/hhvm doesn't exist"
@@ -53,7 +53,7 @@ if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
 fi
 
 # TODO make thie skippable
-#hphp/hhvm/hhvm hphp/test/run all
+hphp/hhvm/hhvm hphp/test/run all
 if [ $? -ne 0 ]; then
 	echo "Testing didn't succeed"
 	exit
