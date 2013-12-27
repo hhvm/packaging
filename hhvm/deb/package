@@ -84,7 +84,7 @@ rsync -avz hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/
 
 #TODO figure out how the -b options works
 cd $PACKAGE/staging
-reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
+reprepro --distdir '+b/dists' --outdir '+b/dists/$RELEASE' includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
 cd -
 
 rsync -avz $PACKAGE/staging/ hiphop@dl.hhvm.com:data/$DISTRO_NAME/
