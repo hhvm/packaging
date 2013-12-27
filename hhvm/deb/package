@@ -22,6 +22,7 @@ if [ ! -d $DISTRO_DIR ]; then
 fi
 
 #TODO check that DISTRO_NAME exists on the remote server
+sudo apt-get install reprepro
 
 if [ -z "$SRC" -o ! -d "$SRC" ]; then
 	SRC=`mktemp -d`
