@@ -17,7 +17,7 @@ use of PHP coding is probably as a replacement for CGI scripts.
 %build
 
 %install
-rsync -av ~/packaging/fedora20/root/ %{buildroot}
+rsync -av ~/packaging/hhvm/rpm/fedora20/root/ %{buildroot}
 
 %pre
 /usr/sbin/useradd -c "www-data" -d /var/www -s /sbin/nologin -r www-data 2>/dev/null || :
