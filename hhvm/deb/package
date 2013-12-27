@@ -53,10 +53,9 @@ if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
 	exit
 fi
 
-# TODO make thie skippable
-hphp/hhvm/hhvm hphp/test/run quick
+hphp/hhvm/hhvm --version | grep -q $VERSION
 if [ $? -ne 0 ]; then
-	echo "Testing didn't succeed"
+	echo "Wrong version was built?"
 	exit
 fi
 
