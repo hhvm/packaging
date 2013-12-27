@@ -31,6 +31,7 @@ cd $SRC
 if [ ! -d $SRC/.git ]; then
 	git clone https://github.com/facebook/hhvm.git $SRC
 	git submodule update --init
+	CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SRC cmake .
 fi
 
 git checkout HHVM-$VERSION
@@ -43,7 +44,6 @@ if ! grep -q $VERSION hphp/system/idl/constants.idl.json; then
 	exit
 fi
 
-CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SRC cmake .
 # TODO make this configurable
 HPHP_HOME=$SRC make -j 8
 
