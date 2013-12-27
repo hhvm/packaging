@@ -53,7 +53,7 @@ if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
 fi
 
 # TODO make thie skippable
-hphp/hhvm/hhvm hphp/test/run all
+hphp/hhvm/hhvm hphp/test/run quick
 if [ $? -ne 0 ]; then
 	echo "Testing didn't succeed"
 	exit
