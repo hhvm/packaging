@@ -45,12 +45,12 @@ if ! grep -q $VERSION hphp/system/idl/constants.idl.json; then
 	exit
 fi
 
-# TODO make this configurable
-HPHP_HOME=$SRC make -j 8
-
 if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
-	echo "$SRC/hphp/hhvm/hhvm doesn't exist"
-	exit
+	HPHP_HOME=$SRC make -j 8
+	if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
+		echo "$SRC/hphp/hhvm/hhvm doesn't exist"
+		exit
+	fi
 fi
 
 hphp/hhvm/hhvm --version | grep -q $VERSION
