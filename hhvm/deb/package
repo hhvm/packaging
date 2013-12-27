@@ -69,7 +69,7 @@ if [ ! -d $PACKAGE/root ]; then
 	cp -R $SKELETON/* $PACKAGE/root/
 	cp -R $DISTRO_DIR/* $PACKAGE/root/
 	cp $SRC/hphp/hhvm/hhvm $PACKAGE/root/usr/bin/
-	chmod 755 $PACKAGE/root/usr/bin/
+	chmod 755 $PACKAGE/root/usr/bin/hhvm
 	perl -pi -e "s/Version: .*/Version: $VERSION~$RELEASE/" $PACKAGE/root/DEBIAN/control
 	sudo chown -R root:root $PACKAGE/root
 	sudo chown -R www-data:www-data $PACKAGE/root/var/log/hhvm/
