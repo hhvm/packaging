@@ -1,0 +1,43 @@
+#!/bin/sh
+set -e
+
+if [ "$#" -le 2 ]; then
+	echo "$0 DISTRO_NAME RELEASE VERSION [PACKAGE_DIR]"
+	echo "for example"
+	echo "$0 ubuntu precise 2.3.0"
+	exit
+fi
+
+DISTRO_NAME=$1
+RELEASE=$2
+VERSION=$3
+SKELETON=$PWD/skeleton
+PACKAGE=$4
+
+#TODO check that DISTRO_NAME exists on the remote server
+
+if [ -z "$PACKAGE" -o ! -d "$PACKAGE" ]; then
+	PACKAGE=`mktemp -d`
+fi
+echo "Packaging in $PACKAGE"
+cd $PACKAGE
+
+if [ ! -d $PACKAGE/root ]; then
+	mkdir $PACKAGE/root
+	cp -R $SKELETON/* $PACKAGE/root/
+	perl -pi -e "s/Version: .*/Version: $VERSION/" $PACKAGE/root/DEBIAN/control
+	sudo chown -R root:root $PACKAGE/root
+fi
+
+dpkg -b $PACKAGE/root/ hhvm-fasstcgi_${VERSION}_amd64.deb
+dpkg-sig -k 452A652F --sign builder $PACKAGE/hhvm-fasstcgi_${VERSION}_amd64.deb
+
+rsync -avz hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/
+
+sudo apt-get install reprepro
+#TODO figure out how the -b options works
+cd $PACKAGE/staging
+reprepro includedeb $RELEASE $PACKAGE/hhvm-fasstcgi_${VERSION}_amd64.deb
+cd -
+
+rsync -avz $PACKAGE/staging/ hiphop@dl.hhvm.com:data/$DISTRO_NAME/
