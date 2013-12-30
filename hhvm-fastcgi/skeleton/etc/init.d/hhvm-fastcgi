@@ -54,6 +54,16 @@ ${ADDITIONAL_ARGS}"
 #
 # Function that starts the daemon/service
 #
+check_run_dir() {
+    # Only perform folder creation, if the PIDFILE location was not modified
+    PIDFILE_BASEDIR=$(dirname ${PIDFILE})
+    # We might have a tmpfs /var/run.
+    if [ "/var/run/hhvm" = "${PIDFILE_BASEDIR}" ] && [ ! -d /var/run/hhvm ]; then
+        mkdir -p -m0755 /var/run/hhvm
+        chown $RUN_AS_USER:$RUN_AS_USER /var/run/hhvm
+    fi
+}
+
 do_start()
 {
         # Return
@@ -112,6 +122,7 @@ do_reload() {
 
 case "$1" in
   start)
+        check_run_dir
         [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
         do_start
         case "$?" in
@@ -144,6 +155,7 @@ case "$1" in
         # If the "reload" option is implemented then remove the
         # 'force-reload' alias
         #
+        check_run_dir
         log_daemon_msg "Restarting $DESC" "$NAME"
         do_stop
         case "$?" in
