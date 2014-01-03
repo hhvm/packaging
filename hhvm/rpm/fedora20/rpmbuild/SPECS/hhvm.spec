@@ -1,6 +1,6 @@
 Name: hhvm
 Version: 2.3.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: PHP and Zend and BSD
 URL: http://www.hhvm.com/
 Summary: HHVM virtual machine, runtime, and JIT for the PHP language
@@ -44,7 +44,6 @@ rsync -av ~/packaging/hhvm/rpm/fedora20/root/ %{buildroot}
 /usr/share/hhvm/hdf/static.mime-types.hdf
 /var/log/hhvm
 /var/run/hhvm
-/var/www
 %attr(775, www-data, www-data) /var/run/hhvm/
 %attr(775, www-data, www-data) /var/log/hhvm/
 
