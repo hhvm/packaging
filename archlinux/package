@@ -6,6 +6,9 @@ echo "$0 <version like 2.3.1>"
 fi
 
 ver=$1
+arch=`uname -m`
+
+mkdir -p staging/$arch
 
 set -e
 
@@ -16,6 +19,7 @@ set -e
 #                                           count as a new version)
 HHVM_VERSION=${ver} makepkg -s
 
-ls
+mv hhvm-${ver}-1-$arch.pkg.tar.xz staging/$arch
+repo-add staging/$arch/hhvm.db.tar.gz staging/$arch/*.pkg.tar.xz
 
-#rsync -avz hhvm-${ver}.pkg.tar.xz hiphop@dl.hhvm.com:data/archlinux/
+#rsync -avz staging/ hiphop@dl.hhvm.com:data/archlinux/
