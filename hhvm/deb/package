@@ -15,6 +15,7 @@ VERSION=$3
 SRC=$4
 SKELETON=$PWD/skeleton
 PACKAGE=$5
+NIGHTLY_DATE=`date +%Y-%m-%d`
 
 if [ ! -d $DISTRO_DIR ]; then
 	echo "directory $DISTRO_DIR doesn't exist"
@@ -34,14 +35,20 @@ if [ ! -d $SRC/.git ]; then
 	CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SRC cmake .
 fi
 
-git checkout HHVM-$VERSION
-if ! grep -q $VERSION hphp/version; then
-	echo "$VERSION isn't in hphp/version"
-	exit
-fi
-if ! grep -q $VERSION hphp/system/idl/constants.idl.json; then
-	echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
-	exit
+if [ "$VERSION" = "nightly" ]; then
+	git checkout master
+	perl -pi -e 's/[0-9.]*-dev/nightly-'$NIGHTLY_DATE/ hphp/version
+	perl -pi -e 's/[0-9.]*-dev/nightly-'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
+else
+	git checkout HHVM-$VERSION
+	if ! grep -q $VERSION hphp/version; then
+		echo "$VERSION isn't in hphp/version"
+		exit
+	fi
+	if ! grep -q $VERSION hphp/system/idl/constants.idl.json; then
+		echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
+		exit
+	fi
 fi
 
 if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
@@ -70,7 +77,15 @@ if [ ! -d $PACKAGE/root ]; then
 	cp -R $DISTRO_DIR/* $PACKAGE/root/
 	cp $SRC/hphp/hhvm/hhvm $PACKAGE/root/usr/bin/
 	chmod 755 $PACKAGE/root/usr/bin/hhvm
-	perl -pi -e "s/Version: .*/Version: $VERSION~$RELEASE/" $PACKAGE/root/DEBIAN/control
+	if [ "$VERSION" = "nightly" ]; then
+		perl -pi -e "s/Conflicts: .*\n//" $PACKAGE/root/DEBIAN/control
+		perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
+		perl -pi -e "s/Replaces: .*\n//" $PACKAGE/root/DEBIAN/control
+		perl -pi -e "s/Package: hhvm/Package: hhvm-nightly\nConflicts: hhvm\nProvides: hhvm\nReplaces: hhvm/" $PACKAGE/root/DEBIAN/control
+		perl -pi -e "s/Version: .*/Version: $NIGHTLY_DATE~$RELEASE/" $PACKAGE/root/DEBIAN/control
+	else	
+		perl -pi -e "s/Version: .*/Version: $VERSION~$RELEASE/" $PACKAGE/root/DEBIAN/control
+	fi
 	sudo chown -R root:root $PACKAGE/root
 	sudo chown -R www-data:www-data $PACKAGE/root/var/log/hhvm/
 	sudo chown -R www-data:www-data $PACKAGE/root/var/run/hhvm/
@@ -88,3 +103,4 @@ reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
 cd -
 
 rsync -avz $PACKAGE/staging/ hiphop@dl.hhvm.com:data/$DISTRO_NAME/
+ssh hiphop@dl.hhvm.com "/home/hiphop/trigger-hiphop"
