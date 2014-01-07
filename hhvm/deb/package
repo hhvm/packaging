@@ -8,12 +8,15 @@ if [ "$#" -le 2 ]; then
 	exit
 fi
 
+DIR=`dirname $0`
+DIR=`readlink -m $DIR`
+echo $DIR
 DISTRO_NAME=$1
 RELEASE=$2
-DISTRO_DIR=$PWD/$RELEASE
+DISTRO_DIR=$DIR/$RELEASE
 VERSION=$3
 SRC=$4
-SKELETON=$PWD/skeleton
+SKELETON=$DIR/skeleton
 PACKAGE=$5
 NIGHTLY_DATE=`date +%Y-%m-%d`
 
