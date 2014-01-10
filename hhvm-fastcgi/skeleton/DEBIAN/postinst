@@ -201,7 +201,7 @@ nginx_check_custom() {
 	  -o ! \( -z "$(grep -ER "^[^#]*(fastcgi|hhvm.conf)" "/etc/nginx/conf.d/")" \) \
           -o ! \( -z "$(grep -ER "^[^#]*(fastcgi|hhvm.conf)" "/etc/nginx/sites-enabled/")" \) ]
 	then
-		echo "WARNING: Detected clashing configuration, not configuring"
+		echo "WARNING: Detected clashing configuration. Look at /etc/nginx/hhvm.conf for information how to connect to the hhvm fastcgi instance."
 		return 0
 	fi
 	return 1
