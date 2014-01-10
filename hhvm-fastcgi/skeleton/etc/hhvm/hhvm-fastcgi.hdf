@@ -1,0 +1,46 @@
+PidFile = /var/run/hhvm/pid
+
+Server {
+  Port = 9000
+
+  # Needs to be set, otherwise it tries to scan the / folder for some reason
+  SourceRoot = /var/www/
+}
+
+Log {
+  Level = Warning
+  AlwaysLogUnhandledExceptions = true
+  RuntimeErrorReportingLevel = 8191
+  UseLogFile = true
+  UseSyslog = false
+  File = /var/log/hhvm/error.log
+  Access {
+    * {
+      File = /var/log/hhvm/access.log
+      Format = %h %l %u % t \"%r\" %>s %b
+    }
+  }
+}
+
+Repo {
+  Central {
+    Path = /var/log/hhvm/.hhvm.hhbc
+  }
+}
+
+#include "/usr/share/hhvm/hdf/static.mime-types.hdf"
+StaticFile {
+  FilesMatch {
+    * {
+      pattern = .*\.(dll|exe)
+      headers {
+        * = Content-Disposition: attachment
+      }
+    }
+  }
+  Extensions : StaticMimeTypes
+}
+
+MySQL {
+  TypedResults = false
+}
