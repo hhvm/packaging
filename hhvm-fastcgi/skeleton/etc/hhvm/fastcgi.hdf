@@ -2,7 +2,6 @@ PidFile = /var/run/hhvm/pid
 
 Server {
   Port = 9000
-  Type = fastcgi
 
   # Needs to be set, otherwise it tries to scan the / folder for some reason
   SourceRoot = /var/www/

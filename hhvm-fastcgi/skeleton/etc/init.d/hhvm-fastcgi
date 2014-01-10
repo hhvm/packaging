@@ -36,7 +36,7 @@ RUN_AS_USER="www-data"
 ADDITIONAL_ARGS=""
 
 # Load the config and set the user to run it as
-DAEMON_ARGS="--config ${CONFIG_FILE} --user ${RUN_AS_USER} --mode daemon ${ADDITIONAL_ARGS}"
+DAEMON_ARGS="--config ${CONFIG_FILE} -vServer.Type=fastcgi --user ${RUN_AS_USER} --mode daemon ${ADDITIONAL_ARGS}"
 
 # Load the VERBOSE setting and other rcS variables
 . /lib/init/vars.sh
