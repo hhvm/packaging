@@ -1,0 +1,25 @@
+#!/bin/sh
+
+if [ "$#" -ne 1 -a "$#" -ne 2 ]; then
+echo "$0 <version like 2.3.1>"
+        exit
+fi
+
+VERSION=$1
+ARCH=`uname -m`
+
+set -e
+
+mkdir -p staging/${ARCH}
+
+# Some flags that could be added to this command:
+#   -c - Clean up work files when done
+#   --check - run the tests when finished
+#   -f - Force build if already built (shouldn't be needed since pkgrel updates
+#                                           count as a new version)
+HHVM_VERSION=${VERSION} makepkg -s
+
+mv hhvm-${VERSION}-1-$ARCH.pkg.tar.xz staging/${ARCH}
+repo-add staging/${ARCH}/hhvm.db.tar.gz staging/${ARCH}/*.pkg.tar.xz
+
+#rsync -avz staging/ hiphop@dl.hhvm.com:data/archlinux/

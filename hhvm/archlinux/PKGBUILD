@@ -1,0 +1,62 @@
+# Packager: Facebook
+# Maintainer: James Miller
+
+# This is a bit of a hacky PKGBUILD all things considered. It requires
+# the HHVM_VERSION environment variable to be set to work. This is done to
+# make automated building a bit easier
+
+pkgname=hhvm
+pkgver=2.3.2
+pkgrel=1
+pkgdesc="Virtual Machine, Runtime, and JIT for PHP"
+arch=('x86_64')
+url="http://hhvm.com"
+license=('PHP')
+groups=()
+depends=('boost-libs' 'google-glog' 'libmysqlclient' 'libmemcached' 'pcre' 'gd'
+         'libxml2' 'intel-tbb' 'libmcrypt' 'oniguruma' 'libldap' 'elfutils'
+         'jemalloc' 'curl' 'expat')
+makedepends=('git' 'cmake' 'gcc>=4.8' 'chrpath' 'boost' 'imap' 'libdwarf')
+checkdepends=()
+optdepends=()
+provides=('hhvm')
+conflicts=()
+replaces=()
+backup=()
+options=()
+changelog=
+
+source=("hhvm"::"git+https://github.com/facebook/hhvm.git#tag=HHVM-$HHVM_VERSION")
+
+md5sums=('SKIP')
+
+pkgver() {
+    if [ "" = $HHVM_VERSION ]; then
+        echo "No HHVM_VERSION variable set!"
+        exit 1
+    fi
+    echo $HHVM_VERSION
+}
+
+prepare() {
+    export CMAKE_PREFIX_PATH="$srcdir"
+    export HPHP_HOME="$srcdir/$pkgname"
+
+    if [ -f "$startdir/patches/hhvm-$pkgver.patch" ]; then
+        cd "$srcdir/$pkgname"
+        patch -N -p1 -i "$startdir/patches/hhvm-$pkgver.patch"
+    fi
+}
+
+build() {
+	cd "$srcdir/$pkgname"
+    git submodule update --init
+    CC=gcc CXX=g++ INCLUDE=/usr/include/libdwarf HPHP_NOTEST=1 \
+        cmake . -DCMAKE_INSTALL_PREFIX="$pkgdir/usr"
+	make $MAKEFLAGS hhvm
+}
+
+package() {
+	cd "$srcdir/$pkgname"
+	make install
+}
