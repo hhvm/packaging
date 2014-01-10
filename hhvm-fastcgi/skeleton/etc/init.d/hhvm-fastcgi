@@ -27,7 +27,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 [ -x "$DAEMON" ] || exit 0
 
 # Config file location
-CONFIG_FILE="/etc/hhvm/fastcgi.hdf"
+CONFIG_FILE="/etc/hhvm/hhvm-fastcgi.hdf"
 
 # User to run under
 RUN_AS_USER="www-data"
