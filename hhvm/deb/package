@@ -17,7 +17,7 @@ VERSION=$3
 SRC=$4
 SKELETON=$DIR/skeleton
 PACKAGE=$5
-NIGHTLY_DATE=`date +%Y-%m-%d`
+NIGHTLY_DATE=`date +%Y.%m.%d`
 
 if [ ! -d $DISTRO_DIR ]; then
 	echo "directory $DISTRO_DIR doesn't exist"
@@ -83,8 +83,8 @@ fi
 
 if [ "$VERSION" = "nightly" ]; then
 	git checkout master
-	perl -pi -e 's/[0-9.]*-dev/nightly-'$NIGHTLY_DATE/ hphp/version
-	perl -pi -e 's/[0-9.]*-dev/nightly-'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
+	perl -pi -e 's/([0-9.]*-dev)/\1+'$NIGHTLY_DATE/ hphp/version
+	perl -pi -e 's/([0-9.]*-dev)/\1+'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
 else
 	git checkout HHVM-$VERSION
 	if ! grep -q $VERSION hphp/version; then
