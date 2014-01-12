@@ -105,10 +105,11 @@ if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
 	fi
 fi
 
-$SRC/hphp/hhvm/hhvm --version | grep -q $VERSION
-if [ $? -ne 0 ]; then
-	echo "Wrong version was built?"
-	exit
+echo "Checking version"
+if [ "$VERSION" = "nightly" ]; then
+	$SRC/hphp/hhvm/hhvm --version | grep -q $NIGHTLY_DATE
+else
+	$SRC/hphp/hhvm/hhvm --version | grep -q $VERSION
 fi
 
 if [ -z "$PACKAGE" -o ! -d "$PACKAGE" ]; then
