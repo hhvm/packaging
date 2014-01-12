@@ -48,7 +48,8 @@ if [ ! -d $SRC/.git ]; then
 		make install
 		cd -
 		sudo cp -d $HEADERS/lib/libevent.so /usr/lib/hhvm/
-		sudo cp $HEADERS/lib/libevent-1.4.so.2.2.0 /usr/lib/hhvm/
+		sudo cp -d $HEADERS/lib/libevent-1.4.so.2 /usr/lib/hhvm/
+		sudo cp -d $HEADERS/lib/libevent-1.4.so.2.2.0 /usr/lib/hhvm/
 	fi
 	if [ "$RELEASE" = "precise" -o "$RELEASE" = "wheezy" ]; then
 		sudo ln -sf /usr/lib/hhvm/libglog.so.0 /usr/lib/hhvm/libglog.so
@@ -59,7 +60,8 @@ if [ ! -d $SRC/.git ]; then
 		make install
 		cd -
 		sudo cp -d $HEADERS/lib/libglog.so /usr/lib/hhvm/
-		sudo cp $HEADERS/lib/libglog.so.0.0.0 /usr/lib/hhvm/
+		sudo cp -d $HEADERS/lib/libglog.so.0 /usr/lib/hhvm/
+		sudo cp -d $HEADERS/lib/libglog.so.0.0.0 /usr/lib/hhvm/
 	fi
 	if [ "$RELEASE" = "precise" ]; then
 		sudo ln -sf /usr/lib/hhvm/libjemalloc.so.1 /usr/lib/hhvm/libjemalloc.so
@@ -73,7 +75,7 @@ if [ ! -d $SRC/.git ]; then
 		make install
 		cd -
 		sudo cp -d $HEADERS/lib/libjemalloc.so /usr/lib/hhvm/
-		sudo cp $HEADERS/lib/libjemalloc.so.1 /usr/lib/hhvm/
+		sudo cp -d $HEADERS/lib/libjemalloc.so.1 /usr/lib/hhvm/
 	fi
 
 	CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SRC cmake .
