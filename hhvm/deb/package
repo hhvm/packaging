@@ -34,6 +34,22 @@ cd $SRC
 if [ ! -d $SRC/.git ]; then
 	git clone https://github.com/facebook/hhvm.git $SRC
 	git submodule update --init
+
+	if [ "$VERSION" = "nightly" ]; then
+		git checkout master
+		perl -pi -e 's/([0-9.]*-dev)/\1+'$NIGHTLY_DATE/ hphp/version
+		perl -pi -e 's/([0-9.]*-dev)/\1+'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
+	else
+		git checkout HHVM-$VERSION
+		if ! grep -q $VERSION hphp/version; then
+			echo "$VERSION isn't in hphp/version"
+			exit
+		fi
+		if ! grep -q $VERSION hphp/system/idl/constants.idl.json; then
+			echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
+			exit
+		fi
+	fi
 	
 	HEADERS=`mktemp -d`
 	mkdir $HEADERS/include
@@ -79,22 +95,6 @@ if [ ! -d $SRC/.git ]; then
 	fi
 
 	CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SRC cmake .
-fi
-
-if [ "$VERSION" = "nightly" ]; then
-	git checkout master
-	perl -pi -e 's/([0-9.]*-dev)/\1+'$NIGHTLY_DATE/ hphp/version
-	perl -pi -e 's/([0-9.]*-dev)/\1+'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
-else
-	git checkout HHVM-$VERSION
-	if ! grep -q $VERSION hphp/version; then
-		echo "$VERSION isn't in hphp/version"
-		exit
-	fi
-	if ! grep -q $VERSION hphp/system/idl/constants.idl.json; then
-		echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
-		exit
-	fi
 fi
 
 if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
