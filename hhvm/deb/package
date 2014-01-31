@@ -55,20 +55,21 @@ if [ ! -d $SRC/.git ]; then
 	
 	HEADERS=`mktemp -d`
 	mkdir $HEADERS/include
-	if [ "$RELEASE" = "precise" -o "$RELEASE" = "saucy" -o "$RELEASE" = "wheezy" ]; then
-		git clone git://github.com/libevent/libevent.git $HEADERS/libevent
-		cd $HEADERS/libevent
-		git checkout release-1.4.14b-stable
-		cat $SRC/hphp/third_party/libevent-1.4.14.fb-changes.diff | patch -p1
-		./autogen.sh
-		./configure --prefix=$HEADERS
-		make -j 8
-		make install
-		cd -
-		sudo cp -d $HEADERS/lib/libevent.so /usr/lib/hhvm/
-		sudo cp -d $HEADERS/lib/libevent-1.4.so.2 /usr/lib/hhvm/
-		sudo cp -d $HEADERS/lib/libevent-1.4.so.2.2.0 /usr/lib/hhvm/
-	fi
+
+	# libevent	
+	git clone git://github.com/libevent/libevent.git $HEADERS/libevent
+	cd $HEADERS/libevent
+	git checkout release-1.4.14b-stable
+	cat $SRC/hphp/third_party/libevent-1.4.14.fb-changes.diff | patch -p1
+	./autogen.sh
+	./configure --prefix=$HEADERS
+	make -j 8
+	make install
+	cd -
+	sudo cp -d $HEADERS/lib/libevent.so /usr/lib/hhvm/
+	sudo cp -d $HEADERS/lib/libevent-1.4.so.2 /usr/lib/hhvm/
+	sudo cp -d $HEADERS/lib/libevent-1.4.so.2.2.0 /usr/lib/hhvm/
+
 	if [ "$RELEASE" = "precise" -o "$RELEASE" = "wheezy" ]; then
 		sudo ln -sf /usr/lib/hhvm/libglog.so.0 /usr/lib/hhvm/libglog.so
 		svn checkout http://google-glog.googlecode.com/svn/trunk/ $HEADERS/google-glog
