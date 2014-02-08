@@ -1,7 +1,9 @@
 #!/bin/sh 
-# hphp.postrm, runs ldconfig 
+# hphp.postrm, runs ldconfig, removes alternative
 set -e 
 
 if [ "$1" = "remove" ]; then
   ldconfig
 fi
+
+/usr/sbin/update-alternatives --remove php /usr/bin/hhvm
