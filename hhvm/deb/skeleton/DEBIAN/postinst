@@ -1,7 +1,10 @@
 #!/bin/sh 
-# hphp.postinst, runs ldconfig 
+# hphp.postinst, runs ldconfig, adds php alternative
 set -e 
 
 if [ "$1" = "configure" ]; then
   ldconfig
 fi
+
+# php5-cli uses a priority of 50, so we pick a much smaller number
+/usr/sbin/update-alternatives --install /usr/bin/php php /usr/bin/hhvm 10
