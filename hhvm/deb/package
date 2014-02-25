@@ -101,7 +101,7 @@ if [ ! -d $SRC/.git ]; then
 fi
 
 if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
-	HPHP_HOME=$SRC make -j 8
+	HPHP_HOME=$SRC make -j 4
 	if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
 		echo "$SRC/hphp/hhvm/hhvm doesn't exist"
 		exit
