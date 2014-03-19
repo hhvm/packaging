@@ -28,7 +28,6 @@ rsync -av ~/packaging/hhvm/rpm/fedora20/root/ %{buildroot}
 /etc/hhvm/server.hdf
 /etc/init.d/hhvm
 /usr/bin/hhvm
-/usr/lib/hhvm/libevent-1.4.so.2
 /usr/lib/hhvm/libglog.so.0
 /usr/share/hhvm/LICENSE
 /usr/share/hhvm/LICENSE/PHP
