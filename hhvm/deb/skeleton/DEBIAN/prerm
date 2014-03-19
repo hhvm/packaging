@@ -125,13 +125,13 @@ apache_prerm
 #!/bin/bash
 
 insert_line() {
-	file=mktemp
+	file=`mktemp`
 	sed -E "s/^(\\s*)${2}$/&\\n\\1${3}/" $1 > $file
 	cat $file > $1
 }
 
 remove_line() {
-	file=mktemp
+	file=`mktemp`
 	sed -E "/^.*${2}.*$/d" $1 > $file
 	cat $file > $1
 }
