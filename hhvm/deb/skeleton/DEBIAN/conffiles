@@ -1,3 +1,2 @@
-/etc/hhvm/config.hdf
-/etc/hhvm/server.hdf
+/etc/hhvm/server.ini
 /etc/hhvm/php.ini

@@ -1,9 +1,0 @@
-Package: hhvm-fastcgi
-Version: 2.3.2
-Section: web
-Priority: optional
-Architecture: all
-Essential: no
-Depends: hhvm (>= 2.3.0)
-Maintainer: Paul Tarjan <pt@fb.com>
-Description: The package provides FastCGI support for HHVM. HHVM is a high-performance just-in-time compiled PHP runtime. FastCGI is a protocol that allows language interpreters to run behind web servers.

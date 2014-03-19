@@ -1,9 +1,0 @@
-#!/bin/sh
-
-set -e
-
-if [ -f /etc/init.d/hhvm-fastcgi ]
-then
-	/etc/init.d/hhvm-fastcgi stop
-fi
-

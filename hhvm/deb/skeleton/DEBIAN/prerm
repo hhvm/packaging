@@ -213,8 +213,7 @@ nginx_prerm
 
 set -e 
 
-if [ -f /etc/init.d/hhvm-fastcgi ]
+if [ -f /etc/init.d/hhvm ]
 then
-	/etc/init.d/hhvm-fastcgi stop
+	/etc/init.d/hhvm stop
 fi
-
