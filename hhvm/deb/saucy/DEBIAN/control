@@ -2,7 +2,7 @@ Package: hhvm
 Provides: hhvm-fastcgi
 Replaces: hhvm-fastcgi
 Conflicts: hhvm-fastcgi
-Version: 2.3.2
+Version:
 Section: web
 Priority: optional
 Architecture: amd64
