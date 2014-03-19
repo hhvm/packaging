@@ -118,9 +118,9 @@ if [ ! -d $PACKAGE/root ]; then
 		perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
 		perl -pi -e "s/Replaces: .*\n//" $PACKAGE/root/DEBIAN/control
 		perl -pi -e "s/Package: hhvm/Package: hhvm-nightly\nConflicts: hhvm\nProvides: hhvm\nReplaces: hhvm/" $PACKAGE/root/DEBIAN/control
-		perl -pi -e "s/Version: .*/Version: $NIGHTLY_DATE~$RELEASE/" $PACKAGE/root/DEBIAN/control
+		perl -pi -e "s/Version:.*/Version: $NIGHTLY_DATE~$RELEASE/" $PACKAGE/root/DEBIAN/control
 	else	
-		perl -pi -e "s/Version: .*/Version: $VERSION~$RELEASE/" $PACKAGE/root/DEBIAN/control
+		perl -pi -e "s/Version:.*/Version: $VERSION~$RELEASE/" $PACKAGE/root/DEBIAN/control
 	fi
 	sudo chown -R root:root $PACKAGE/root
 	sudo chown -R www-data:www-data $PACKAGE/root/var/log/hhvm/
