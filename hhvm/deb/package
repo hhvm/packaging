@@ -137,6 +137,8 @@ if [ ! -d $PACKAGE/root ]; then
 	sudo chown -R www-data:www-data $PACKAGE/root/var/run/hhvm/
 fi
 
+sudo apt-get install dpkg-sig reprepro
+
 dpkg -b $PACKAGE/root/ hhvm_${VERSION}_amd64.deb
 dpkg-sig -k 452A652F --sign builder $PACKAGE/hhvm_${VERSION}_amd64.deb
 
@@ -144,7 +146,6 @@ SSH_KEY=/home/ptarjan/.ssh/id_rsa_phraseless
 
 rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/
 
-sudo apt-get install reprepro
 #TODO figure out how the -b options works
 cd $PACKAGE/staging
 reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
