@@ -1,0 +1,121 @@
+sudo apt-get -y install git-core libmysqlclient-dev libxml2-dev libmcrypt-dev libicu-dev openssl binutils-dev \
+libcap-dev libgd2-xpm-dev zlib1g-dev libtbb-dev libonig-dev libpcre3-dev autoconf libtool libcurl4-openssl-dev \
+wget libreadline-dev libncurses-dev libicu-dev libbz2-dev libc-client2007e-dev subversion bzip2 \
+python-software-properties gawk memcached libtool libmagickwand-dev libevent-dev libxslt-dev php5-imagick python-dev
+
+# set up a place to put all the build products
+CMAKE_PREFIX_PATH=`pwd`
+
+# gcc
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt-get update
+sudo apt-get -y install gcc-4.8 g++-4.8 gcc-4.8-base
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 20
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20
+
+# hiphop-base
+git clone git://github.com/facebook/hhvm.git
+
+# curl
+git clone git://github.com/bagder/curl.git
+cd curl
+./buildconf
+./configure --prefix=$CMAKE_PREFIX_PATH
+make -j
+make install
+cd ..
+
+# libevent
+git clone git://github.com/libevent/libevent.git
+cd libevent
+git checkout release-1.4.14b-stable
+cat ../hhvm/hphp/third_party/libevent-1.4.14.fb-changes.diff | patch -p1
+./autogen.sh
+./configure --prefix=$CMAKE_PREFIX_PATH
+make -j
+make install
+cd ..
+
+# libmemcached
+wget https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz
+tar -xzvf libmemcached-1.0.18.tar.gz
+cd libmemcached-1.0.18
+sudo apt-get install -y libcloog-ppl0
+./configure --prefix=$CMAKE_PREFIX_PATH
+make -j
+make install
+cd ..
+
+# cmake
+wget http://www.cmake.org/files/v2.8/cmake-2.8.11.2.tar.gz
+tar -xzvf cmake-2.8.11.2.tar.gz
+cd cmake-2.8.11.2
+./configure --prefix=$CMAKE_PREFIX_PATH
+make -j
+make install
+cd ..
+
+# glog
+wget https://google-glog.googlecode.com/files/glog-0.3.3.tar.gz
+tar -xzvf glog-0.3.3.tar.gz
+cd glog-0.3.3
+./configure --prefix=$CMAKE_PREFIX_PATH
+make -j
+make install
+cd ..
+
+# jemaloc
+wget http://www.canonware.com/download/jemalloc/jemalloc-3.5.1.tar.bz2
+tar xjvf jemalloc-3.5.1.tar.bz2
+cd jemalloc-3.5.1
+./configure --prefix=$CMAKE_PREFIX_PATH
+make -j
+make install
+cd ..
+
+# libunwind
+wget http://download.savannah.gnu.org/releases/libunwind/libunwind-1.1.tar.gz
+tar -xzvf libunwind-1.1.tar.gz
+cd libunwind-1.1
+./configure --prefix=$CMAKE_PREFIX_PATH
+make -j
+make install
+cd ..
+
+# tbb
+wget http://ubuntu.wikimedia.org/ubuntu/pool/universe/t/tbb/libtbb2_4.0+r233-1_amd64.deb
+wget http://ubuntu.wikimedia.org/ubuntu/pool/universe/t/tbb/libtbb-dev_4.0+r233-1_amd64.deb
+sudo dpkg -i libtbb*
+
+# boost
+wget http://ubuntu.wikimedia.org/ubuntu/pool/main/i/icu/libicu48_4.8.1.1-3_amd64.deb
+wget http://ubuntu.wikimedia.org/ubuntu/pool/main/i/icu/libicu-dev_4.8.1.1-3_amd64.deb
+sudo dpkg -i libicu*
+wget http://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.bz2/download -O boost_1_55_0.tar.bz2
+tar xvf boost_1_55_0.tar.bz2
+cd boost_1_55_0
+./bootstrap.sh
+./b2 install --prefix=$CMAKE_PREFIX_PATH
+
+# libelf
+wget http://launchpadlibrarian.net/71053826/libelf1_0.152-1ubuntu1_amd64.deb
+wget http://launchpadlibrarian.net/76118581/libdwarf-dev_20110612-2_amd64.deb
+wget http://launchpadlibrarian.net/71053827/libelf-dev_0.152-1ubuntu1_amd64.deb
+sudo dpkg -i libelf-dev_0.152-1ubuntu1_amd64.deb libdwarf-dev_20110612-2_amd64.deb libelf1_0.152-1ubuntu1_amd64.deb
+
+# ocaml
+wget http://caml.inria.fr/pub/distrib/ocaml-4.01/ocaml-4.01.0.tar.gz
+tar -xzpvf ocaml-4.01.0.tar.gz
+cd ocaml-4.01.0/
+./configure --prefix $CMAKE_PREFIX_PATH
+make world.opt
+make install
+cd ..
+
+# imagemagick
+wget http://www.imagemagick.org/download/ImageMagick-6.8.8-9.tar.bz2
+tar xvf ImageMagick-6.8.8-9.tar.bz2
+cd ImageMagick-6.8.8-9
+./configure --prefix=$CMAKE_PREFIX_PATH
+make -j 8
+make install

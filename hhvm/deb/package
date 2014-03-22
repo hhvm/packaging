@@ -83,6 +83,12 @@ if [ ! -d $SRC/.git ]; then
 		sudo cp -d $HEADERS/lib/libjemalloc.so.1 /usr/lib/hhvm/
 	fi
 
+	if [ -f $DISTRO_DIR/deps ]; then
+		cd $HEADERS
+		`$DISTRO_DIR/deps $HEADERS`
+		cd -
+	fi
+
 	CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SRC cmake .
 fi
 
@@ -111,6 +117,7 @@ if [ ! -d $PACKAGE/root ]; then
 	mkdir $PACKAGE/root
 	cp -R $SKELETON/* $PACKAGE/root/
 	cp -R $DISTRO_DIR/* $PACKAGE/root/
+	rm $PACKAGE/deps
 	cp $SRC/hphp/hhvm/hhvm $PACKAGE/root/usr/bin/
 	chmod 755 $PACKAGE/root/usr/bin/hhvm
 	if [ -f $SRC/hphp/hack/bin/hh_server ]; then
