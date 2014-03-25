@@ -151,7 +151,10 @@ dpkg-sig -k 452A652F --sign builder $PACKAGE/hhvm_${VERSION}_amd64.deb
 
 SSH_KEY=/home/ptarjan/.ssh/id_rsa_phraseless
 
-rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/
+# do it twice since it takes so long something else might have pushed
+for i in `seq 2`; do
+	rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/
+done
 
 #TODO figure out how the -b options works
 cd $PACKAGE/staging
