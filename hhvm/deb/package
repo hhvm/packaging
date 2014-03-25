@@ -137,8 +137,6 @@ if [ ! -d $PACKAGE/root ]; then
 	sudo chown -R www-data:www-data $PACKAGE/root/var/run/hhvm/
 fi
 
-sudo apt-get install dpkg-sig reprepro
-
 dpkg -b $PACKAGE/root/ hhvm_${VERSION}_amd64.deb
 dpkg-sig -k 452A652F --sign builder $PACKAGE/hhvm_${VERSION}_amd64.deb
 
