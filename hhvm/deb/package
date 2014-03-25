@@ -117,7 +117,9 @@ if [ ! -d $PACKAGE/root ]; then
 	mkdir $PACKAGE/root
 	cp -R $SKELETON/* $PACKAGE/root/
 	cp -R $DISTRO_DIR/* $PACKAGE/root/
-	rm $PACKAGE/deps
+	if [ -f $PACKAGE/deps ]; then
+		rm $PACKAGE/deps
+	fi
 	cp $SRC/hphp/hhvm/hhvm $PACKAGE/root/usr/bin/
 	chmod 755 $PACKAGE/root/usr/bin/hhvm
 	if [ -f $SRC/hphp/hack/bin/hh_server ]; then
