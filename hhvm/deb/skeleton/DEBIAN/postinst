@@ -258,4 +258,9 @@ nginx_postinst() {
 nginx_postinst
 
 # php5-cli uses a priority of 50, so we pick a much smaller number
-/usr/sbin/update-alternatives --install /usr/bin/php php /usr/bin/hhvm 10
+if [ -f /usr/sbin/update-alternatives ]; then
+	/usr/sbin/update-alternatives --install /usr/bin/php php /usr/bin/hhvm 10
+fi
+if [ -f /usr/bin/update-alternatives ]; then
+	/usr/bin/update-alternatives --install /usr/bin/php php /usr/bin/hhvm 10
+fi
