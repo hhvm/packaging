@@ -85,7 +85,7 @@ if [ ! -d $SRC/.git ]; then
 
 	if [ -f $DISTRO_DIR/deps ]; then
 		cd $HEADERS
-		`$DISTRO_DIR/deps $HEADERS`
+		$DISTRO_DIR/deps $HEADERS
 		cd -
 	fi
 
