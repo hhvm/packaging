@@ -1,7 +1,7 @@
 sudo apt-get -y install git-core libmysqlclient-dev libxml2-dev libmcrypt-dev libicu-dev openssl binutils-dev \
-libcap-dev libgd2-xpm-dev zlib1g-dev libtbb-dev libonig-dev libpcre3-dev autoconf libtool libcurl4-openssl-dev \
+libcap-dev libgd2-xpm-dev zlib1g-dev libtbb-dev libonig-dev libpcre3-dev autoconf libtool libldap2-dev \
 wget libreadline-dev libncurses-dev libicu-dev libbz2-dev libc-client2007e-dev subversion bzip2 \
-python-software-properties gawk memcached libtool libmagickwand-dev libevent-dev libxslt-dev php5-imagick python-dev
+python-software-properties gawk memcached libtool libxslt-dev php5-imagick python-dev
 
 # set up a place to put all the build products
 CMAKE_PREFIX_PATH=`pwd`
@@ -16,21 +16,19 @@ sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20
 # hiphop-base
 git clone git://github.com/facebook/hhvm.git
 
-# curl
-git clone git://github.com/bagder/curl.git
-cd curl
-./buildconf
+# libevent
+wget https://github.com/downloads/libevent/libevent/libevent-2.0.21-stable.tar.gz
+tar -xzvf libevent-2.0.21-stable.tar.gz
+cd libevent-2.0.21-stable
 ./configure --prefix=$CMAKE_PREFIX_PATH
 make -j
 make install
 cd ..
 
-# libevent
-git clone git://github.com/libevent/libevent.git
-cd libevent
-git checkout release-1.4.14b-stable
-cat ../hhvm/hphp/third_party/libevent-1.4.14.fb-changes.diff | patch -p1
-./autogen.sh
+# curl
+git clone git://github.com/bagder/curl.git
+cd curl
+./buildconf
 ./configure --prefix=$CMAKE_PREFIX_PATH
 make -j
 make install
@@ -96,6 +94,7 @@ tar xvf boost_1_55_0.tar.bz2
 cd boost_1_55_0
 ./bootstrap.sh
 ./b2 install --prefix=$CMAKE_PREFIX_PATH
+cd ..
 
 # libelf
 wget http://launchpadlibrarian.net/71053826/libelf1_0.152-1ubuntu1_amd64.deb
@@ -119,3 +118,4 @@ cd ImageMagick-6.8.8-9
 ./configure --prefix=$CMAKE_PREFIX_PATH
 make -j 8
 make install
+cd ..
