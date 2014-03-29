@@ -1,7 +1,4 @@
 Package: hhvm
-Provides:
-Replaces:
-Conflicts:
 Version:
 Section: web
 Priority: optional
