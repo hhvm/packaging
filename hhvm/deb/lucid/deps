@@ -63,9 +63,9 @@ make install
 cd ..
 
 # jemaloc
-wget http://www.canonware.com/download/jemalloc/jemalloc-3.5.1.tar.bz2
-tar xjvf jemalloc-3.5.1.tar.bz2
-cd jemalloc-3.5.1
+wget http://www.canonware.com/download/jemalloc/jemalloc-3.6.0.tar.bz2
+tar xjvf jemalloc-3.6.0.tar.bz2
+cd jemalloc-3.6.0
 ./configure --prefix=$CMAKE_PREFIX_PATH
 make -j
 make install
