@@ -85,10 +85,12 @@ wget http://ubuntu.wikimedia.org/ubuntu/pool/universe/t/tbb/libtbb2_4.0+r233-1_a
 wget http://ubuntu.wikimedia.org/ubuntu/pool/universe/t/tbb/libtbb-dev_4.0+r233-1_amd64.deb
 sudo dpkg -i libtbb*
 
-# boost
+# icu
 wget http://ubuntu.wikimedia.org/ubuntu/pool/main/i/icu/libicu48_4.8.1.1-3_amd64.deb
 wget http://ubuntu.wikimedia.org/ubuntu/pool/main/i/icu/libicu-dev_4.8.1.1-3_amd64.deb
 sudo dpkg -i libicu*
+
+# boost
 wget http://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.bz2/download -O boost_1_55_0.tar.bz2
 tar xvf boost_1_55_0.tar.bz2
 cd boost_1_55_0
@@ -113,8 +115,8 @@ cd ..
 
 # imagemagick
 wget http://www.imagemagick.org/download/ImageMagick-6.8.8-9.tar.bz2
-tar xvf ImageMagick-6.8.8-9.tar.bz2
-cd ImageMagick-6.8.8-9
+tar xvf ImageMagick.tar.bz2
+cd ImageMagick
 ./configure --prefix=$CMAKE_PREFIX_PATH
 make -j 8
 make install
