@@ -114,7 +114,7 @@ make install
 cd ..
 
 # imagemagick
-wget http://www.imagemagick.org/download/ImageMagick-6.8.8-9.tar.bz2
+wget http://www.imagemagick.org/download/ImageMagick.tar.bz2
 tar xvf ImageMagick.tar.bz2
 cd ImageMagick
 ./configure --prefix=$CMAKE_PREFIX_PATH
