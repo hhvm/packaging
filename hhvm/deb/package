@@ -32,12 +32,14 @@ if [ -z "$SRC" -o ! -d "$SRC" ]; then
 	SRC=`mktemp -d`
 fi
 	
-if [ "$VERSION" = "nightly" ]; then
+if [ `echo $VERSION | grep '^nightly.*'` ]; then
 	NIGHTLY=true
+	echo "Nightly"
 fi
-if [ "$VERSION" = "nightly-dbg" ]; then
+if [ `echo $VERSION | grep '.*-dbg$'` ]; then
 	EXTRA_CMAKE_FLAGS="$EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug"
-	NIGHTLY=true
+	VERSION=`echo $VERSION | cut -d '-' -f 1`
+	echo "Debug"
 fi
 
 cd $SRC
