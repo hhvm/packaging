@@ -148,11 +148,17 @@ if [ ! -d $PACKAGE/root ]; then
 		perl -pi -e "s/Replaces: .*\n//" $PACKAGE/root/DEBIAN/control
 		perl -pi -e "s/Version:.*/Version: $NIGHTLY_DATE~$RELEASE/" $PACKAGE/root/DEBIAN/control
 		if [ "$VERSION" = "nightly" ]; then
-			perl -pi -e "s/Package: hhvm/Package: hhvm-nightly\nConflicts: hhvm\nProvides: hhvm\nReplaces: hhvm/" $PACKAGE/root/DEBIAN/control
+			perl -pi -e "s/Package: hhvm/Package: hhvm-nightly\nConflicts: hhvm, hhvm-dbg\nProvides: hhvm\nReplaces: hhvm, hhvm-dbg/" $PACKAGE/root/DEBIAN/control
 		elif [ "$VERSION" = "nightly-dbg" ]; then
-			perl -pi -e "s/Package: hhvm/Package: hhvm-nightly-dbg\nConflicts: hhvm, hhvm-nightly\nProvides: hhvm\nReplaces: hhvm, hhvm-nightly/" $PACKAGE/root/DEBIAN/control
+			perl -pi -e "s/Package: hhvm/Package: hhvm-nightly-dbg\nConflicts: hhvm, hhvm-nightly, hhvm-dbg\nProvides: hhvm\nReplaces: hhvm, hhvm-nightly, hhvm-dbg/" $PACKAGE/root/DEBIAN/control
 		fi
 	else	
+		if [ `echo $VERSION | grep '.*-dbg$'` ]; then
+			perl -pi -e "s/Conflicts: .*\n//" $PACKAGE/root/DEBIAN/control
+			perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
+			perl -pi -e "s/Replaces: .*\n//" $PACKAGE/root/DEBIAN/control
+			perl -pi -e "s/Package: hhvm/Package: hhvm-dbg\nConflicts: hhvm\nProvides: hhvm\nReplaces: hhvm/" $PACKAGE/root/DEBIAN/control
+		fi
 		perl -pi -e "s/Version:.*/Version: $VERSION~$RELEASE/" $PACKAGE/root/DEBIAN/control
 	fi
 	sudo chown -R root:root $PACKAGE/root
