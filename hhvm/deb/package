@@ -18,6 +18,8 @@ SRC=$4
 SKELETON=$DIR/skeleton
 PACKAGE=$5
 NIGHTLY_DATE=`date +%Y.%m.%d`
+EXTRA_CMAKE_FLAGS=""
+NIGHTLY=false
 
 if [ ! -d $DISTRO_DIR ]; then
 	echo "directory $DISTRO_DIR doesn't exist"
@@ -29,12 +31,20 @@ fi
 if [ -z "$SRC" -o ! -d "$SRC" ]; then
 	SRC=`mktemp -d`
 fi
+	
+if [ "$VERSION" = "nightly" ]; then
+	NIGHTLY=true
+fi
+if [ "$VERSION" = "nightly-dbg" ]; then
+	EXTRA_CMAKE_FLAGS="$EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug"
+	NIGHTLY=true
+fi
 
 cd $SRC
 if [ ! -d $SRC/.git ]; then
 	git clone https://github.com/facebook/hhvm.git $SRC
 
-	if [ "$VERSION" = "nightly" ]; then
+	if [ "$NIGHTLY" = true ]; then
 		git checkout master
 		perl -pi -e 's/([0-9.]*-dev)/\1+'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
 	else
@@ -85,11 +95,13 @@ if [ ! -d $SRC/.git ]; then
 		cd -
 	fi
 
-	CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SRC cmake .
+	CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SRC cmake $EXTRA_CMAKE_FLAGS .
 fi
 
 if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
 	HPHP_HOME=$SRC make -j 4
+	# just incase, do it sequentially
+	HPHP_HOME=$SRC make
 	if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
 		echo "$SRC/hphp/hhvm/hhvm doesn't exist"
 		exit
@@ -97,7 +109,7 @@ if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
 fi
 
 echo "Checking version"
-if [ "$VERSION" = "nightly" ]; then
+if [ "$NIGHTLY" = true ]; then
 	$SRC/hphp/hhvm/hhvm --version | grep -q $NIGHTLY_DATE
 else
 	$SRC/hphp/hhvm/hhvm --version | grep -q $VERSION
@@ -128,12 +140,16 @@ if [ ! -d $PACKAGE/root ]; then
 	cp -r $SRC/hphp/hack/hhi $PACKAGE/root/usr/share/hhvm/hack/
 	cp -r $SRC/hphp/hack/editor-plugins/emacs $PACKAGE/root/usr/share/hhvm/hack/
 	cp -r $SRC/hphp/hack/editor-plugins/vim $PACKAGE/root/usr/share/hhvm/hack/
-	if [ "$VERSION" = "nightly" ]; then
+	if [ "$NIGHTLY" = true ]; then
 		perl -pi -e "s/Conflicts: .*\n//" $PACKAGE/root/DEBIAN/control
 		perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
 		perl -pi -e "s/Replaces: .*\n//" $PACKAGE/root/DEBIAN/control
-		perl -pi -e "s/Package: hhvm/Package: hhvm-nightly\nConflicts: hhvm\nProvides: hhvm\nReplaces: hhvm/" $PACKAGE/root/DEBIAN/control
 		perl -pi -e "s/Version:.*/Version: $NIGHTLY_DATE~$RELEASE/" $PACKAGE/root/DEBIAN/control
+		if [ "$VERSION" = "nightly" ]; then
+			perl -pi -e "s/Package: hhvm/Package: hhvm-nightly\nConflicts: hhvm\nProvides: hhvm\nReplaces: hhvm/" $PACKAGE/root/DEBIAN/control
+		elif [ "$VERSION" = "nightly-dbg" ]; then
+			perl -pi -e "s/Package: hhvm/Package: hhvm-nightly-dbg\nConflicts: hhvm, hhvm-nightly\nProvides: hhvm\nReplaces: hhvm, hhvm-nightly/" $PACKAGE/root/DEBIAN/control
+		fi
 	else	
 		perl -pi -e "s/Version:.*/Version: $VERSION~$RELEASE/" $PACKAGE/root/DEBIAN/control
 	fi
