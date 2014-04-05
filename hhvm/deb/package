@@ -20,6 +20,7 @@ PACKAGE=$5
 NIGHTLY_DATE=`date +%Y.%m.%d`
 EXTRA_CMAKE_FLAGS=""
 NIGHTLY=false
+DEBUG=false
 
 if [ ! -d $DISTRO_DIR ]; then
 	echo "directory $DISTRO_DIR doesn't exist"
@@ -37,7 +38,7 @@ if [ `echo $VERSION | grep '^nightly.*'` ]; then
 	echo "Nightly"
 fi
 if [ `echo $VERSION | grep '.*-dbg$'` ]; then
-	EXTRA_CMAKE_FLAGS="$EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug"
+	DEBUG=true
 	VERSION=`echo $VERSION | cut -d '-' -f 1`
 	echo "Debug"
 fi
@@ -97,11 +98,14 @@ if [ ! -d $SRC/.git ]; then
 		cd -
 	fi
 
+	if [ "$DEBUG" = true ]; then
+		EXTRA_CMAKE_FLAGS="$EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug"
+	fi
 	CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SRC cmake $EXTRA_CMAKE_FLAGS .
 fi
 
 if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
-	HPHP_HOME=$SRC make -j 4
+	HPHP_HOME=$SRC make -j 4 || true
 	# just incase, do it sequentially
 	HPHP_HOME=$SRC make
 	if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
@@ -147,13 +151,13 @@ if [ ! -d $PACKAGE/root ]; then
 		perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
 		perl -pi -e "s/Replaces: .*\n//" $PACKAGE/root/DEBIAN/control
 		perl -pi -e "s/Version:.*/Version: $NIGHTLY_DATE~$RELEASE/" $PACKAGE/root/DEBIAN/control
-		if [ "$VERSION" = "nightly" ]; then
-			perl -pi -e "s/Package: hhvm/Package: hhvm-nightly\nConflicts: hhvm, hhvm-dbg\nProvides: hhvm\nReplaces: hhvm, hhvm-dbg/" $PACKAGE/root/DEBIAN/control
-		elif [ "$VERSION" = "nightly-dbg" ]; then
+		if [ "$DEBUG" = true ]; then
 			perl -pi -e "s/Package: hhvm/Package: hhvm-nightly-dbg\nConflicts: hhvm, hhvm-nightly, hhvm-dbg\nProvides: hhvm\nReplaces: hhvm, hhvm-nightly, hhvm-dbg/" $PACKAGE/root/DEBIAN/control
+		else
+			perl -pi -e "s/Package: hhvm/Package: hhvm-nightly\nConflicts: hhvm, hhvm-dbg\nProvides: hhvm\nReplaces: hhvm, hhvm-dbg/" $PACKAGE/root/DEBIAN/control
 		fi
 	else	
-		if [ `echo $VERSION | grep '.*-dbg$'` ]; then
+		if [ "$DEBUG" = true ]; then
 			perl -pi -e "s/Conflicts: .*\n//" $PACKAGE/root/DEBIAN/control
 			perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
 			perl -pi -e "s/Replaces: .*\n//" $PACKAGE/root/DEBIAN/control
