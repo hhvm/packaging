@@ -189,5 +189,5 @@ rsync -avz -e "ssh -i $SSH_KEY" $PACKAGE/staging/ hiphop@dl.hhvm.com:data/$DISTR
 ssh -i $SSH_KEY hiphop@dl.hhvm.com "/home/hiphop/trigger-hiphop"
 
 # cleanup
-rm -rf $HEADERS $SRC $PACKAGE
+rm -rf $HEADERS $SRC
 sudo rm -rf $PACKAGE
