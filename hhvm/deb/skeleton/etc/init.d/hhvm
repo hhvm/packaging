@@ -29,6 +29,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 # Default values. This values can be overwritten in '/etc/default/hhvm'
 CONFIG_FILE="/etc/hhvm/server.ini"
 RUN_AS_USER="www-data"
+RUN_AS_GROUP="www-data"
 ADDITIONAL_ARGS=""
 
 # Read configuration variable file if it is present
@@ -57,7 +58,7 @@ check_run_dir() {
     # We might have a tmpfs /var/run.
     if [ "/var/run/hhvm" = "${PIDFILE_BASEDIR}" ] && [ ! -d /var/run/hhvm ]; then
         mkdir -p -m0755 /var/run/hhvm
-        chown $RUN_AS_USER:$RUN_AS_USER /var/run/hhvm
+        chown $RUN_AS_USER:$RUN_AS_GROUP /var/run/hhvm
     fi
 }
 
@@ -67,7 +68,7 @@ do_start()
         #   0 if daemon has been started
         #   1 if daemon was already running
         #   2 if daemon could not be started
-        sudo -u ${RUN_AS_USER} touch ${PIDFILE}
+        su ${RUN_AS_USER} -c "touch ${PIDFILE}"
         start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
                 || return 1
         start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- \
