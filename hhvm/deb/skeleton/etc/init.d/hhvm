@@ -28,6 +28,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 
 # Default values. This values can be overwritten in '/etc/default/hhvm'
 CONFIG_FILE="/etc/hhvm/server.ini"
+SYSTEM_CONFIG_FILE="/etc/hhvm/php.ini"
 RUN_AS_USER="www-data"
 RUN_AS_GROUP="www-data"
 ADDITIONAL_ARGS=""
@@ -35,7 +36,8 @@ ADDITIONAL_ARGS=""
 # Read configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
-DAEMON_ARGS="--config ${CONFIG_FILE} \
+DAEMON_ARGS="--config ${SYSTEM_CONFIG_FILE} \
+--config ${CONFIG_FILE} \
 --user ${RUN_AS_USER} \
 --mode daemon \
 -vPidFile=${PIDFILE} \
