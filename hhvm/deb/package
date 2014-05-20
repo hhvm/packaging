@@ -180,12 +180,21 @@ for i in `seq 2`; do
 	rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/
 done
 
+# these take up too much space	
+if [ "$NIGHTLY" = true ]; then
+	if [ "$DEBUG" = true ]; then
+		rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}-dbg/*${RELEASE}*.deb
+	else
+		rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}/*${RELEASE}*.deb
+	fi
+fi
+
 #TODO figure out how the -b options works
 cd $PACKAGE/staging
 reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
 cd -
 
-rsync -avz -e "ssh -i $SSH_KEY" $PACKAGE/staging/ hiphop@dl.hhvm.com:data/$DISTRO_NAME/
+rsync --delete -avz -e "ssh -i $SSH_KEY" $PACKAGE/staging/ hiphop@dl.hhvm.com:data/$DISTRO_NAME/
 ssh -i $SSH_KEY hiphop@dl.hhvm.com "/home/hiphop/trigger-hiphop"
 
 # cleanup
