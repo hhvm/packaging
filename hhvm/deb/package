@@ -183,9 +183,9 @@ done
 # these take up too much space	
 if [ "$NIGHTLY" = true ]; then
 	if [ "$DEBUG" = true ]; then
-		rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}-dbg/*${RELEASE}*.deb
+		rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}-dbg/*${RELEASE}*.deb || true
 	else
-		rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}/*${RELEASE}*.deb
+		rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}/*${RELEASE}*.deb || true
 	fi
 fi
 
