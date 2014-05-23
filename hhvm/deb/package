@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+export PATH=$PATH:/usr/local/bin/ 
 
 if [ "$#" -le 2 ]; then
 	echo "$0 DISTRO_NAME RELEASE VERSION [SRC_DIR] [PACKAGE_DIR]"
