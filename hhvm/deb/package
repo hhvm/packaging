@@ -194,7 +194,13 @@ cd $PACKAGE/staging
 reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
 cd -
 
-rsync --delete -avz -e "ssh -i $SSH_KEY" $PACKAGE/staging/ hiphop@dl.hhvm.com:data/$DISTRO_NAME/
+RSYNC_OPTS=""
+if [ "$NIGHTLY" = true ]; then
+	# if we are nightly, blow away uneeded things, otherwise keep the old packages
+	RSYNC_OPTS="--delete"
+fi
+
+rsync $RSYNC_OPTS -avz -e "ssh -i $SSH_KEY" $PACKAGE/staging/ hiphop@dl.hhvm.com:data/$DISTRO_NAME/
 ssh -i $SSH_KEY hiphop@dl.hhvm.com "/home/hiphop/trigger-hiphop"
 
 # cleanup
