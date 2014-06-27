@@ -1,9 +1,9 @@
 #!/bin/sh
 set -e
-export PATH=$PATH:/usr/local/bin/ 
+export PATH=$PATH:/usr/local/bin/
 
 if [ "$#" -le 2 ]; then
-	echo "$0 DISTRO_NAME RELEASE VERSION [SRC_DIR] [PACKAGE_DIR]"
+	echo "$0 DISTRO_NAME RELEASE VERSION [SOURCE_DIR] [PACKAGE_DIR]"
 	echo "for example"
 	echo "$0 ubuntu precise 2.3.0"
 	exit
@@ -15,7 +15,7 @@ DISTRO_NAME=$1
 RELEASE=$2
 DISTRO_DIR=$DIR/$RELEASE
 VERSION=$3
-SRC=$4
+SOURCE=$4
 SKELETON=$DIR/skeleton
 PACKAGE=$5
 NIGHTLY_DATE=`date +%Y.%m.%d`
@@ -30,10 +30,10 @@ fi
 
 #TODO check that DISTRO_NAME exists on the remote server
 
-if [ -z "$SRC" -o ! -d "$SRC" ]; then
-	SRC=`mktemp -d`
+if [ -z "$SOURCE" -o ! -d "$SOURCE" ]; then
+	SOURCE=`mktemp -d`
 fi
-	
+
 if [ `echo $VERSION | grep '^nightly.*'` ]; then
 	NIGHTLY=true
 	echo "Nightly"
@@ -44,9 +44,9 @@ if [ `echo $VERSION | grep '.*-dbg$'` ]; then
 	echo "Debug"
 fi
 
-cd $SRC
-if [ ! -d $SRC/.git ]; then
-	git clone https://github.com/facebook/hhvm.git $SRC
+cd $SOURCE
+if [ ! -d $SOURCE/.git ]; then
+	git clone https://github.com/facebook/hhvm.git $SOURCE
 
 	if [ "$NIGHTLY" = true ]; then
 		git checkout master
@@ -59,9 +59,9 @@ if [ ! -d $SRC/.git ]; then
 		fi
 	fi
 
-	# After the checkout since the submodules might be different between versions	
+	# After the checkout since the submodules might be different between versions
 	git submodule update --init --recursive
-	
+
 	HEADERS=`mktemp -d`
 	mkdir $HEADERS/include
 
@@ -102,24 +102,24 @@ if [ ! -d $SRC/.git ]; then
 	if [ "$DEBUG" = true ]; then
 		EXTRA_CMAKE_FLAGS="$EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug"
 	fi
-	CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SRC cmake $EXTRA_CMAKE_FLAGS .
+	CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SOURCE cmake $EXTRA_CMAKE_FLAGS .
 fi
 
-if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
-	HPHP_HOME=$SRC make -j 4 || true
+if [ ! -f $SOURCE/hphp/hhvm/hhvm ]; then
+	HPHP_HOME=$SOURCE make -j 4 || true
 	# just incase, do it sequentially
-	HPHP_HOME=$SRC make
-	if [ ! -f $SRC/hphp/hhvm/hhvm ]; then
-		echo "$SRC/hphp/hhvm/hhvm doesn't exist"
+	HPHP_HOME=$SOURCE make
+	if [ ! -f $SOURCE/hphp/hhvm/hhvm ]; then
+		echo "$SOURCE/hphp/hhvm/hhvm doesn't exist"
 		exit
 	fi
 fi
 
 echo "Checking version"
 if [ "$NIGHTLY" = true ]; then
-	$SRC/hphp/hhvm/hhvm --version | grep -q $NIGHTLY_DATE
+	$SOURCE/hphp/hhvm/hhvm --version | grep -q $NIGHTLY_DATE
 else
-	$SRC/hphp/hhvm/hhvm --version | grep -q $VERSION
+	$SOURCE/hphp/hhvm/hhvm --version | grep -q $VERSION
 fi
 
 if [ -z "$PACKAGE" -o ! -d "$PACKAGE" ]; then
@@ -135,18 +135,18 @@ if [ ! -d $PACKAGE/root ]; then
 	if [ -f $PACKAGE/root/deps ]; then
 		rm $PACKAGE/root/deps
 	fi
-	cp $SRC/hphp/hhvm/hhvm $PACKAGE/root/usr/bin/
+	cp $SOURCE/hphp/hhvm/hhvm $PACKAGE/root/usr/bin/
 	chmod 755 $PACKAGE/root/usr/bin/hhvm
-	if [ -f $SRC/hphp/hack/bin/hh_server ]; then
-		cp $SRC/hphp/hack/bin/hh_client $PACKAGE/root/usr/bin/
-		cp $SRC/hphp/hack/bin/hh_server $PACKAGE/root/usr/bin/
+	if [ -f $SOURCE/hphp/hack/bin/hh_server ]; then
+		cp $SOURCE/hphp/hack/bin/hh_client $PACKAGE/root/usr/bin/
+		cp $SOURCE/hphp/hack/bin/hh_server $PACKAGE/root/usr/bin/
 		chmod 755 $PACKAGE/root/usr/bin/hh_client
 		chmod 755 $PACKAGE/root/usr/bin/hh_server
 	fi
 	mkdir $PACKAGE/root/usr/share/hhvm/hack/
-	cp -r $SRC/hphp/hack/hhi $PACKAGE/root/usr/share/hhvm/hack/
-	cp -r $SRC/hphp/hack/editor-plugins/emacs $PACKAGE/root/usr/share/hhvm/hack/
-	cp -r $SRC/hphp/hack/editor-plugins/vim $PACKAGE/root/usr/share/hhvm/hack/
+	cp -r $SOURCE/hphp/hack/hhi $PACKAGE/root/usr/share/hhvm/hack/
+	cp -r $SOURCE/hphp/hack/editor-plugins/emacs $PACKAGE/root/usr/share/hhvm/hack/
+	cp -r $SOURCE/hphp/hack/editor-plugins/vim $PACKAGE/root/usr/share/hhvm/hack/
 	if [ "$NIGHTLY" = true ]; then
 		perl -pi -e "s/Conflicts: .*\n//" $PACKAGE/root/DEBIAN/control
 		perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
@@ -157,7 +157,7 @@ if [ ! -d $PACKAGE/root ]; then
 		else
 			perl -pi -e "s/Package: hhvm/Package: hhvm-nightly\nConflicts: hhvm, hhvm-dbg\nProvides: hhvm\nReplaces: hhvm, hhvm-dbg/" $PACKAGE/root/DEBIAN/control
 		fi
-	else	
+	else
 		if [ "$DEBUG" = true ]; then
 			perl -pi -e "s/Conflicts: .*\n//" $PACKAGE/root/DEBIAN/control
 			perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
@@ -180,7 +180,7 @@ rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/s
 # do it twice since it takes so long something else might have pushed
 rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/
 
-# these take up too much space	
+# these take up too much space
 if [ "$NIGHTLY" = true ]; then
 	if [ "$DEBUG" = true ]; then
 		rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}-dbg/*${RELEASE}*.deb || true
@@ -204,5 +204,5 @@ rsync $RSYNC_OPTS -avz -e "ssh -i $SSH_KEY" $PACKAGE/staging/ hiphop@dl.hhvm.com
 ssh -i $SSH_KEY hiphop@dl.hhvm.com "/home/hiphop/trigger-hiphop"
 
 # cleanup
-rm -rf $HEADERS $SRC
+rm -rf $HEADERS $SOURCE
 sudo rm -rf $PACKAGE
