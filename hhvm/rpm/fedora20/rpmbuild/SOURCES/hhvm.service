@@ -1,0 +1,8 @@
+[Unit]
+Description=HipHop Virtual Machine (FCGI)
+
+[Service]
+ExecStart=/usr/bin/hhvm --config /etc/hhvm/server.hdf --user www-data --mode daemon -vServer.Type=fastcgi -vServer.Port=9000
+
+[Install]
+WantedBy=multi-user.target
