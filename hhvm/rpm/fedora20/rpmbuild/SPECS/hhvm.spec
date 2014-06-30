@@ -131,9 +131,9 @@ make install
 /usr/sbin/useradd -c "www-data" -d /var/www -s /sbin/nologin -r www-data 2>/dev/null || :
 
 %files
-%config /etc/hhvm/config.ini
+%config /etc/hhvm/config.hdf
 %config /etc/hhvm/php.ini
-%config /etc/hhvm/server.ini
+%config /etc/hhvm/server.hdf
 /usr/lib/systemd/system/hhvm.service
 /usr/bin/hhvm
 /usr/bin/hphpize
