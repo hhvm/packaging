@@ -130,7 +130,7 @@ cd $PACKAGE
 
 if [ ! -d $PACKAGE/root ]; then
 	mkdir $PACKAGE/root
-	cp -R $SKELETON/* $PACKAGE/root/
+	cp -R $SKELETON/hhvm/* $PACKAGE/root/
 	cp -R $DISTRO_DIR/* $PACKAGE/root/
 	if [ -f $PACKAGE/root/deps ]; then
 		rm $PACKAGE/root/deps
