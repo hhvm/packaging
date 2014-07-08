@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+if [ -f /etc/init.d/hhvm ]
+then
+	/etc/init.d/hhvm stop
+fi
+
+echo "********************************************************************"
+echo "* HHVM Developer Package is being removed."
+echo "********************************************************************"
