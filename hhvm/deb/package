@@ -236,7 +236,7 @@ fi
 #TODO figure out how the -b options works
 cd $PACKAGE/staging
 reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
-if [ "$RELEASE" = "trusty" ];
+if [ "$RELEASE" = "trusty" ]; then
     reprepro includedeb $RELEASE $HPACKAGE/hhvm_dev_${VERSION}_amd64.deb
 fi
 cd -
