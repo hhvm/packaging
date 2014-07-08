@@ -3,10 +3,10 @@ set -e
 export PATH=$PATH:/usr/local/bin/
 
 if [ "$#" -le 2 ]; then
-	echo "$0 DISTRO_NAME RELEASE VERSION [SOURCE_DIR] [PACKAGE_DIR]"
-	echo "for example"
-	echo "$0 ubuntu precise 2.3.0"
-	exit
+    echo "$0 DISTRO_NAME RELEASE VERSION [SOURCE_DIR] [PACKAGE_DIR] [BUILD_DIR] [HEADER_PACKAGE_DIR]"
+    echo "for example"
+    echo "$0 ubuntu precise 2.3.0"
+    exit
 fi
 
 DIR=`dirname $0`
@@ -18,162 +18,207 @@ VERSION=$3
 SOURCE=$4
 SKELETON=$DIR/skeleton
 PACKAGE=$5
+BUILD=$6
+HPACKAGE=$7
 NIGHTLY_DATE=`date +%Y.%m.%d`
 EXTRA_CMAKE_FLAGS=""
 NIGHTLY=false
 DEBUG=false
 
 if [ ! -d $DISTRO_DIR ]; then
-	echo "directory $DISTRO_DIR doesn't exist"
-	exit
+    echo "directory $DISTRO_DIR doesn't exist"
+    exit
 fi
 
 #TODO check that DISTRO_NAME exists on the remote server
 
 if [ -z "$SOURCE" -o ! -d "$SOURCE" ]; then
-	SOURCE=`mktemp -d`
+    SOURCE=`mktemp -d`
 fi
 
 if [ `echo $VERSION | grep '^nightly.*'` ]; then
-	NIGHTLY=true
-	echo "Nightly"
+    NIGHTLY=true
+    echo "Nightly"
 fi
 if [ `echo $VERSION | grep '.*-dbg$'` ]; then
-	DEBUG=true
-	VERSION=`echo $VERSION | cut -d '-' -f 1`
-	echo "Debug"
+    DEBUG=true
+    VERSION=`echo $VERSION | cut -d '-' -f 1`
+    echo "Debug"
+fi
+
+if [ -z "$BUILD" -o ! -d "$BUILD" ]; then
+    BUILD=`mktemp -d`
 fi
 
 cd $SOURCE
-if [ ! -d $SOURCE/.git ]; then
-	git clone https://github.com/facebook/hhvm.git $SOURCE
+if [ ! -d $SOURCE/.git || true ]; then
+    git clone https://github.com/facebook/hhvm.git $SOURCE
 
-	if [ "$NIGHTLY" = true ]; then
-		git checkout master
-		perl -pi -e 's/([0-9.]*-dev)/\1+'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
-	else
-		git checkout HHVM-$VERSION
-		if ! grep -q $VERSION hphp/system/idl/constants.idl.json; then
-			echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
-			exit
-		fi
+    if [ "$NIGHTLY" = true ]; then
+	git checkout master
+	perl -pi -e 's/([0-9.]*-dev)/\1+'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
+    else
+        git checkout HHVM-$VERSION
+	if ! grep -q $VERSION hphp/system/idl/constants.idl.json; then
+	    echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
+	    exit
 	fi
+    fi
 
-	# After the checkout since the submodules might be different between versions
-	git submodule update --init --recursive
+    # After the checkout since the submodules might be different between versions
+    git submodule update --init --recursive
 
-	HEADERS=`mktemp -d`
-	mkdir $HEADERS/include
+    HEADERS=`mktemp -d`
+    mkdir $HEADERS/include
 
-	if [ "$RELEASE" = "precise" -o "$RELEASE" = "wheezy" ]; then
-		sudo ln -sf /usr/lib/hhvm/libglog.so.0 /usr/lib/hhvm/libglog.so
-		svn checkout http://google-glog.googlecode.com/svn/trunk/ $HEADERS/google-glog
-		cd $HEADERS/google-glog
-		./configure --prefix=$HEADERS
-		make -j 8
-		make install
-		cd -
-		sudo cp -d $HEADERS/lib/libglog.so /usr/lib/hhvm/
-		sudo cp -d $HEADERS/lib/libglog.so.0 /usr/lib/hhvm/
-		sudo cp -d $HEADERS/lib/libglog.so.0.0.0 /usr/lib/hhvm/
-	fi
-	if [ "$RELEASE" = "precise" ]; then
-		sudo ln -sf /usr/lib/hhvm/libjemalloc.so.1 /usr/lib/hhvm/libjemalloc.so
-		cd $HEADERS
-		wget http://www.canonware.com/download/jemalloc/jemalloc-3.6.0.tar.bz2
-		tar xjvf jemalloc-3.6.0.tar.bz2
-		cd -
-		cd $HEADERS/jemalloc-3.6.0
-		./configure --prefix=$HEADERS
-		make -j 8
-		make install
-		cd -
-		sudo cp -d $HEADERS/lib/libjemalloc.so /usr/lib/hhvm/
-		sudo cp -d $HEADERS/lib/libjemalloc.so.1 /usr/lib/hhvm/
-	fi
+    if [ "$RELEASE" = "precise" -o "$RELEASE" = "wheezy" ]; then
+	sudo ln -sf /usr/lib/hhvm/libglog.so.0 /usr/lib/hhvm/libglog.so
+	svn checkout http://google-glog.googlecode.com/svn/trunk/ $HEADERS/google-glog
+	cd $HEADERS/google-glog
+	./configure --prefix=$HEADERS
+	make -j 8
+	make install
+	cd -
+	sudo cp -d $HEADERS/lib/libglog.so /usr/lib/hhvm/
+	sudo cp -d $HEADERS/lib/libglog.so.0 /usr/lib/hhvm/
+	sudo cp -d $HEADERS/lib/libglog.so.0.0.0 /usr/lib/hhvm/
+    fi
+    if [ "$RELEASE" = "precise" ]; then
+	sudo ln -sf /usr/lib/hhvm/libjemalloc.so.1 /usr/lib/hhvm/libjemalloc.so
+	cd $HEADERS
+	wget http://www.canonware.com/download/jemalloc/jemalloc-3.6.0.tar.bz2
+	tar xjvf jemalloc-3.6.0.tar.bz2
+	cd -
+	cd $HEADERS/jemalloc-3.6.0
+	./configure --prefix=$HEADERS
+	make -j 8
+	make install
+	cd -
+	sudo cp -d $HEADERS/lib/libjemalloc.so /usr/lib/hhvm/
+	sudo cp -d $HEADERS/lib/libjemalloc.so.1 /usr/lib/hhvm/
+    fi
 
-	if [ -f $DISTRO_DIR/deps ]; then
-		cd $HEADERS
-		$DISTRO_DIR/deps $HEADERS
-		PATH=$HEADERS/bin:$PATH
-		cd -
-	fi
+    if [ -f $DISTRO_DIR/deps ]; then
+	cd $HEADERS
+	$DISTRO_DIR/deps $HEADERS
+	PATH=$HEADERS/bin:$PATH
+	cd -
+    fi
 
-	if [ "$DEBUG" = true ]; then
-		EXTRA_CMAKE_FLAGS="$EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug"
-	fi
-	CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SOURCE cmake $EXTRA_CMAKE_FLAGS .
+    if [ "$DEBUG" = true ]; then
+	EXTRA_CMAKE_FLAGS="$EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug"
+    fi
+    CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SOURCE cmake -DCMAKE_INSTALL_PREFIX="/usr" $EXTRA_CMAKE_FLAGS .
 fi
 
 if [ ! -f $SOURCE/hphp/hhvm/hhvm ]; then
-	HPHP_HOME=$SOURCE make -j 4 || true
-	# just incase, do it sequentially
-	HPHP_HOME=$SOURCE make
-	if [ ! -f $SOURCE/hphp/hhvm/hhvm ]; then
-		echo "$SOURCE/hphp/hhvm/hhvm doesn't exist"
-		exit
-	fi
+    HPHP_HOME=$SOURCE make -j 4 || true
+    # just incase, do it sequentially
+    HPHP_HOME=$SOURCE make
+    if [ ! -f $SOURCE/hphp/hhvm/hhvm ]; then
+	echo "$SOURCE/hphp/hhvm/hhvm doesn't exist"
+	exit
+    fi
+fi
+
+echo "Installing hhvm into $BUILD"
+# build the headers essentially.
+if [ ! -f $BUILD/bin/hhvm ]; then
+    HPHP_HOME=$SOURCE make install DESTDIR=$BUILD
+    if [ ! -f $BUILD/usr/bin/hhvm ]; then
+        echo "$BUILD/bin/hhvm doesn't exist"
+        exit
+    fi
 fi
 
 echo "Checking version"
 if [ "$NIGHTLY" = true ]; then
-	$SOURCE/hphp/hhvm/hhvm --version | grep -q $NIGHTLY_DATE
+    $SOURCE/hphp/hhvm/hhvm --version | grep -q $NIGHTLY_DATE
 else
-	$SOURCE/hphp/hhvm/hhvm --version | grep -q $VERSION
+    $SOURCE/hphp/hhvm/hhvm --version | grep -q $VERSION
 fi
 
 if [ -z "$PACKAGE" -o ! -d "$PACKAGE" ]; then
-	PACKAGE=`mktemp -d`
+    PACKAGE=`mktemp -d`
 fi
-echo "Packaging in $PACKAGE"
+
+
+echo "Packaging HHVM in $PACKAGE"
 cd $PACKAGE
 
 if [ ! -d $PACKAGE/root ]; then
-	mkdir $PACKAGE/root
-	cp -R $SKELETON/* $PACKAGE/root/
-	cp -R $DISTRO_DIR/* $PACKAGE/root/
-	if [ -f $PACKAGE/root/deps ]; then
-		rm $PACKAGE/root/deps
-	fi
-	cp $SOURCE/hphp/hhvm/hhvm $PACKAGE/root/usr/bin/
-	chmod 755 $PACKAGE/root/usr/bin/hhvm
-	if [ -f $SOURCE/hphp/hack/bin/hh_server ]; then
-		cp $SOURCE/hphp/hack/bin/hh_client $PACKAGE/root/usr/bin/
-		cp $SOURCE/hphp/hack/bin/hh_server $PACKAGE/root/usr/bin/
-		chmod 755 $PACKAGE/root/usr/bin/hh_client
-		chmod 755 $PACKAGE/root/usr/bin/hh_server
-	fi
-	mkdir $PACKAGE/root/usr/share/hhvm/hack/
-	cp -r $SOURCE/hphp/hack/hhi $PACKAGE/root/usr/share/hhvm/hack/
-	cp -r $SOURCE/hphp/hack/editor-plugins/emacs $PACKAGE/root/usr/share/hhvm/hack/
-	cp -r $SOURCE/hphp/hack/editor-plugins/vim $PACKAGE/root/usr/share/hhvm/hack/
-	if [ "$NIGHTLY" = true ]; then
-		perl -pi -e "s/Conflicts: .*\n//" $PACKAGE/root/DEBIAN/control
-		perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
-		perl -pi -e "s/Replaces: .*\n//" $PACKAGE/root/DEBIAN/control
-		perl -pi -e "s/Version:.*/Version: $NIGHTLY_DATE~$RELEASE/" $PACKAGE/root/DEBIAN/control
-		if [ "$DEBUG" = true ]; then
-			perl -pi -e "s/Package: hhvm/Package: hhvm-nightly-dbg\nConflicts: hhvm, hhvm-nightly, hhvm-dbg\nProvides: hhvm\nReplaces: hhvm, hhvm-nightly, hhvm-dbg/" $PACKAGE/root/DEBIAN/control
-		else
-			perl -pi -e "s/Package: hhvm/Package: hhvm-nightly\nConflicts: hhvm, hhvm-dbg\nProvides: hhvm\nReplaces: hhvm, hhvm-dbg/" $PACKAGE/root/DEBIAN/control
-		fi
+    mkdir $PACKAGE/root
+    cp -R $SKELETON/hhvm/* $PACKAGE/root/
+    cp -R $DISTRO_DIR/* $PACKAGE/root/
+    if [ -f $PACKAGE/root/deps ]; then
+	rm $PACKAGE/root/deps
+    fi
+    cp $SOURCE/hphp/hhvm/hhvm $PACKAGE/root/usr/bin/
+    chmod 755 $PACKAGE/root/usr/bin/hhvm
+    if [ -f $SOURCE/hphp/hack/bin/hh_server ]; then
+	cp $SOURCE/hphp/hack/bin/hh_client $PACKAGE/root/usr/bin/
+	cp $SOURCE/hphp/hack/bin/hh_server $PACKAGE/root/usr/bin/
+	chmod 755 $PACKAGE/root/usr/bin/hh_client
+	chmod 755 $PACKAGE/root/usr/bin/hh_server
+    fi
+    mkdir $PACKAGE/root/usr/share/hhvm/hack/
+    cp -r $SOURCE/hphp/hack/hhi $PACKAGE/root/usr/share/hhvm/hack/
+    cp -r $SOURCE/hphp/hack/editor-plugins/emacs $PACKAGE/root/usr/share/hhvm/hack/
+    cp -r $SOURCE/hphp/hack/editor-plugins/vim $PACKAGE/root/usr/share/hhvm/hack/
+    if [ "$NIGHTLY" = true ]; then
+	perl -pi -e "s/Conflicts: .*\n//" $PACKAGE/root/DEBIAN/control
+	perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
+	perl -pi -e "s/Replaces: .*\n//" $PACKAGE/root/DEBIAN/control
+	perl -pi -e "s/Depends: .*\n/Depends: hhvm/" $PACKAGE/root/DEBIAN/control
+	perl -pi -e "s/Version:.*/Version: $NIGHTLY_DATE~$RELEASE/" $PACKAGE/root/DEBIAN/control
+	if [ "$DEBUG" = true ]; then
+	    perl -pi -e "s/Package: hhvm/Package: hhvm-nightly-dbg\nConflicts: hhvm, hhvm-nightly, hhvm-dbg\nProvides: hhvm\nReplaces: hhvm, hhvm-nightly, hhvm-dbg/" $PACKAGE/root/DEBIAN/control
 	else
-		if [ "$DEBUG" = true ]; then
-			perl -pi -e "s/Conflicts: .*\n//" $PACKAGE/root/DEBIAN/control
-			perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
-			perl -pi -e "s/Replaces: .*\n//" $PACKAGE/root/DEBIAN/control
-			perl -pi -e "s/Package: hhvm/Package: hhvm-dbg\nConflicts: hhvm\nProvides: hhvm\nReplaces: hhvm/" $PACKAGE/root/DEBIAN/control
-		fi
-		perl -pi -e "s/Version:.*/Version: $VERSION~$RELEASE/" $PACKAGE/root/DEBIAN/control
+	    perl -pi -e "s/Package: hhvm/Package: hhvm-nightly\nConflicts: hhvm, hhvm-dbg\nProvides: hhvm\nReplaces: hhvm, hhvm-dbg/" $PACKAGE/root/DEBIAN/control
 	fi
-	sudo chown -R root:root $PACKAGE/root
-	sudo chown -R www-data:www-data $PACKAGE/root/var/log/hhvm/
-	sudo chown -R www-data:www-data $PACKAGE/root/var/run/hhvm/
+    else
+	if [ "$DEBUG" = true ]; then
+	    perl -pi -e "s/Conflicts: .*\n//" $PACKAGE/root/DEBIAN/control
+	    perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
+	    perl -pi -e "s/Replaces: .*\n//" $PACKAGE/root/DEBIAN/control
+	    perl -pi -e "s/Package: hhvm/Package: hhvm-dbg\nConflicts: hhvm\nProvides: hhvm\nReplaces: hhvm/" $PACKAGE/root/DEBIAN/control
+	fi
+	perl -pi -e "s/Version:.*/Version: $VERSION~$RELEASE/" $PACKAGE/root/DEBIAN/control
+    fi
+    sudo chown -R root:root $PACKAGE/root
+    sudo chown -R www-data:www-data $PACKAGE/root/var/log/hhvm/
+    sudo chown -R www-data:www-data $PACKAGE/root/var/run/hhvm/
 fi
 
 dpkg -b $PACKAGE/root/ hhvm_${VERSION}_amd64.deb
 dpkg-sig -k 452A652F --sign builder $PACKAGE/hhvm_${VERSION}_amd64.deb
 
+if [ -z "$HPACKAGE" -o ! -d "$HPACKAGE" ]; then
+    HPACKAGE=`mktemp -d`
+fi
+
+echo "Packaging dev in $HPACKAGE"
+cd $HPACKAGE
+
+if [ ! -d $HPACKAGE/root -a "$RELEASE" = "trusty" ]; then
+    mkdir $HPACKAGE/root
+    cp -r $SKELETON/hhvm-dev/* $HPACKAGE/root/
+    cp -r $DISTRO_DIR-dev/* $HPACKAGE/root/
+    cp -r $BUILD/usr/include/hphp $HPACKAGE/root/usr/include/
+    cp -r $BUILD/usr/lib/hphp $HPACKAGE/root/usr/lib/
+    cp -r $BUILD/usr/bin/hphpize $HPACKAGE/root/usr/bin/
+    if [ "$NIGHTLY" = true ]; then
+	perl -pi -e "s/Version:.*/Version: $NIGHTLY_DATE~$RELEASE/" $HPACKAGE/root/DEBIAN/control
+	perl -pi -e "s/Package: hhvm-dev/Package: hhvm-dev-nightly\nConflicts: hhvm-dev\nProvides: hhvm-dev\nReplaces: hhvm-dev" $HPACKAGE/root/DEBIAN/control
+    else
+	perl -pi -e "s/Version:.*/Version: $VERSION~$RELEASE/" $HPACKAGE/root/DEBIAN/control
+    fi
+    sudo chown -R root:root $HPACKAGE/root
+fi
+if [ "$RELEASE" = "trusty" ]; then
+    dpkg -b $HPACKAGE/root/ hhvm_dev_${VERSION}_amd64.deb
+    dpkg-sig -k 452A652F --sign builder $HPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+fi
 SSH_KEY=/home/ptarjan/.ssh/id_rsa_phraseless
 
 rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/ || true
@@ -182,22 +227,25 @@ rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/s
 
 # these take up too much space
 if [ "$NIGHTLY" = true ]; then
-	if [ "$DEBUG" = true ]; then
-		rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}-dbg/*${RELEASE}*.deb || true
-	else
-		rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}/*${RELEASE}*.deb || true
-	fi
+    if [ "$DEBUG" = true ]; then
+	rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}-dbg/*${RELEASE}*.deb || true
+    else
+	rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}/*${RELEASE}*.deb || true
+    fi
 fi
 
 #TODO figure out how the -b options works
 cd $PACKAGE/staging
 reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
+if [ "$RELEASE" = "trusty" ];
+    reprepro includedeb $RELEASE $HPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+fi
 cd -
 
 RSYNC_OPTS=""
 if [ "$NIGHTLY" = true ]; then
-	# if we are nightly, blow away uneeded things, otherwise keep the old packages
-	RSYNC_OPTS="--delete"
+    # if we are nightly, blow away uneeded things, otherwise keep the old packages
+    RSYNC_OPTS="--delete"
 fi
 
 rsync $RSYNC_OPTS -avz -e "ssh -i $SSH_KEY" $PACKAGE/staging/ hiphop@dl.hhvm.com:data/$DISTRO_NAME/
@@ -205,4 +253,4 @@ ssh -i $SSH_KEY hiphop@dl.hhvm.com "/home/hiphop/trigger-hiphop"
 
 # cleanup
 rm -rf $HEADERS $SOURCE
-sudo rm -rf $PACKAGE
+sudo rm -rf $PACKAGE $BUILD $HPACKAGE
