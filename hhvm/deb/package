@@ -123,9 +123,9 @@ fi
 
 echo "Installing hhvm into $BUILD"
 # build the headers essentially.
-if [ ! -f $BUILD/bin/hhvm ]; then
+if [ ! -f $BUILD/usr/bin/hphpize ]; then
     HPHP_HOME=$SOURCE make install DESTDIR=$BUILD
-    if [ ! -f $BUILD/usr/bin/hhvm ]; then
+    if [ ! -f $BUILD/usr/bin/hphpize ]; then
         echo "$BUILD/bin/hhvm doesn't exist"
         exit
     fi
