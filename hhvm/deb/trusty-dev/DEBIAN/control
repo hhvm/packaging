@@ -4,7 +4,6 @@ Section: web
 Priority: optional
 Architecture: amd64
 Essential: no
-Recommends: hhvm
-Depends: autoconf, automake, binutils-dev, build-essential, cmake, g++, git, libboost-dev, libboost-filesystem-dev, libboost-program-options-dev, libboost-regex-dev, libboost-system-dev, libboost-thread-dev, libbz2-dev, libc-client-dev, libldap2-dev, libc-client2007e-dev, libcap-dev, libcurl4-openssl-dev, libdwarf-dev, libelf-dev, libexpat-dev, libgd2-xpm-dev, libgoogle-glog-dev, libgoogle-perftools-dev, libicu-dev, libjemalloc-dev, libmcrypt-dev, libmemcached-dev, libmysqlclient-dev, libncurses-dev, libonig-dev, libpcre3-dev, libreadline-dev, libtbb-dev, libtool, libxml2-dev, zlib1g-dev, libevent-dev, libmagickwand-dev, libinotifytools0-dev, libiconv-hook-dev, libedit-dev, libiberty-dev, libxslt1-dev, ocaml-native-compilers, php5-imagick, libyaml-dev
+Depends: hhvm, autoconf, automake, binutils-dev, build-essential, cmake, g++, git, libboost-dev, libboost-filesystem-dev, libboost-program-options-dev, libboost-regex-dev, libboost-system-dev, libboost-thread-dev, libbz2-dev, libc-client-dev, libldap2-dev, libc-client2007e-dev, libcap-dev, libcurl4-openssl-dev, libdwarf-dev, libelf-dev, libexpat-dev, libgd2-xpm-dev, libgoogle-glog-dev, libgoogle-perftools-dev, libicu-dev, libjemalloc-dev, libmcrypt-dev, libmemcached-dev, libmysqlclient-dev, libncurses-dev, libonig-dev, libpcre3-dev, libreadline-dev, libtbb-dev, libtool, libxml2-dev, zlib1g-dev, libevent-dev, libmagickwand-dev, libinotifytools0-dev, libiconv-hook-dev, libedit-dev, libiberty-dev, libxslt1-dev, ocaml-native-compilers, php5-imagick, libyaml-dev
 Maintainer: Paul Tarjan <pt@fb.com>
 Description: Developer package for the HHVM virtual machine, runtime, and JIT for the PHP language
