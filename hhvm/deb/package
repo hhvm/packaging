@@ -3,7 +3,7 @@ set -e
 export PATH=$PATH:/usr/local/bin/
 
 if [ "$#" -le 2 ]; then
-    echo "$0 DISTRO_NAME RELEASE VERSION [SOURCE_DIR] [PACKAGE_DIR]"
+    echo "$0 DISTRO_NAME RELEASE VERSION [SOURCE_DIR] [PACKAGE_DIR] [BUILD_DIR] [DEV_PACKAGE_DIR]"
     echo "for example"
     echo "$0 ubuntu precise 2.3.0"
     exit
@@ -18,6 +18,8 @@ VERSION=$3
 SOURCE=$4
 SKELETON=$DIR/skeleton
 PACKAGE=$5
+BUILD=$6
+DPACKAGE=$7
 NIGHTLY_DATE=`date +%Y.%m.%d`
 EXTRA_CMAKE_FLAGS=""
 NIGHTLY=false
@@ -44,6 +46,10 @@ if [ `echo $VERSION | grep '.*-dbg$'` ]; then
     echo "Debug"
 fi
 
+if [ -z "$BUILD" -o ! -d "$BUILD" ]; then
+    BUILD=`mktemp -d`
+fi
+
 cd $SOURCE
 if [ ! -d $SOURCE/.git ]; then
     git clone https://github.com/facebook/hhvm.git $SOURCE
@@ -52,7 +58,7 @@ if [ ! -d $SOURCE/.git ]; then
 	git checkout master
 	perl -pi -e 's/([0-9.]*-dev)/\1+'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
     else
-	git checkout HHVM-$VERSION
+        git checkout HHVM-$VERSION
 	if ! grep -q $VERSION hphp/system/idl/constants.idl.json; then
 	    echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
 	    exit
@@ -102,7 +108,7 @@ if [ ! -d $SOURCE/.git ]; then
     if [ "$DEBUG" = true ]; then
 	EXTRA_CMAKE_FLAGS="$EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug"
     fi
-    CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SOURCE cmake $EXTRA_CMAKE_FLAGS .
+    CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SOURCE cmake -DCMAKE_INSTALL_PREFIX="/usr" $EXTRA_CMAKE_FLAGS .
 fi
 
 if [ ! -f $SOURCE/hphp/hhvm/hhvm ]; then
@@ -112,6 +118,16 @@ if [ ! -f $SOURCE/hphp/hhvm/hhvm ]; then
     if [ ! -f $SOURCE/hphp/hhvm/hhvm ]; then
 	echo "$SOURCE/hphp/hhvm/hhvm doesn't exist"
 	exit
+    fi
+fi
+
+echo "Installing hhvm into $BUILD"
+# build the headers essentially.
+if [ ! -f $BUILD/bin/hhvm ]; then
+    HPHP_HOME=$SOURCE make install DESTDIR=$BUILD
+    if [ ! -f $BUILD/usr/bin/hhvm ]; then
+        echo "$BUILD/bin/hhvm doesn't exist"
+        exit
     fi
 fi
 
@@ -125,7 +141,8 @@ fi
 if [ -z "$PACKAGE" -o ! -d "$PACKAGE" ]; then
     PACKAGE=`mktemp -d`
 fi
-echo "Packaging in $PACKAGE"
+
+echo "Packaging HHVM in $PACKAGE"
 cd $PACKAGE
 
 if [ ! -d $PACKAGE/root ]; then
@@ -174,6 +191,32 @@ fi
 dpkg -b $PACKAGE/root/ hhvm_${VERSION}_amd64.deb
 dpkg-sig -k 452A652F --sign builder $PACKAGE/hhvm_${VERSION}_amd64.deb
 
+if [ -z "$DPACKAGE" -o ! -d "$DPACKAGE" ]; then
+    DPACKAGE=`mktemp -d`
+fi
+
+echo "Packaging dev in $DPACKAGE"
+cd $DPACKAGE
+
+if [ ! -d $DPACKAGE/root -a "$RELEASE" = "trusty" ]; then
+    mkdir $DPACKAGE/root
+    cp -r $SKELETON-dev/* $DPACKAGE/root/
+    cp -r $DISTRO_DIR-dev/* $DPACKAGE/root/
+    cp -r $BUILD/usr/include/hphp $DPACKAGE/root/usr/include/
+    cp -r $BUILD/usr/lib/hphp $DPACKAGE/root/usr/lib/
+    cp -r $BUILD/usr/bin/hphpize $DPACKAGE/root/usr/bin/
+    if [ "$NIGHTLY" = true ]; then
+	perl -pi -e "s/Version:.*/Version: $NIGHTLY_DATE~$RELEASE/" $DPACKAGE/root/DEBIAN/control
+	perl -pi -e "s/Package: hhvm-dev/Package: hhvm-dev-nightly\nConflicts: hhvm-dev\nProvides: hhvm-dev\nReplaces: hhvm-dev" $DPACKAGE/root/DEBIAN/control
+    else
+	perl -pi -e "s/Version:.*/Version: $VERSION~$RELEASE/" $DPACKAGE/root/DEBIAN/control
+    fi
+    sudo chown -R root:root $DPACKAGE/root
+fi
+if [ "$RELEASE" = "trusty" ]; then
+    dpkg -b $DPACKAGE/root/ hhvm_dev_${VERSION}_amd64.deb
+    dpkg-sig -k 452A652F --sign builder $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+fi
 SSH_KEY=/home/ptarjan/.ssh/id_rsa_phraseless
 
 rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/ || true
@@ -192,6 +235,9 @@ fi
 #TODO figure out how the -b options works
 cd $PACKAGE/staging
 reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
+if [ "$RELEASE" = "trusty" ]; then
+    reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+fi
 cd -
 
 RSYNC_OPTS=""
@@ -205,4 +251,4 @@ ssh -i $SSH_KEY hiphop@dl.hhvm.com "/home/hiphop/trigger-hiphop"
 
 # cleanup
 rm -rf $HEADERS $SOURCE
-sudo rm -rf $PACKAGE
+sudo rm -rf $PACKAGE $BUILD $DPACKAGE
