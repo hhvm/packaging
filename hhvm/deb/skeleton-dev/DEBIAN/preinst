@@ -1,8 +1,0 @@
-#!/bin/sh
-
-set -e
-
-if [ -f /etc/init.d/hhvm ]
-then
-	/etc/init.d/hhvm stop
-fi
