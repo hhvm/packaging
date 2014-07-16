@@ -17,7 +17,7 @@ sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20
 git clone git://github.com/facebook/hhvm.git
 
 # libevent
-wget https://github.com/downloads/libevent/libevent/libevent-2.0.21-stable.tar.gz
+wget https://github.com/libevent/libevent/archive/release-2.0.21-stable.tar.gz
 tar -xzvf libevent-2.0.21-stable.tar.gz
 cd libevent-2.0.21-stable
 ./configure --prefix=$CMAKE_PREFIX_PATH
