@@ -205,7 +205,7 @@ if [ ! -d $DPACKAGE/root -a "$RELEASE" = "trusty" ]; then
     cp -r $BUILD/usr/include/hphp $DPACKAGE/root/usr/include/
     cp -r $BUILD/usr/lib/hphp $DPACKAGE/root/usr/lib/
     cp -r $BUILD/usr/bin/hphpize $DPACKAGE/root/usr/bin/
-    chmod 755 $PACKAGE/root/usr/bin/hphpize
+    chmod 755 $DPACKAGE/root/usr/bin/hphpize
     if [ "$NIGHTLY" = true ]; then
         perl -pi -e "s/Version:.*/Version: $NIGHTLY_DATE~$RELEASE/" $DPACKAGE/root/DEBIAN/control
         perl -pi -e "s/Package: hhvm-dev/Package: hhvm-dev-nightly\nConflicts: hhvm-dev\nProvides: hhvm-dev\nReplaces: hhvm-dev/" $DPACKAGE/root/DEBIAN/control
