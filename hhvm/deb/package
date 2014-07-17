@@ -161,7 +161,6 @@ if [ ! -d $PACKAGE/root ]; then
         chmod 755 $PACKAGE/root/usr/bin/hh_server
     fi
     mkdir $PACKAGE/root/usr/share/hhvm/hack/
-    cp -r $SOURCE/hphp/hack/hhi $PACKAGE/root/usr/share/hhvm/hack/
     cp -r $SOURCE/hphp/hack/editor-plugins/emacs $PACKAGE/root/usr/share/hhvm/hack/
     cp -r $SOURCE/hphp/hack/editor-plugins/vim $PACKAGE/root/usr/share/hhvm/hack/
     if [ "$NIGHTLY" = true ]; then
