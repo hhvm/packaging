@@ -37,6 +37,7 @@ hphp/runtime/ext_zend_compat/php-src/main/php_config-linux.h
 hphp/runtime/ext_zend_compat/ftp/ftp.h
 hphp/runtime/ext_zend_compat/ftp/php_ftp.h
 hphp/runtime/ext_zend_compat/oauth/provider.h
+hphp/runtime/ext_zend_compat/php-src/Zend/zend_iterators.h
 hphp/runtime/ext_zend_compat/php-src/main/streams/php_stream_transport.h
 hphp/runtime/ext_zend_compat/php-src/main/streams/php_stream_filter_api.h
 hphp/runtime/ext_zend_compat/php-src/main/streams/php_stream_plain_wrapper.h
