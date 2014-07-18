@@ -1,0 +1,9 @@
+Package: hhvm-dev
+Version:
+Section: web
+Priority: optional
+Architecture: amd64
+Essential: no
+Depends: hhvm, autoconf, automake, binutils-dev, build-essential, cmake, g++, git, libboost-thread-dev, libbz2-dev, libc-client2007e-dev, libcap-dev, libcurl4-openssl-dev, libdwarf-dev, libelf-dev, libgoogle-glog-dev, libicu-dev, libjemalloc-dev, libmemcached-dev, libmysqlclient-dev, libpcre3-dev, libtbb-dev, zlib1g-dev, libevent-dev, libxml2-dev
+Maintainer: Paul Tarjan <pt@fb.com>
+Description: Developer package for the HHVM virtual machine, runtime, and JIT for the PHP language
