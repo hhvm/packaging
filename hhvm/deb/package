@@ -197,7 +197,7 @@ fi
 echo "Packaging dev in $DPACKAGE"
 cd $DPACKAGE
 
-if [ ! -d $DPACKAGE/root -a "$RELEASE" = "trusty" ]; then
+if [ ! -d $DPACKAGE/root ]; then
     mkdir $DPACKAGE/root
     cp -r $SKELETON-dev/* $DPACKAGE/root/
     cp -r $DISTRO_DIR-dev/* $DPACKAGE/root/
@@ -213,10 +213,10 @@ if [ ! -d $DPACKAGE/root -a "$RELEASE" = "trusty" ]; then
     fi
     sudo chown -R root:root $DPACKAGE/root
 fi
-if [ "$RELEASE" = "trusty" ]; then
-    dpkg -b $DPACKAGE/root/ hhvm_dev_${VERSION}_amd64.deb
-    dpkg-sig -k 452A652F --sign builder $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
-fi
+
+dpkg -b $DPACKAGE/root/ hhvm_dev_${VERSION}_amd64.deb
+dpkg-sig -k 452A652F --sign builder $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+
 SSH_KEY=/home/ptarjan/.ssh/id_rsa_phraseless
 
 rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/ || true
@@ -235,9 +235,7 @@ fi
 #TODO figure out how the -b options works
 cd $PACKAGE/staging
 reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
-if [ "$RELEASE" = "trusty" ]; then
-    reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
-fi
+reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
 cd -
 
 RSYNC_OPTS=""
