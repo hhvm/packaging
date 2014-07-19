@@ -197,7 +197,7 @@ fi
 echo "Packaging dev in $DPACKAGE"
 cd $DPACKAGE
 
-if [ ! -d $DPACKAGE/root ]; then
+if [ ! -d $DPACKAGE/root -a "$DEBUG" = false ]; then
     mkdir $DPACKAGE/root
     cp -r $SKELETON-dev/* $DPACKAGE/root/
     cp -r $DISTRO_DIR-dev/* $DPACKAGE/root/
@@ -214,8 +214,10 @@ if [ ! -d $DPACKAGE/root ]; then
     sudo chown -R root:root $DPACKAGE/root
 fi
 
-dpkg -b $DPACKAGE/root/ hhvm_dev_${VERSION}_amd64.deb
-dpkg-sig -k 452A652F --sign builder $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+if [ "$DEBUG" = false ]; then
+    dpkg -b $DPACKAGE/root/ hhvm_dev_${VERSION}_amd64.deb
+    dpkg-sig -k 452A652F --sign builder $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+fi
 
 SSH_KEY=/home/ptarjan/.ssh/id_rsa_phraseless
 
@@ -235,7 +237,9 @@ fi
 #TODO figure out how the -b options works
 cd $PACKAGE/staging
 reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
-reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+if [ "$DEBUG" = false ]; then
+    reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+fi
 cd -
 
 RSYNC_OPTS=""
