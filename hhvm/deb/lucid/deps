@@ -20,6 +20,7 @@ git clone git://github.com/facebook/hhvm.git
 wget https://github.com/libevent/libevent/archive/release-2.0.21-stable.tar.gz
 tar -xzvf release-2.0.21-stable.tar.gz
 cd libevent-release-2.0.21-stable
+./autogen.sh
 ./configure --prefix=$CMAKE_PREFIX_PATH
 make -j
 make install
