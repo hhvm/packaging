@@ -29,6 +29,7 @@ cd ..
 # curl
 git clone git://github.com/bagder/curl.git
 cd curl
+git checkout curl-7_37_1
 ./buildconf
 ./configure --prefix=$CMAKE_PREFIX_PATH
 make -j
