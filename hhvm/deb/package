@@ -96,6 +96,8 @@ if [ ! -d $SOURCE/.git ]; then
         cd -
         sudo cp -d $HEADERS/lib/libjemalloc.so /usr/lib/hhvm/
         sudo cp -d $HEADERS/lib/libjemalloc.so.1 /usr/lib/hhvm/
+
+        EXTRA_CMAKE_FLAGS="-DSTATIC_CXX_LIB=On"
     fi
 
     if [ -f $DISTRO_DIR/deps ]; then
