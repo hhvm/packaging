@@ -239,15 +239,17 @@ rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/s
 rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/
 
 # these take up too much space
-if [ "$NIGHTLY" = true -a "$DEVONLY" = false ]; then
-    if [ "$DEBUG" = true ]; then
-        rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}-dbg/*${RELEASE}*.deb || true
+if [ "$NIGHTLY" = true ]; then
+    if [ "$DEVONLY" = false ]; then
+        if [ "$DEBUG" = true ]; then
+            rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}-dbg/*${RELEASE}*.deb || true
+        else
+            rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}/*${RELEASE}*.deb || true
+        fi
     else
-        rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}/*${RELEASE}*.deb || true
-    fi
-else
-    if [ "$DEBUG" = false ]; then
-        rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}/*dev*${RELEASE}*.deb || true
+        if [ "$DEBUG" = false ]; then
+            rm $nPACKAGE/staging/pool/main/h/hhvm-${VERSION}/*dev*${RELEASE}*.deb || true
+        fi
     fi
 fi
 
