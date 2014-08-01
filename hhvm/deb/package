@@ -248,7 +248,7 @@ if [ "$NIGHTLY" = true ]; then
         fi
     else
         if [ "$DEBUG" = false ]; then
-            rm $nPACKAGE/staging/pool/main/h/hhvm-${VERSION}/*dev*${RELEASE}*.deb || true
+            rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}/*dev*${RELEASE}*.deb || true
         fi
     fi
 fi
