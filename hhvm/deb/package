@@ -43,7 +43,6 @@ if [ `echo $VERSION | grep '^nightly.*'` ]; then
 fi
 if [ `echo $VERSION | grep '.*-dev$'` ]; then
     DEVONLY=true
-    DEBUG=false
     VERSION=`echo $VERSION | cut -d '-' -f 1`
     echo "Dev only, Debug off"
 fi
