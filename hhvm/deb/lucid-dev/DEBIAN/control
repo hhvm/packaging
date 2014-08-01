@@ -1,4 +1,4 @@
-Package: hhvm
+Package: hhvm-dev
 Version:
 Section: web
 Priority: optional
