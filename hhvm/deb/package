@@ -246,7 +246,6 @@ if [ "$DEVONLY" = true ]; then
     echo "repreproing dev package"
     reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
 else
-    # these take up too much space
     if [ "$NIGHTLY" = true ]; then
         if [ "$DEBUG" = true ]; then
             rm pool/main/h/hhvm-${VERSION}-dbg/*${RELEASE}*.deb || true
