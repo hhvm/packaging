@@ -187,6 +187,7 @@ if [ ! -d $PACKAGE/root ]; then
     sudo chown -R root:root $PACKAGE/root
     sudo chown -R www-data:www-data $PACKAGE/root/var/log/hhvm/
     sudo chown -R www-data:www-data $PACKAGE/root/var/run/hhvm/
+    echo "finished creating hhvm package contents"
 fi
 
 dpkg -b $PACKAGE/root/ hhvm_${VERSION}_amd64.deb
@@ -196,27 +197,28 @@ if [ -z "$DPACKAGE" -o ! -d "$DPACKAGE" ]; then
     DPACKAGE=`mktemp -d`
 fi
 
-echo "Packaging dev in $DPACKAGE"
-cd $DPACKAGE
-
-if [ ! -d $DPACKAGE/root -a "$DEBUG" = false ]; then
-    mkdir $DPACKAGE/root
-    cp -r $SKELETON-dev/* $DPACKAGE/root/
-    cp -r $DISTRO_DIR-dev/* $DPACKAGE/root/
-    cp -r $BUILD/usr/include/hphp $DPACKAGE/root/usr/include/
-    cp -r $BUILD/usr/lib/hphp $DPACKAGE/root/usr/lib/
-    cp -r $BUILD/usr/bin/hphpize $DPACKAGE/root/usr/bin/
-    chmod 755 $DPACKAGE/root/usr/bin/hphpize
-    if [ "$NIGHTLY" = true ]; then
-        perl -pi -e "s/Version:.*/Version: $NIGHTLY_DATE~$RELEASE/" $DPACKAGE/root/DEBIAN/control
-        perl -pi -e "s/Package: hhvm-dev/Package: hhvm-dev-nightly\nConflicts: hhvm-dev\nProvides: hhvm-dev\nReplaces: hhvm-dev/" $DPACKAGE/root/DEBIAN/control
-    else
-        perl -pi -e "s/Version:.*/Version: $VERSION~$RELEASE/" $DPACKAGE/root/DEBIAN/control
-    fi
-    sudo chown -R root:root $DPACKAGE/root
-fi
-
 if [ "$DEBUG" = false ]; then
+    echo "Packaging dev in $DPACKAGE"
+    cd $DPACKAGE
+
+    if [ ! -d $DPACKAGE/root ]; then
+        mkdir $DPACKAGE/root
+        cp -r $SKELETON-dev/* $DPACKAGE/root/
+        cp -r $DISTRO_DIR-dev/* $DPACKAGE/root/
+        cp -r $BUILD/usr/include/hphp $DPACKAGE/root/usr/include/
+        cp -r $BUILD/usr/lib/hphp $DPACKAGE/root/usr/lib/
+        cp -r $BUILD/usr/bin/hphpize $DPACKAGE/root/usr/bin/
+        chmod 755 $DPACKAGE/root/usr/bin/hphpize
+        if [ "$NIGHTLY" = true ]; then
+            perl -pi -e "s/Version:.*/Version: $NIGHTLY_DATE~$RELEASE/" $DPACKAGE/root/DEBIAN/control
+            perl -pi -e "s/Package: hhvm-dev/Package: hhvm-dev-nightly\nConflicts: hhvm-dev\nProvides: hhvm-dev\nReplaces: hhvm-dev/" $DPACKAGE/root/DEBIAN/control
+        else
+            perl -pi -e "s/Version:.*/Version: $VERSION~$RELEASE/" $DPACKAGE/root/DEBIAN/control
+        fi
+        sudo chown -R root:root $DPACKAGE/root
+        echo "finished creating dev package contents"
+    fi
+
     dpkg -b $DPACKAGE/root/ hhvm_dev_${VERSION}_amd64.deb
     dpkg-sig -k 452A652F --sign builder $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
 fi
@@ -240,6 +242,7 @@ fi
 cd $PACKAGE/staging
 reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
 if [ "$DEBUG" = false ]; then
+    echo "repreproing dev package"
     reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
 fi
 cd -
