@@ -41,7 +41,7 @@ if [ `echo $VERSION | grep '^nightly.*'` ]; then
     NIGHTLY=true
     echo "Nightly"
 fi
-if [ `echo $VERSION | grep '.*-dev$'` ]; then
+if [ `echo $VERSION | grep '.*-dev*'` ]; then
     DEVONLY=true
     VERSION=`echo $VERSION | cut -d '-' -f 1`
     echo "Dev only, Debug off"
