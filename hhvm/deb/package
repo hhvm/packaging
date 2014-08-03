@@ -206,7 +206,8 @@ if [ "$DEBUG" = false ]; then
         cp -r $SKELETON-dev/* $DPACKAGE/root/
         cp -r $DISTRO_DIR-dev/* $DPACKAGE/root/
         cp -r $BUILD/usr/include/hphp $DPACKAGE/root/usr/include/
-        cp -r $BUILD/usr/lib/hphp $DPACKAGE/root/usr/lib/
+        LIBDIR=`ls $BUILD | grep lib`
+        rsync -r $BUILD/${LIBDIR}/hphp $DPACKAGE/root/usr/${LIBDIR}/
         cp -r $BUILD/usr/bin/hphpize $DPACKAGE/root/usr/bin/
         chmod 755 $DPACKAGE/root/usr/bin/hphpize
         if [ "$NIGHTLY" = true ]; then
