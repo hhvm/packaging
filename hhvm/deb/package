@@ -24,6 +24,7 @@ NIGHTLY_DATE=`date +%Y.%m.%d`
 EXTRA_CMAKE_FLAGS=""
 NIGHTLY=false
 DEBUG=false
+DEVONLY=false
 
 if [ ! -d $DISTRO_DIR ]; then
     echo "directory $DISTRO_DIR doesn't exist"
@@ -39,6 +40,11 @@ fi
 if [ `echo $VERSION | grep '^nightly.*'` ]; then
     NIGHTLY=true
     echo "Nightly"
+fi
+if [ `echo $VERSION | grep '.*-dev*'` ]; then
+    DEVONLY=true
+    VERSION=`echo $VERSION | cut -d '-' -f 1`
+    echo "Dev only, Debug off"
 fi
 if [ `echo $VERSION | grep '.*-dbg$'` ]; then
     DEBUG=true
@@ -232,21 +238,29 @@ rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/s
 # do it twice since it takes so long something else might have pushed
 rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/
 
-# these take up too much space
-if [ "$NIGHTLY" = true ]; then
-    if [ "$DEBUG" = true ]; then
-        rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}-dbg/*${RELEASE}*.deb || true
-    else
-        rm $PACKAGE/staging/pool/main/h/hhvm-${VERSION}/*${RELEASE}*.deb || true
-    fi
-fi
-
-#TODO figure out how the -b options works
 cd $PACKAGE/staging
-reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
-if [ "$DEBUG" = false ]; then
+if [ "$DEVONLY" = true ]; then
+    # these take up too much space
+    if [ "$NIGHTLY" = true]; then
+        rm pool/main/h/hhvm-${VERSION}/*dev*${RELEASE}*.deb || true
+    fi
     echo "repreproing dev package"
     reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+else
+    if [ "$NIGHTLY" = true ]; then
+        if [ "$DEBUG" = true ]; then
+            rm pool/main/h/hhvm-${VERSION}-dbg/*${RELEASE}*.deb || true
+        else
+            rm pool/main/h/hhvm-${VERSION}/*${RELEASE}*.deb || true
+        fi
+    fi
+
+    #TODO figure out how the -b options works
+    reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
+    if [ "$DEBUG" = false ]; then
+        echo "repreproing dev package"
+        reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+    fi
 fi
 cd -
 
