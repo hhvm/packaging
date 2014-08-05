@@ -207,7 +207,7 @@ if [ "$DEBUG" = false ]; then
         cp -r $DISTRO_DIR-dev/* $DPACKAGE/root/
         cp -r $BUILD/usr/include/hphp $DPACKAGE/root/usr/include/
         # this should give us the lib/<architecture> of the machine we are on
-        ARCH=`dpkg-architecture -qDEB_BUILD_MULTIARCH`
+        ARCH=`dpkg-architecture -qDEB_BUILD_GNU_TYPE`
         mkdir --parents $BUILD/usr/lib/$ARCH
         cp -r $BUILD/usr/lib/$ARCH/hhvm $DPACKAGE/root/usr/lib/$ARCH/
         cp -r $BUILD/usr/bin/hphpize $DPACKAGE/root/usr/bin/
