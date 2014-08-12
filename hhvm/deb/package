@@ -214,7 +214,7 @@ if [ "$DEBUG" = false ]; then
         cp -r $BUILD/usr/include/hphp $DPACKAGE/root/usr/include/
         # cmake 2.8.7 does not support debian multiarch
         cmake --version | grep --quiet "2\.8\.7"
-        if [ $? -o "$RELEASE" = "precise" ]; then
+        if [ $? = true -o "$RELEASE" = "lucid" ]; then
             echo "cmake is version 2.8.7. building lib files into lib"
             mkdir --parents $BUILD/usr/lib
             cp -r $BUILD/usr/lib/hhvm $DPACKAGE/root/usr/lib/hhvm
