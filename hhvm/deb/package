@@ -212,17 +212,16 @@ if [ "$DEBUG" = false ]; then
         cp -r $SKELETON-dev/* $DPACKAGE/root/
         cp -r $DISTRO_DIR-dev/* $DPACKAGE/root/
         cp -r $BUILD/usr/include/hphp $DPACKAGE/root/usr/include/
-        # cmake 2.8.7 does not support debian multiarch
-        cmake --version | grep --quiet "2\.8\.7"
-        if [ $? = true -o "$RELEASE" = "lucid" ]; then
+        # cmake 2.8.7 does not support debian multiarch and lucid is too old
+        if cmake --version | grep --quiet "2\.8\.7" || test "$RELEASE" = "lucid"; then
             echo "cmake is version 2.8.7. building lib files into lib"
-            mkdir --parents $DPACKAGE/usr/lib
+            mkdir --parents $DPACKAGE/root/usr/lib
             cp -r $BUILD/usr/lib/hhvm $DPACKAGE/root/usr/lib/hhvm
         else
             # this should give us the lib/<architecture> of the machine we are on
             ARCH=`dpkg-architecture -qDEB_BUILD_GNU_TYPE`
             echo "cmake is not 2.8.7. building lib files into lib/$ARCH"
-            mkdir --parents $DPACKAGE/usr/lib/$ARCH
+            mkdir --parents $DPACKAGE/root/usr/lib/$ARCH
             cp -r $BUILD/usr/lib/$ARCH/hhvm $DPACKAGE/root/usr/lib/$ARCH/hhvm
         fi
         cp -r $BUILD/usr/bin/hphpize $DPACKAGE/root/usr/bin/
