@@ -1,0 +1,87 @@
+#!/bin/bash
+#
+#	/etc/rc.d/init.d/hhvm
+#
+# Starts the hhvm daemon
+#
+# chkconfig: 345 26 74
+# description: HHVM (aka the HipHop Virtual Machine) is an open-source virtual machine designed for executing programs written in Hack and PHP
+# processname: hhvm
+
+### BEGIN INIT INFO
+# Provides: hhvm
+# Required-Start: $local_fs
+# Required-Stop: $local_fs
+# Default-Start:  2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop hhvm
+# Description: HHVM (aka the HipHop Virtual Machine) is an open-source virtual machine designed for executing programs written in Hack and PHP
+### END INIT INFO
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+prog="hhvm"
+lockfile="/var/lock/subsys/hhvm"
+RUN_AS_USER="apache"
+CONFIG_FILE="/etc/hhvm/server.ini"
+ADDITIONAL_ARGS=""
+PIDFILE="/var/run/hhvm.pid"
+
+[ -f /etc/sysconfig/hhvm ] && . /etc/sysconfig/hhvm
+
+start() {
+	test -x /usr/bin/hhvm || exit 0
+	echo -n $"Starting $prog: "
+        daemon hhvm --config $CONFIG_FILE -d pid=$PIDFILE --user $RUN_AS_USER --mode daemon $ADDITIONAL_ARGS
+        retval=$?
+        echo
+        [ $retval -eq 0 ] && touch $lockfile
+        return $retval
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc $prog -TERM
+    retval=$?
+    if [ $retval -eq 0 ]; then
+        if [ "$CONSOLETYPE" != "serial" ]; then
+           echo -en "\\033[16G"
+        fi
+        rm -f $lockfile
+    fi
+    echo
+    return $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+rh_status() {
+    status $prog
+}
+
+case "$1" in
+  start)
+	$1
+        ;;
+  stop)
+        $1
+        ;;
+
+  restart)
+        $1
+        ;;
+
+  status)
+        rh_$1
+        ;;
+
+  *)
+        echo "Usage: /etc/init.d/hhvm {start|stop|restart|status}"
+        exit 1
+esac
+
+exit 0
