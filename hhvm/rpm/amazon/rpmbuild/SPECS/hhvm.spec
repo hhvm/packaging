@@ -1,14 +1,14 @@
 %define debug_package %{nil}
-%global commit 32574d90c536f361dde4e66389b0ea6960809461
-%global commitdate 20140909
+%global commit 46e69b6c2402a19478f263336a6cb35057f40a19
+%global commitdate 20140918
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global owner facebook
 %global project hhvm
-%global build_version 1
+%global build_version 2
 
 Name: hhvm
-Summary: HHVM is a new open-source virtual machine designed for executing programs written in PHP. HHVM uses a just-in-time (JIT) compilation approach to achieve superior performance while maintaining the flexibility that PHP developers are accustomed to.  http://hhvm.com
 Version: 3.3.0
+Summary: HHVM is a new open-source virtual machine designed for executing programs written in PHP. HHVM uses a just-in-time (JIT) compilation approach to achieve superior performance while maintaining the flexibility that PHP developers are accustomed to.  http://hhvm.com
 Release: %{build_version}.%{commitdate}git%{shortcommit}%{?dist}
 License: GPL
 Group: Development/Compilers
@@ -130,6 +130,10 @@ rm -rf $RPM_BUILD_ROOT/%{_libdir}
 
 
 %changelog
+* Fri Sep 19 2014 Ilya Ivanov <burner1024 @ github>
+ - Update to commit 46e69b6c2402a19478f263336a6cb35057f40a19
+ - Move repo.central.path to /tmp by default to avoid denied file permissions
+
 * Thu Sep 11 2014 Ilya Ivanov <burner1024 @ github>
  - Adapt for Amazon Linux
  - Release 3.3.0
