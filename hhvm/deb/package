@@ -89,7 +89,7 @@ if [ ! -d $SOURCE/.git ]; then
         sudo cp -d $HEADERS/lib/libglog.so.0 /usr/lib/hhvm/
         sudo cp -d $HEADERS/lib/libglog.so.0.0.0 /usr/lib/hhvm/
     fi
-    if [ "$RELEASE" = "precise" ]; then
+    if [ "$RELEASE" = "precise" -o "$RELEASE" = "wheezy" ]; then
         sudo ln -sf /usr/lib/hhvm/libjemalloc.so.1 /usr/lib/hhvm/libjemalloc.so
         cd $HEADERS
         wget http://www.canonware.com/download/jemalloc/jemalloc-3.6.0.tar.bz2
