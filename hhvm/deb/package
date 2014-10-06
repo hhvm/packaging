@@ -4,8 +4,10 @@ export PATH=$PATH:/usr/local/bin/
 
 if [ "$#" -le 2 ]; then
     echo "$0 DISTRO_NAME RELEASE VERSION [SOURCE_DIR] [PACKAGE_DIR] [BUILD_DIR] [DEV_PACKAGE_DIR]"
-    echo "for example"
-    echo "$0 ubuntu precise 2.3.0"
+    echo "  for example, stable:"
+    echo "    $0 ubuntu precise 3.3.0-1"
+    echo "  or nightly:"
+    echo "    $0 debian jessie 3.4.0-nightly"
     exit
 fi
 
@@ -15,6 +17,7 @@ DISTRO_NAME=$1
 RELEASE=$2
 DISTRO_DIR=$DIR/$RELEASE
 VERSION=$3
+HHVM_VERSION=`echo $VERSION | cut -d '-' -f 1`
 SOURCE=$4
 SKELETON=$DIR/skeleton
 PACKAGE=$5
@@ -37,11 +40,18 @@ if [ -z "$SOURCE" -o ! -d "$SOURCE" ]; then
     SOURCE=`mktemp -d`
 fi
 
-if [ `echo $VERSION | grep '^nightly.*'` ]; then
+if [ `echo $VERSION | grep '.*-nightly.*'` ]; then
     NIGHTLY=true
     echo "Nightly"
 fi
-if [ `echo $VERSION | grep '.*-dev*'` ]; then
+if [ "$NIGHTLY" = true ]; then
+	GIT_TARGET=master
+	PACKAGE_VERSION=$NIGHTLY_DATE~$RELEASE
+else
+	GIT_TARGET=HHVM-$HHVM_VERSION
+	PACKAGE_VERSION=`echo $VERSION | sed -E 's/-(dbg|dev)$//'`~$RELEASE
+fi
+if [ `echo $VERSION | grep '.*-dev$'` ]; then
     DEVONLY=true
     VERSION=`echo $VERSION | cut -d '-' -f 1`
     echo "Dev only, Debug off"
@@ -59,16 +69,15 @@ fi
 cd $SOURCE
 if [ ! -d $SOURCE/.git ]; then
     git clone https://github.com/facebook/hhvm.git $SOURCE
+    git checkout $GIT_TARGET
+
+    if ! grep -q $HHVM_VERSION hphp/system/idl/constants.idl.json; then
+        echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
+        exit
+    fi
 
     if [ "$NIGHTLY" = true ]; then
-        git checkout master
-        perl -pi -e 's/([0-9.]*-dev)/\1+'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
-    else
-        git checkout HHVM-$VERSION
-        if ! grep -q $VERSION hphp/system/idl/constants.idl.json; then
-            echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
-            exit
-        fi
+        perl -pi -e 's/([0-9.]*-dev)/\1~nightly.'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
     fi
 
     # After the checkout since the submodules might be different between versions
@@ -140,11 +149,7 @@ if [ ! -f $BUILD/usr/bin/hphpize ]; then
 fi
 
 echo "Checking version"
-if [ "$NIGHTLY" = true ]; then
-    $SOURCE/hphp/hhvm/hhvm --version | grep -q $NIGHTLY_DATE
-else
-    $SOURCE/hphp/hhvm/hhvm --version | grep -q $VERSION
-fi
+$SOURCE/hphp/hhvm/hhvm --version | grep -q $HHVM_VERSION
 
 if [ -z "$PACKAGE" -o ! -d "$PACKAGE" ]; then
     PACKAGE=`mktemp -d`
@@ -171,11 +176,12 @@ if [ ! -d $PACKAGE/root ]; then
     mkdir $PACKAGE/root/usr/share/hhvm/hack/
     cp -r $SOURCE/hphp/hack/editor-plugins/emacs $PACKAGE/root/usr/share/hhvm/hack/
     cp -r $SOURCE/hphp/hack/editor-plugins/vim $PACKAGE/root/usr/share/hhvm/hack/
+
     if [ "$NIGHTLY" = true ]; then
         perl -pi -e "s/Conflicts: .*\n//" $PACKAGE/root/DEBIAN/control
         perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
         perl -pi -e "s/Replaces: .*\n//" $PACKAGE/root/DEBIAN/control
-        perl -pi -e "s/Version:.*/Version: $NIGHTLY_DATE~$RELEASE/" $PACKAGE/root/DEBIAN/control
+        perl -pi -e "s/Version:.*/Version: $PACKAGE_VERSION/" $PACKAGE/root/DEBIAN/control
         if [ "$DEBUG" = true ]; then
             perl -pi -e "s/Package: hhvm/Package: hhvm-nightly-dbg\nConflicts: hhvm, hhvm-nightly, hhvm-dbg\nProvides: hhvm\nReplaces: hhvm, hhvm-nightly, hhvm-dbg/" $PACKAGE/root/DEBIAN/control
         else
@@ -188,7 +194,7 @@ if [ ! -d $PACKAGE/root ]; then
             perl -pi -e "s/Replaces: .*\n//" $PACKAGE/root/DEBIAN/control
             perl -pi -e "s/Package: hhvm/Package: hhvm-dbg\nConflicts: hhvm\nProvides: hhvm\nReplaces: hhvm/" $PACKAGE/root/DEBIAN/control
         fi
-        perl -pi -e "s/Version:.*/Version: $VERSION~$RELEASE/" $PACKAGE/root/DEBIAN/control
+        perl -pi -e "s/Version:.*/Version: $PACKAGE_VERSION/" $PACKAGE/root/DEBIAN/control
     fi
     sudo chown -R root:root $PACKAGE/root
     sudo chown -R www-data:www-data $PACKAGE/root/var/log/hhvm/
@@ -196,8 +202,8 @@ if [ ! -d $PACKAGE/root ]; then
     echo "finished creating hhvm package contents"
 fi
 
-dpkg -b $PACKAGE/root/ hhvm_${VERSION}_amd64.deb
-dpkg-sig -k 452A652F --sign builder $PACKAGE/hhvm_${VERSION}_amd64.deb
+dpkg -b $PACKAGE/root/ hhvm_${PACKAGE_VERSION}_amd64.deb
+dpkg-sig -k 452A652F --sign builder $PACKAGE/hhvm_${PACKAGE_VERSION}_amd64.deb
 
 if [ -z "$DPACKAGE" -o ! -d "$DPACKAGE" ]; then
     DPACKAGE=`mktemp -d`
@@ -226,18 +232,16 @@ if [ "$DEBUG" = false ]; then
         fi
         cp -r $BUILD/usr/bin/hphpize $DPACKAGE/root/usr/bin/
         chmod 755 $DPACKAGE/root/usr/bin/hphpize
+        perl -pi -e "s/Version:.*/Version: $PACKAGE_VERSION/" $DPACKAGE/root/DEBIAN/control
         if [ "$NIGHTLY" = true ]; then
-            perl -pi -e "s/Version:.*/Version: $NIGHTLY_DATE~$RELEASE/" $DPACKAGE/root/DEBIAN/control
             perl -pi -e "s/Package: hhvm-dev/Package: hhvm-dev-nightly\nConflicts: hhvm-dev\nProvides: hhvm-dev\nReplaces: hhvm-dev/" $DPACKAGE/root/DEBIAN/control
-        else
-            perl -pi -e "s/Version:.*/Version: $VERSION~$RELEASE/" $DPACKAGE/root/DEBIAN/control
         fi
         sudo chown -R root:root $DPACKAGE/root
         echo "finished creating dev package contents"
     fi
 
-    dpkg -b $DPACKAGE/root/ hhvm_dev_${VERSION}_amd64.deb
-    dpkg-sig -k 452A652F --sign builder $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+    dpkg -b $DPACKAGE/root/ hhvm_dev_${PACKAGE_VERSION}_amd64.deb
+    dpkg-sig -k 452A652F --sign builder $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
 fi
 
 SSH_KEY=/home/ptarjan/.ssh/id_rsa_phraseless
@@ -250,24 +254,24 @@ cd $PACKAGE/staging
 if [ "$DEVONLY" = true ]; then
     # these take up too much space
     if [ "$NIGHTLY" = true]; then
-        rm pool/main/h/hhvm-${VERSION}/*dev*${RELEASE}*.deb || true
+        rm pool/main/h/hhvm-dev-nightly/*dev*${RELEASE}*.deb || true
     fi
     echo "repreproing dev package"
-    reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+    reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
 else
     if [ "$NIGHTLY" = true ]; then
         if [ "$DEBUG" = true ]; then
-            rm pool/main/h/hhvm-${VERSION}-dbg/*${RELEASE}*.deb || true
+            rm pool/main/h/hhvm-nightly-dbg/*${RELEASE}*.deb || true
         else
-            rm pool/main/h/hhvm-${VERSION}/*${RELEASE}*.deb || true
+            rm pool/main/h/hhvm-nightly/*${RELEASE}*.deb || true
         fi
     fi
 
     #TODO figure out how the -b options works
-    reprepro includedeb $RELEASE $PACKAGE/hhvm_${VERSION}_amd64.deb
+    reprepro includedeb $RELEASE $PACKAGE/hhvm_${PACKAGE_VERSION}_amd64.deb
     if [ "$DEBUG" = false ]; then
         echo "repreproing dev package"
-        reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${VERSION}_amd64.deb
+        reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
     fi
 fi
 cd -
