@@ -70,6 +70,12 @@ cd $SOURCE
 if [ ! -d $SOURCE/.git ]; then
     git clone https://github.com/facebook/hhvm.git $SOURCE
     git checkout $GIT_TARGET
+   
+    # Things that stupidly weren't in the release but we can't re-tag.
+    # Make sure they're on the branch so we can kill them on the next release. 
+    if [ "$RELEASE" = "lucid" ]; then
+      git cherry-pick 774f79f947ef35a73e92d3fe2ce2e4ea83174a58 || true
+    fi
 
     if ! grep -q $HHVM_VERSION hphp/system/idl/constants.idl.json; then
         echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
