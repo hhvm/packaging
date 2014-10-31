@@ -76,9 +76,6 @@ if [ ! -d $SOURCE/.git ]; then
     if [ "$RELEASE" = "lucid" ]; then
       git cherry-pick 774f79f947ef35a73e92d3fe2ce2e4ea83174a58 || true
     fi
-    if [ "$RELEASE" = "jessie" ]; then
-      git cherry-pick 5b8c73ab2bfb31d29d52c7bdba28bc58ba1dd066 || true
-    fi
 
     if ! grep -q $HHVM_VERSION hphp/system/idl/constants.idl.json; then
         echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
