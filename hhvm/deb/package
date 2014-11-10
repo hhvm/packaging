@@ -250,7 +250,7 @@ if [ "$DEBUG" = false ]; then
     dpkg-sig -k 452A652F --sign builder $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
 fi
 
-SSH_KEY=/home/ptarjan/.ssh/id_rsa_phraseless
+SSH_KEY=$HOME/.ssh/id_rsa_phraseless
 
 rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/ || true
 # do it twice since it takes so long something else might have pushed
