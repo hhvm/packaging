@@ -257,12 +257,14 @@ if [ "$DEBUG" = false ]; then
 fi
 
 SSH_KEY=$HOME/.ssh/id_rsa_phraseless
+STAGING=/var/tmp/staging/$DISTRO_NAME/
 
-rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/ || true
+mkdir -p $STAGING
+rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $STAGING || true
 # do it twice since it takes so long something else might have pushed
-rsync -avz -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $PACKAGE/staging/
+rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $STAGING
 
-cd $PACKAGE/staging
+cd $STAGING
 if [ "$DEVONLY" = true ]; then
     # these take up too much space
     if [ "$NIGHTLY" = true]; then
@@ -294,7 +296,7 @@ if [ "$NIGHTLY" = true ]; then
     RSYNC_OPTS="--delete"
 fi
 
-rsync $RSYNC_OPTS -avz -e "ssh -i $SSH_KEY" $PACKAGE/staging/ hiphop@dl.hhvm.com:data/$DISTRO_NAME/
+rsync $RSYNC_OPTS -av -e "ssh -i $SSH_KEY" $STAGING hiphop@dl.hhvm.com:data/$DISTRO_NAME/
 ssh -i $SSH_KEY hiphop@dl.hhvm.com "/home/hiphop/trigger-hiphop"
 
 # cleanup
