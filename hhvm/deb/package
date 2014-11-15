@@ -264,6 +264,8 @@ rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $S
 # do it twice since it takes so long something else might have pushed
 rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $STAGING
 
+REPREPRO="reprepro --keepunreferencedfiles --keepunusednewfiles includedeb $RELEASE"
+
 cd $STAGING
 if [ "$DEVONLY" = true ]; then
     # these take up too much space
@@ -271,7 +273,7 @@ if [ "$DEVONLY" = true ]; then
         rm pool/main/h/hhvm-dev-nightly/*dev*${RELEASE}*.deb || true
     fi
     echo "repreproing dev package"
-    reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
+    $REPREPRO $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
 else
     if [ "$NIGHTLY" = true ]; then
         if [ "$DEBUG" = true ]; then
@@ -282,10 +284,10 @@ else
     fi
 
     #TODO figure out how the -b options works
-    reprepro includedeb $RELEASE $PACKAGE/hhvm_${PACKAGE_VERSION}_amd64.deb
+    $REPREPRO $PACKAGE/hhvm_${PACKAGE_VERSION}_amd64.deb
     if [ "$DEBUG" = false ]; then
         echo "repreproing dev package"
-        reprepro includedeb $RELEASE $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
+        $REPREPRO $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
     fi
 fi
 cd -
