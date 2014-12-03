@@ -5,6 +5,6 @@ Priority: optional
 Architecture: amd64
 Essential: no
 Recommends: hhvm
-Depends: git-core, automake, cmake, libmysqlclient-dev, libxml2-dev, libicu-dev, build-essential, binutils-dev, libcap-dev, zlib1g-dev, libonig-dev, libpcre3-dev, autoconf, libtool, libcurl4-openssl-dev, libmemcached-dev, libbz2-dev, libc-client2007e-dev, libelf-dev, libdwarf-dev, subversion, libtbb2, libtbb-dev, g++-4.7, gcc-4.7, libjemalloc-dev, g++, cpp, gcc, make, libgd2-xpm-dev, libboost-thread-dev, libevent-dev, libldap2-dev
+Depends: git-core, automake, cmake, libmysqlclient-dev, libxml2-dev, libicu-dev, build-essential, binutils-dev, libcap-dev, zlib1g-dev, libonig-dev, libpcre3-dev, autoconf, libtool, libcurl4-openssl-dev, libmemcached-dev, libbz2-dev, libc-client2007e-dev, libelf-dev, libdwarf-dev, subversion, libtbb2, libtbb-dev, g++-4.9, gcc-4.9, libjemalloc-dev, g++, cpp, gcc, make, libgd2-xpm-dev, libboost-thread-dev, libevent-dev, libldap2-dev
 Maintainer: Paul Tarjan <pt@fb.com>
 Description: Developer package for the HHVM virtual machine, runtime, and JIT for the PHP language
