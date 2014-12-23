@@ -76,6 +76,10 @@ if [ ! -d $SOURCE/.git ]; then
     if [ "$RELEASE" = "lucid" ]; then
       git cherry-pick 774f79f947ef35a73e92d3fe2ce2e4ea83174a58 || true
     fi
+    if [ "$VERSION" = "3.3.2" ]; then
+      # 3.3.2 fails "make install", whoops...
+      git cherry-pick 97d032ecf4eab6767e333cdcc395c2508a228eb4
+    fi
 
     if ! grep -q $HHVM_VERSION hphp/system/idl/constants.idl.json; then
         echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
