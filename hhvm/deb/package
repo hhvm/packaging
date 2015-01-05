@@ -79,6 +79,10 @@ if [ ! -d $SOURCE/.git ]; then
     if [ "$VERSION" = "3.3.2" ]; then
       # 3.3.2 fails "make install", whoops...
       git cherry-pick 97d032ecf4eab6767e333cdcc395c2508a228eb4
+      if [ "$RELEASE" = "jessie" ]; then
+        # jessie changed the way ImageMagick worked, fix got in too late
+        git cherry-pick 26c2a06a09441bbcd2def473fe394865fab6ece8
+      fi
     fi
 
     if ! grep -q $HHVM_VERSION hphp/system/idl/constants.idl.json; then
