@@ -16,8 +16,9 @@ DIR=`readlink -m $DIR`
 DISTRO_NAME=$1
 RELEASE=$2
 DISTRO_DIR=$DIR/$RELEASE
-VERSION=$3
-HHVM_VERSION=`echo $VERSION | cut -d '-' -f 1`
+VERSION=$3 # Version of deb we are building, including minor revision (if applicable), e.g., 3.3.2-1
+HHVM_VERSION=`echo $VERSION | cut -d '-' -f 1` # Version without minor revision, e.g., 3.3.2
+STABLE_VERSION=`echo $VERSION | cut -d '.' -f 1-2` # Stable version series, e.g., 3.3
 SOURCE=$4
 SKELETON=$DIR/skeleton
 PACKAGE=$5
@@ -28,6 +29,7 @@ EXTRA_CMAKE_FLAGS=""
 NIGHTLY=false
 DEBUG=false
 DEVONLY=false
+LTS=false
 
 if [ ! -d $DISTRO_DIR ]; then
     echo "directory $DISTRO_DIR doesn't exist"
@@ -45,11 +47,17 @@ if [ `echo $VERSION | grep '.*-nightly.*'` ]; then
     echo "Nightly"
 fi
 if [ "$NIGHTLY" = true ]; then
-	GIT_TARGET=master
-	PACKAGE_VERSION=$NIGHTLY_DATE~$RELEASE
+    GIT_TARGET=master
+    PACKAGE_VERSION=$NIGHTLY_DATE~$RELEASE
 else
-	GIT_TARGET=HHVM-$HHVM_VERSION
-	PACKAGE_VERSION=`echo $VERSION | sed -E 's/-(dbg|dev)$//'`~$RELEASE
+    GIT_TARGET=HHVM-$HHVM_VERSION
+    PACKAGE_VERSION=`echo $VERSION | sed -E 's/-(dbg|dev)$//'`~$RELEASE
+    case $STABLE_VERSION in
+        3.3 | 3.6)
+            LTS=true
+            echo "LTS"
+            ;;
+    esac
 fi
 if [ `echo $VERSION | grep '.*-dev$'` ]; then
     DEVONLY=true
@@ -272,16 +280,19 @@ rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $S
 # do it twice since it takes so long something else might have pushed
 rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $STAGING
 
-REPREPRO="reprepro --keepunreferencedfiles --keepunusednewfiles includedeb $RELEASE"
+REPREPRO="reprepro --keepunreferencedfiles --keepunusednewfiles includedeb"
 
 cd $STAGING
 if [ "$DEVONLY" = true ]; then
     # these take up too much space
-    if [ "$NIGHTLY" = true]; then
+    if [ "$NIGHTLY" = true ]; then
         rm pool/main/h/hhvm-dev-nightly/*dev*${RELEASE}*.deb || true
     fi
     echo "repreproing dev package"
-    $REPREPRO $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
+    $REPREPRO $RELEASE $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
+    if [ "$LTS" = true ]; then
+        $REPREPRO $RELEASE-lts-$STABLE_VERSION $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
+    fi
 else
     if [ "$NIGHTLY" = true ]; then
         if [ "$DEBUG" = true ]; then
@@ -292,10 +303,16 @@ else
     fi
 
     #TODO figure out how the -b options works
-    $REPREPRO $PACKAGE/hhvm_${PACKAGE_VERSION}_amd64.deb
+    $REPREPRO $RELEASE $PACKAGE/hhvm_${PACKAGE_VERSION}_amd64.deb
+    if [ "$LTS" = true ]; then
+        $REPREPRO $RELEASE-lts-$STABLE_VERSION $PACKAGE/hhvm_${PACKAGE_VERSION}_amd64.deb
+    fi
     if [ "$DEBUG" = false ]; then
         echo "repreproing dev package"
-        $REPREPRO $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
+        $REPREPRO $RELEASE $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
+        if [ "$LTS" = true ]; then
+            $REPREPRO $RELEASE-lts-$STABLE_VERSION $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
+        fi
     fi
 fi
 cd -
