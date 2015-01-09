@@ -1,0 +1,60 @@
+#!/bin/sh
+set -e
+export PATH=$PATH:/usr/local/bin/
+
+if [ "$#" -lt 1 ]; then
+    echo "$0 VERSION [SOURCE_DIR]"
+    echo "  for example, stable:"
+    echo "    $0 3.3.0-1"
+    echo "  or nightly:"
+    echo "    $0 3.4.0-nightly"
+    exit
+fi
+
+DIR=`dirname $0`
+DIR=`readlink -m $DIR`
+VERSION=$1
+HHVM_VERSION=`echo $VERSION | cut -d '-' -f 1`
+SOURCE=$2
+SOURCE=`mktemp -d`
+GIT_TARGET=HHVM-$HHVM_VERSION
+
+if [ `echo $VERSION | grep '.*-nightly.*'` ]; then
+	echo "Nighly, doing nothing."
+fi
+
+cd $SOURCE
+git clone https://github.com/facebook/hhvm.git $SOURCE/hhvm-${VERSION}
+cd $SOURCE/hhvm-${VERSION}
+git checkout $GIT_TARGET
+
+if ! grep -q $HHVM_VERSION hphp/system/idl/constants.idl.json; then
+	echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
+	exit
+fi
+
+# After the checkout since the submodules might be different between versions
+git submodule update --init --recursive
+
+# Cleanup git folders.
+find -name ".git"|xargs rm -rf
+
+cd $SOURCE
+tar cfvj hhvm-${VERSION}.tar.bz2 hhvm-${VERSION}
+
+SSH_KEY=$HOME/.ssh/id_rsa_phraseless
+STAGING=/var/tmp/staging/source/
+
+mkdir -p $STAGING $STAGING/nightly
+rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/source/ $STAGING || true
+# do it twice since it takes so long something else might have pushed
+rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/source/ $STAGING
+
+cp $SOURCE/hhvm-${VERSION}.tar.bz2 $STAGING/
+
+RSYNC_OPTS=""
+rsync $RSYNC_OPTS -av -e "ssh -i $SSH_KEY" $STAGING hiphop@dl.hhvm.com:data/source/
+ssh -i $SSH_KEY hiphop@dl.hhvm.com "/home/hiphop/trigger-hiphop"
+
+# cleanup
+rm -rf $SOURCE
