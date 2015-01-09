@@ -176,6 +176,7 @@ $SOURCE/hphp/hhvm/hhvm --version | grep -q $HHVM_VERSION
 if [ -z "$PACKAGE" -o ! -d "$PACKAGE" ]; then
     PACKAGE=`mktemp -d`
 fi
+FAKEROOT=$PACKAGE/fakeroot.dat
 
 echo "Packaging HHVM in $PACKAGE"
 cd $PACKAGE
@@ -224,18 +225,19 @@ if [ ! -d $PACKAGE/root ]; then
         fi
         perl -pi -e "s/Version:.*/Version: $PACKAGE_VERSION/" $PACKAGE/root/DEBIAN/control
     fi
-    sudo chown -R root:root $PACKAGE/root
-    sudo chown -R www-data:www-data $PACKAGE/root/var/log/hhvm/
-    sudo chown -R www-data:www-data $PACKAGE/root/var/run/hhvm/
+    fakeroot -s $FAKEROOT chown -R root:root $PACKAGE/root
+    fakeroot -s $FAKEROOT -i $FAKEROOT chown -R www-data:www-data $PACKAGE/root/var/log/hhvm/
+    fakeroot -s $FAKEROOT -i $FAKEROOT chown -R www-data:www-data $PACKAGE/root/var/run/hhvm/
     echo "finished creating hhvm package contents"
 fi
 
-dpkg -b $PACKAGE/root/ hhvm_${PACKAGE_VERSION}_amd64.deb
+fakeroot -i $FAKEROOT dpkg -b $PACKAGE/root/ hhvm_${PACKAGE_VERSION}_amd64.deb
 dpkg-sig -k 452A652F --sign builder $PACKAGE/hhvm_${PACKAGE_VERSION}_amd64.deb
 
 if [ -z "$DPACKAGE" -o ! -d "$DPACKAGE" ]; then
     DPACKAGE=`mktemp -d`
 fi
+FAKEROOT=$DPACKAGE/fakeroot.dat
 
 if [ "$DEBUG" = false ]; then
     echo "Packaging dev in $DPACKAGE"
@@ -264,11 +266,11 @@ if [ "$DEBUG" = false ]; then
         if [ "$NIGHTLY" = true ]; then
             perl -pi -e "s/Package: hhvm-dev/Package: hhvm-dev-nightly\nConflicts: hhvm-dev\nProvides: hhvm-dev\nReplaces: hhvm-dev/" $DPACKAGE/root/DEBIAN/control
         fi
-        sudo chown -R root:root $DPACKAGE/root
+        fakeroot -s $FAKEROOT chown -R root:root $DPACKAGE/root
         echo "finished creating dev package contents"
     fi
 
-    dpkg -b $DPACKAGE/root/ hhvm_dev_${PACKAGE_VERSION}_amd64.deb
+    fakeroot -i $FAKEROOT dpkg -b $DPACKAGE/root/ hhvm_dev_${PACKAGE_VERSION}_amd64.deb
     dpkg-sig -k 452A652F --sign builder $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
 fi
 
@@ -328,4 +330,4 @@ ssh -i $SSH_KEY hiphop@dl.hhvm.com "/home/hiphop/trigger-hiphop"
 
 # cleanup
 rm -rf $HEADERS $SOURCE
-sudo rm -rf $PACKAGE $BUILD $DPACKAGE
+rm -rf $PACKAGE $BUILD $DPACKAGE
