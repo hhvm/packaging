@@ -93,11 +93,6 @@ if [ ! -d $SOURCE/.git ]; then
       fi
     fi
 
-    if ! grep -q $HHVM_VERSION hphp/system/idl/constants.idl.json; then
-        echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
-        exit
-    fi
-
     if [ "$NIGHTLY" = true ]; then
         perl -pi -e 's/([0-9.]*-dev)/\1~nightly.'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
     fi
@@ -148,6 +143,19 @@ if [ ! -d $SOURCE/.git ]; then
         EXTRA_CMAKE_FLAGS="$EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug"
     fi
     CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SOURCE cmake -Wno-dev -DCMAKE_INSTALL_PREFIX="/usr" $EXTRA_CMAKE_FLAGS .
+
+    if [ -f hphp/runtime/version.h ]; then
+        HPHP_HOME=$SOURCE make version
+        if [ `echo "$VERSION" | sed s/nightly/dev/` != `$SOURCE/hphp/tools/version/version` ]; then
+            echo "$VERSION does not match version.h"
+            exit
+        fi
+    else
+        if ! grep -q $HHVM_VERSION hphp/system/idl/constants.idl.json; then
+            echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
+            exit
+        fi
+    fi
 fi
 
 if [ ! -f $SOURCE/hphp/hhvm/hhvm ]; then
