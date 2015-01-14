@@ -196,8 +196,6 @@ if [ ! -d $PACKAGE/root ]; then
     if [ -f $PACKAGE/root/deps ]; then
         rm $PACKAGE/root/deps
     fi
-    # Most of these install steps shouldn't be here, but rather in the cmake
-    # "make install" target! Putting things here makes it very hard to version.
     cp $SOURCE/hphp/hhvm/hhvm $PACKAGE/root/usr/bin/
     chmod 755 $PACKAGE/root/usr/bin/hhvm
     if [ -f $SOURCE/hphp/hack/bin/hh_server ]; then
