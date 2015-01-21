@@ -338,3 +338,9 @@ ssh -i $SSH_KEY hiphop@dl.hhvm.com "/home/hiphop/trigger-hiphop"
 # cleanup
 rm -rf $HEADERS $SOURCE
 rm -rf $PACKAGE $BUILD $DPACKAGE
+
+if [ "$NIGHTLY" = true -a "$DEBUG" = false ]; then
+    echo "Pinging FB build tracker"
+    curl "https://our.intern.facebook.com/intern/hhvm/ossbuildping/?distro=$RELEASE"
+    echo
+fi
