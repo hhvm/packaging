@@ -28,11 +28,6 @@ git clone https://github.com/facebook/hhvm.git $SOURCE/hhvm-${VERSION}
 cd $SOURCE/hhvm-${VERSION}
 git checkout $GIT_TARGET
 
-if ! grep -q $HHVM_VERSION hphp/system/idl/constants.idl.json; then
-	echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
-	exit
-fi
-
 # After the checkout since the submodules might be different between versions
 git submodule update --init --recursive
 
