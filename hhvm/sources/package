@@ -16,11 +16,16 @@ DIR=`readlink -m $DIR`
 VERSION=$1
 HHVM_VERSION=`echo $VERSION | cut -d '-' -f 1`
 SOURCE=$2
-SOURCE=`mktemp -d`
+
+if [ -z "$SOURCE" -o ! -d "$SOURCE" ]; then
+	SOURCE=`mktemp -d`
+fi
+
 GIT_TARGET=HHVM-$HHVM_VERSION
 
 if [ `echo $VERSION | grep '.*-nightly.*'` ]; then
 	echo "Nighly, doing nothing."
+	exit
 fi
 
 cd $SOURCE
