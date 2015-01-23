@@ -61,12 +61,12 @@ else
 fi
 if [ `echo $VERSION | grep '.*-dev$'` ]; then
     DEVONLY=true
-    VERSION=`echo $VERSION | cut -d '-' -f 1`
+    VERSION=`echo $VERSION | sed s/-dev$//`
     echo "Dev only, Debug off"
 fi
 if [ `echo $VERSION | grep '.*-dbg$'` ]; then
     DEBUG=true
-    VERSION=`echo $VERSION | cut -d '-' -f 1`
+    VERSION=`echo $VERSION | sed s/-dbg$//`
     echo "Debug"
 fi
 
