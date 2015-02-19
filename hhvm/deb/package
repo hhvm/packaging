@@ -104,6 +104,7 @@ if [ ! -d $SOURCE/.git ]; then
     mkdir $HEADERS/include
 
     if [ "$RELEASE" = "precise" -o "$RELEASE" = "wheezy" ]; then
+        # These distros don't have a new enough glog
         sudo ln -sf /usr/lib/hhvm/libglog.so.0 /usr/lib/hhvm/libglog.so
         svn checkout http://google-glog.googlecode.com/svn/trunk/ $HEADERS/google-glog
         cd $HEADERS/google-glog
@@ -114,8 +115,8 @@ if [ ! -d $SOURCE/.git ]; then
         sudo cp -d $HEADERS/lib/libglog.so /usr/lib/hhvm/
         sudo cp -d $HEADERS/lib/libglog.so.0 /usr/lib/hhvm/
         sudo cp -d $HEADERS/lib/libglog.so.0.0.0 /usr/lib/hhvm/
-    fi
-    if [ "$RELEASE" = "precise" -o "$RELEASE" = "wheezy" ]; then
+
+        # They also don't have a new enough jemalloc
         sudo ln -sf /usr/lib/hhvm/libjemalloc.so.1 /usr/lib/hhvm/libjemalloc.so
         cd $HEADERS
         wget http://www.canonware.com/download/jemalloc/jemalloc-3.6.0.tar.bz2
@@ -129,7 +130,13 @@ if [ ! -d $SOURCE/.git ]; then
         sudo cp -d $HEADERS/lib/libjemalloc.so /usr/lib/hhvm/
         sudo cp -d $HEADERS/lib/libjemalloc.so.1 /usr/lib/hhvm/
 
-        EXTRA_CMAKE_FLAGS="-DSTATIC_CXX_LIB=On"
+        # Extra options:
+        #  - Old version of gcc in the base distros mean we need to manually
+        #    install a new gcc, and so should statically link libstdc++ and
+        #    libgcc so users don't have to have the new gcc-base.
+        #  - mcrouter requires boost::context which only exists since boost 1.50
+        #    and these distros have too old a version.
+        EXTRA_CMAKE_FLAGS="-DSTATIC_CXX_LIB=On -DENABLE_MCROUTER=Off"
     fi
 
     if [ -f $DISTRO_DIR/deps ]; then
