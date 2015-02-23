@@ -30,3 +30,7 @@ echo "* "
 echo "* You can use HHVM for /usr/bin/php even if you have php-cli installed:"
 echo "* $ sudo /usr/bin/update-alternatives --install /usr/bin/php php /usr/bin/hhvm 60"
 echo "********************************************************************"
+
+if which invoke-rc.d >/dev/null 2>&1; then
+    invoke-rc.d hhvm start
+fi
