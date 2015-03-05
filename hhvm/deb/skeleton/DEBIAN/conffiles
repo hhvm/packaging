@@ -1,3 +1,4 @@
 /etc/hhvm/server.ini
 /etc/hhvm/php.ini
 /etc/default/hhvm
+/etc/init.d/hhvm
