@@ -166,9 +166,7 @@ if [ ! -d $SOURCE/.git ]; then
 fi
 
 if [ ! -f $SOURCE/hphp/hhvm/hhvm ]; then
-    HPHP_HOME=$SOURCE make -j 4 || true
-    # just incase, do it sequentially
-    HPHP_HOME=$SOURCE make
+    HPHP_HOME=$SOURCE make -j 4
     if [ ! -f $SOURCE/hphp/hhvm/hhvm ]; then
         echo "$SOURCE/hphp/hhvm/hhvm doesn't exist"
         exit
