@@ -81,9 +81,6 @@ if [ ! -d $SOURCE/.git ]; then
    
     # Things that stupidly weren't in the release but we can't re-tag.
     # Make sure they're on the branch so we can kill them on the next release. 
-    if [ "$RELEASE" = "lucid" ]; then
-      git cherry-pick 774f79f947ef35a73e92d3fe2ce2e4ea83174a58 || true
-    fi
     if [ "$VERSION" = "3.3.2" ]; then
       # 3.3.2 fails "make install", whoops...
       git cherry-pick 97d032ecf4eab6767e333cdcc395c2508a228eb4
@@ -137,13 +134,6 @@ if [ ! -d $SOURCE/.git ]; then
         #  - mcrouter requires boost::context which only exists since boost 1.50
         #    and these distros have too old a version.
         EXTRA_CMAKE_FLAGS="-DSTATIC_CXX_LIB=On -DENABLE_MCROUTER=Off"
-    fi
-
-    if [ -f $DISTRO_DIR/deps ]; then
-        cd $HEADERS
-        $DISTRO_DIR/deps $HEADERS
-        PATH=$HEADERS/bin:$PATH
-        cd -
     fi
 
     if [ "$DEBUG" = true ]; then

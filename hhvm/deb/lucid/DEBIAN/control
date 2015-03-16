@@ -1,9 +1,0 @@
-Package: hhvm
-Version:
-Section: web
-Priority: optional
-Architecture: amd64
-Essential: no
-Depends: binutils, libasn1-8-heimdal, libbz2-1.0, libc6, libcap2, libc-client2007e, libcomerr2, libelf1, libexpat1, libfontconfig1, libfreetype6, libgcc1, libgcrypt11, libgd2-xpm, libgnutls26, libgpg-error0, libgssapi-krb5-2, libheimntlm0-heimdal, libhx509-4-heimdal, libidn11, libk5crypto3, libkeyutils1, libkrb5-25-heimdal, libkrb5-3, libkrb5support0, libldap-2.4-2, libmcrypt4, libmemcached2, libmysqlclient16, libonig2, libpam0g, libpcre3, libpng12-0, libroken18-heimdal, libsasl2-2, libsqlite3-0, libssl0.9.8, libstdc++6, libtasn1-3, libtbb2, libwind0-heimdal, libx11-6, libxau6, libxcb1, libxdmcp6, libxml2, libxpm4, zlib1g, libedit2, libxslt1.1, libgmp10
-Maintainer: Paul Tarjan <pt@fb.com>
-Description: HHVM virtual machine, runtime, and JIT for the PHP language

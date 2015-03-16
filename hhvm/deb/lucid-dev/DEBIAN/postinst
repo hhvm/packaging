@@ -1,9 +1,0 @@
-#!/bin/bash
-
-echo "********************************************************************"
-echo "* HHVM Developer Package is mostly installed."
-echo "*If you want to build hhvm extensions you will likely need to follow"
-echo "*the instructions at:"
-echo "*https://github.com/facebook/hhvm/wiki/Building%20and%20installing%20on%20Ubuntu%2010.04%20LTS"
-echo "*up to the building of hhvm from source."
-echo "********************************************************************"

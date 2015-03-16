@@ -1,9 +1,0 @@
-Package: hhvm-dev
-Version:
-Section: web
-Priority: optional
-Architecture: amd64
-Essential: no
-Depends: hhvm, git-core, libmysqlclient-dev, libxml2-dev, libicu-dev, binutils-dev, libcap-dev, libtbb-dev, libpcre3-dev, autoconf, libtool, libcurl4-openssl-dev, wget, libicu-dev, libbz2-dev, libc-client2007e-dev, subversion, bzip2, python-software-properties, gawk, memcached, libtool, libmagickwand-dev, libevent-dev, php5-imagick, python-dev
-Maintainer: Paul Tarjan <pt@fb.com>
-Description: HHVM virtual machine, runtime, and JIT for the PHP language
