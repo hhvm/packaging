@@ -208,6 +208,12 @@ if [ ! -d $PACKAGE/root ]; then
     mkdir -p $PACKAGE/root/usr/share/hhvm/hack/
     cp -r $SOURCE/hphp/hack/editor-plugins/emacs $PACKAGE/root/usr/share/hhvm/hack/
 
+    if [ "$RELEASE" = "precise" -o "$RELEASE" = "wheezy" ]; then
+      mkdir -p $PACKAGE/root/usr/lib/hhvm/
+      cp -L /usr/lib/hhvm/libglog.so.0 $PACKAGE/root/usr/lib/hhvm/
+      cp -L /usr/lib/hhvm/libjemalloc.so.1 $PACKAGE/root/usr/lib/hhvm/
+    fi
+
     if [ "$NIGHTLY" = true ]; then
         perl -pi -e "s/Conflicts: .*\n//" $PACKAGE/root/DEBIAN/control
         perl -pi -e "s/Provides: .*\n//" $PACKAGE/root/DEBIAN/control
