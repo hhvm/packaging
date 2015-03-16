@@ -139,7 +139,7 @@ if [ ! -d $SOURCE/.git ]; then
     if [ "$DEBUG" = true ]; then
         EXTRA_CMAKE_FLAGS="$EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug"
     fi
-    CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SOURCE cmake -Wno-dev -DCMAKE_INSTALL_PREFIX="/usr" $EXTRA_CMAKE_FLAGS .
+    CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SOURCE cmake -Wno-dev -DCMAKE_INSTALL_PREFIX="/usr" -DMYSQL_UNIX_SOCK_ADDR=/var/run/mysqld/mysqld.sock $EXTRA_CMAKE_FLAGS .
 
     if [ -f hphp/runtime/version.h ]; then
         HPHP_HOME=$SOURCE make version
