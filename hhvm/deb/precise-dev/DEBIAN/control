@@ -4,6 +4,6 @@ Section: web
 Priority: optional
 Architecture: amd64
 Essential: no
-Depends: hhvm, git-core, cmake, g++, libmysqlclient-dev, libxml2-dev, libicu-dev, binutils-dev, libcap-dev, libtbb-dev, libpcre3-dev, autoconf, automake, libcurl4-openssl-dev, wget, libmemcached-dev, libbz2-dev, libelf-dev, libdwarf-dev, python-software-properties, libevent-dev, libtool, subversion
+Depends: hhvm, git-core, cmake, g++, libmysqlclient-dev, libxml2-dev, libicu-dev, binutils-dev, libcap-dev, libtbb-dev, libpcre3-dev, autoconf, automake, libcurl4-openssl-dev, wget, libmemcached-dev, libbz2-dev, libelf-dev, libdwarf-dev, python-software-properties, libevent-dev, libtool, subversion, libyaml-0-2
 Maintainer: Paul Tarjan <pt@fb.com>
 Description: Developer package for the HHVM virtual machine, runtime, and JIT for the PHP language
