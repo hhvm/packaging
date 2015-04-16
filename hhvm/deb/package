@@ -235,7 +235,6 @@ if [ ! -d $PACKAGE/root ]; then
     fi
     fakeroot -s $FAKEROOT chown -R root:root $PACKAGE/root
     fakeroot -s $FAKEROOT -i $FAKEROOT chown -R www-data:www-data $PACKAGE/root/var/log/hhvm/
-    fakeroot -s $FAKEROOT -i $FAKEROOT chown -R www-data:www-data $PACKAGE/root/var/run/hhvm/
     echo "finished creating hhvm package contents"
 fi
 
