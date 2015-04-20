@@ -39,6 +39,7 @@ echo "*    --install /usr/bin/php php /usr/bin/hhvm 60"
 echo "********************************************************************"
 
 install -d -m 755 -o www-data -g www-data /var/run/hhvm
+install -d -m 01733 /var/lib/hhvm/sessions
 
 if which invoke-rc.d >/dev/null 2>&1; then
     invoke-rc.d hhvm start
