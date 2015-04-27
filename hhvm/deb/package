@@ -79,17 +79,6 @@ if [ ! -d $SOURCE/.git ]; then
     git clone https://github.com/facebook/hhvm.git $SOURCE
     git checkout $GIT_TARGET
    
-    # Things that stupidly weren't in the release but we can't re-tag.
-    # Make sure they're on the branch so we can kill them on the next release. 
-    if [ "$VERSION" = "3.3.2" ]; then
-      # 3.3.2 fails "make install", whoops...
-      git cherry-pick 97d032ecf4eab6767e333cdcc395c2508a228eb4
-      if [ "$RELEASE" = "jessie" ]; then
-        # jessie changed the way ImageMagick worked, fix got in too late
-        git cherry-pick 26c2a06a09441bbcd2def473fe394865fab6ece8
-      fi
-    fi
-
     if [ "$NIGHTLY" = true ]; then
         perl -pi -e 's/([0-9.]*-dev)/\1~nightly.'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
     fi
@@ -100,7 +89,7 @@ if [ ! -d $SOURCE/.git ]; then
     HEADERS=`mktemp -d`
     mkdir $HEADERS/include
 
-    if [ "$RELEASE" = "precise" -o "$RELEASE" = "wheezy" ]; then
+    if [ "$RELEASE" = "wheezy" ]; then
         # These distros don't have a new enough glog
         sudo ln -sf /usr/lib/hhvm/libglog.so.0 /usr/lib/hhvm/libglog.so
         svn checkout http://google-glog.googlecode.com/svn/trunk/ $HEADERS/google-glog
@@ -141,17 +130,10 @@ if [ ! -d $SOURCE/.git ]; then
     fi
     CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SOURCE cmake -Wno-dev -DCMAKE_INSTALL_PREFIX="/usr" -DMYSQL_UNIX_SOCK_ADDR=/var/run/mysqld/mysqld.sock $EXTRA_CMAKE_FLAGS .
 
-    if [ -f hphp/runtime/version.h ]; then
-        HPHP_HOME=$SOURCE make version
-        if [ `echo "$VERSION" | sed s/nightly/dev/` != `$SOURCE/hphp/tools/version/version` ]; then
-            echo "$VERSION does not match version.h"
-            exit
-        fi
-    else
-        if ! grep -q $HHVM_VERSION hphp/system/idl/constants.idl.json; then
-            echo "$VERSION isn't in hphp/system/idl/constants.idl.json"
-            exit
-        fi
+    HPHP_HOME=$SOURCE make version
+    if [ `echo "$VERSION" | sed s/nightly/dev/` != `$SOURCE/hphp/tools/version/version` ]; then
+      echo "$VERSION does not match version.h"
+      exit
     fi
 fi
 
@@ -208,7 +190,7 @@ if [ ! -d $PACKAGE/root ]; then
     mkdir -p $PACKAGE/root/usr/share/hhvm/hack/
     cp -r $SOURCE/hphp/hack/editor-plugins/emacs $PACKAGE/root/usr/share/hhvm/hack/
 
-    if [ "$RELEASE" = "precise" -o "$RELEASE" = "wheezy" ]; then
+    if [ "$RELEASE" = "wheezy" ]; then
       mkdir -p $PACKAGE/root/usr/lib/hhvm/
       cp -L /usr/lib/hhvm/libglog.so.0 $PACKAGE/root/usr/lib/hhvm/
       cp -L /usr/lib/hhvm/libjemalloc.so.1 $PACKAGE/root/usr/lib/hhvm/
