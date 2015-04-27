@@ -54,8 +54,8 @@ else
     PACKAGE_VERSION=`echo $VERSION | sed -E 's/-(dbg|dev)$//'`~$RELEASE
     case $STABLE_VERSION in
         3.3 | 3.6)
-            LTS=true
-            echo "LTS"
+            echo "You are using the wrong branch of the packaging script."
+            exit 1
             ;;
     esac
 fi
