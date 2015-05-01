@@ -116,13 +116,25 @@ if [ ! -d $SOURCE/.git ]; then
         sudo cp -d $HEADERS/lib/libjemalloc.so /usr/lib/hhvm/
         sudo cp -d $HEADERS/lib/libjemalloc.so.1 /usr/lib/hhvm/
 
+        # Or boost :(
+        cd $HEADERS
+        wget http://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.bz2/download -O boost_1_55_0.tar.bz2
+        tar xvf boost_1_55_0.tar.bz2
+        cd -
+        cd $HEADERS/boost_1_55_0/
+        ./bootstrap.sh --without-libraries=python --prefix=$HEADERS
+        ./b2 variant=release threading=multi link=static --layout=tagged -j4
+        ./b2 variant=release threading=multi link=static --layout=tagged install
+        cd -
+
         # Extra options:
         #  - Old version of gcc in the base distros mean we need to manually
         #    install a new gcc, and so should statically link libstdc++ and
         #    libgcc so users don't have to have the new gcc-base.
-        #  - mcrouter requires boost::context which only exists since boost 1.50
-        #    and these distros have too old a version.
-        EXTRA_CMAKE_FLAGS="-DSTATIC_CXX_LIB=On -DENABLE_MCROUTER=Off"
+        #  - Old version of boost in the base distros means we need to locally
+        #    build boost, but don't want to ship the crapload of extra libraries
+        #    and so statically link.
+        EXTRA_CMAKE_FLAGS="-DSTATIC_CXX_LIB=On -DBoost_USE_STATIC_LIBS=ON"
     fi
 
     if [ "$DEBUG" = true ]; then
