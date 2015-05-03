@@ -1,0 +1,16 @@
+Description: Fix compilation of the webscalesqlclient code
+Author: Giuseppe Lavagetto
+Forwarded: No
+Last-Update: 2015-03-30
+--- a/third-party/webscalesqlclient/webscalesql-5.6/sql/net_serv.cc
++++ b/third-party/webscalesqlclient/webscalesql-5.6/sql/net_serv.cc
+@@ -544,7 +544,7 @@ net_write_command_nonblocking(NET *net, uchar command,
+ 
+   switch (net->async_operation) {
+     case NET_ASYNC_OP_IDLE:
+-      MYSQL_NET_WRITE_START(len);
++      MYSQL_NET_WRITE_START(prefix_len + 1 + packet_len); /* 1 extra byte for command */
+       if (!begin_packet_write_state(net, command, packet, packet_len, prefix, prefix_len)) {
+         *res = 0;
+         goto done;
+

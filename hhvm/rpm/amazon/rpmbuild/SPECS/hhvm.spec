@@ -1,44 +1,49 @@
 %define debug_package %{nil}
-%global commit 46e69b6c2402a19478f263336a6cb35057f40a19
-%global commitdate 20140918
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global owner facebook
 %global project hhvm
-%global build_version 2
+%global package_version 1
 
 Name: hhvm
-Version: 3.3.0
-Summary: HHVM is a new open-source virtual machine designed for executing programs written in PHP. HHVM uses a just-in-time (JIT) compilation approach to achieve superior performance while maintaining the flexibility that PHP developers are accustomed to.  http://hhvm.com
-Release: %{build_version}.%{commitdate}git%{shortcommit}%{?dist}
+Version: 3.6.2
+Summary: HHVM is a new open-source virtual machine designed for executing programs written in PHP. HHVM uses a just-in-time (JIT) compilation approach to achieve superior performance while maintaining the flexibility that PHP developers are accustomed to. http://hhvm.com
+Release: %{package_version}%{?dist}
 License: GPL
 Group: Development/Compilers
 Provides: hiphop-php
 Packager: Ilya Ivanov <burner1024 @ github>
 Url: https://github.com/%{owner}/%{project}
-Source0: https://github.com/%{owner}/%{project}/archive/%{commit}/%{project}-%{commit}.tar.gz
+Source0: https://github.com/%{owner}/%{project}/archive/%{project}-%{version}.tar.gz
 Source1: hhvm-init
 Source2: hhvm-sysconfig
 Source3: hhvm-server.ini
 Source4: hhvm-static.mime-types.hdf
+Patch0: fix-webscalesql_new-b68835746159231ccd8a46c05db572f1be906748.patch
 BuildRoot: %{_tmppath}/build-root-%{name}-%{version}
 BuildArch: x86_64
 BuildRequires: binutils,binutils-devel
 BuildRequires: boost-devel >= 1.50
+#BuildRequires: cmake >= 3
 BuildRequires: curl-devel >= 7.29.0
 BuildRequires: elfutils-libelf-devel
 BuildRequires: expat-devel
 BuildRequires: gd-devel
-BuildRequires: git,perl,flex,bison,cmake
+BuildRequires: git,perl,flex,bison
 BuildRequires: glog-devel >= 0.3.2
+BuildRequires: gmp-devel
 BuildRequires: ImageMagick-devel >= 6.7.8.9
+BuildRequires: fastlz-devel
 BuildRequires: libcap-devel
 BuildRequires: libdwarf-devel
+BuildRequires: libedit-devel
 BuildRequires: libevent-devel >= 1.4.14
 BuildRequires: libicu >= 4.2
 BuildRequires: libmcrypt-devel
 BuildRequires: libmemcached-devel >= 1.0.8
+BuildRequires: libvpx-devel
 BuildRequires: libxml2-devel
 BuildRequires: libxslt-devel >= 1.1.28
+BuildRequires: libyaml-devel
+BuildRequires: lz4-devel
 BuildRequires: mysql-devel
 BuildRequires: oniguruma-devel
 BuildRequires: openldap-devel
@@ -48,6 +53,7 @@ BuildRequires: readline-devel
 BuildRequires: tbb-devel >= 4
 BuildRequires: unixODBC-devel >= 2.2.14-12
 BuildRequires: zlib-devel
+
 Requires: boost >= 1.50.0
 Requires: curl >= 7.29.0
 Requires: expat >= 2.0.1
@@ -72,13 +78,14 @@ Requires: zlib
 HipHop for PHP is an open source project developed by Facebook. HipHop offers a PHP execution engine called the "HipHop Virtual Machine" (HHVM) which uses a just-in-time compilation approach to achieve superior performance. To date, Facebook has achieved more than a 6x reduction in CPU utilization for the site using HipHop as compared with Zend PHP.
 
 %prep
-%setup -qn %{name}-%{commit}
+%setup -qn %{name}-%{version}
+%patch0 -p1
 
 %build
 export USE_HHVM=1
 export HPHP_HOME=`pwd`
 export HPHP_LIB=`pwd`/bin
-cmake .
+cmake -DMYSQL_UNIX_SOCK_ADDR=/var/lib/mysql/mysql.sock .
 make
 
 %install
@@ -128,8 +135,15 @@ rm -rf $RPM_BUILD_ROOT/%{_libdir}
 /var/log/hhvm/
 
 
-
 %changelog
+* Sun May 3 2015 Ilya Ivanov <burner1024 @ github>
+ - Use HHVM releases instead of current git branches
+ - Build release 3.6.2
+ - Add mysql socket arg to cmake, so it doesn't fail
+ - Bump required cmake version to 3 (http://www.cmake.org/files/v3.2/cmake-3.2.2-Linux-x86_64.tar.gz is used currently)
+ - Apply websqlclient patch (https://github.com/facebook/hhvm/issues/5100, https://gerrit.wikimedia.org/r/#/c/200513/1/debian/patches/fix-webscalesql.patch)
+ - Add a few libraries to build requirements, so that support is built-in
+
 * Fri Sep 19 2014 Ilya Ivanov <burner1024 @ github>
  - Update to commit 46e69b6c2402a19478f263336a6cb35057f40a19
  - Move repo.central.path to /tmp by default to avoid denied file permissions
