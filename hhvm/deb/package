@@ -197,6 +197,8 @@ if [ ! -d $PACKAGE/root ]; then
     fi
     cp $SOURCE/hphp/hhvm/hhvm $PACKAGE/root/usr/bin/
     chmod 755 $PACKAGE/root/usr/bin/hhvm
+    cp $SOURCE/hphp/tools/oss-repo-mode $PACKAGE/root/usr/bin/hhvm-repo-mode
+    chmod 755 $PACKAGE/root/usr/bin/hhvm-repo-mode
     if [ -f $SOURCE/hphp/hack/bin/hh_server ]; then
         cp $SOURCE/hphp/hack/bin/hh_client $PACKAGE/root/usr/bin/
         cp $SOURCE/hphp/hack/bin/hh_server $PACKAGE/root/usr/bin/
