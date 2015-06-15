@@ -291,11 +291,12 @@ fi
 
 SSH_KEY=$HOME/.ssh/id_rsa_phraseless
 STAGING=/var/tmp/staging/$DISTRO_NAME/
+RSYNC_HOST=ftp.osuosl.org
 
 mkdir -p $STAGING
-rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $STAGING || true
+rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@$RSYNC_HOST:data/$DISTRO_NAME/ $STAGING || true
 # do it twice since it takes so long something else might have pushed
-rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/$DISTRO_NAME/ $STAGING
+rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@$RSYNC_HOST:data/$DISTRO_NAME/ $STAGING
 
 REPREPRO="reprepro --keepunreferencedfiles --keepunusednewfiles includedeb"
 
@@ -340,8 +341,8 @@ if [ "$NIGHTLY" = true ]; then
     RSYNC_OPTS="--delete"
 fi
 
-rsync $RSYNC_OPTS -av -e "ssh -i $SSH_KEY" $STAGING hiphop@dl.hhvm.com:data/$DISTRO_NAME/
-ssh -i $SSH_KEY hiphop@dl.hhvm.com "/home/hiphop/trigger-hiphop"
+rsync $RSYNC_OPTS -av -e "ssh -i $SSH_KEY" $STAGING hiphop@$RSYNC_HOST:data/$DISTRO_NAME/
+ssh -i $SSH_KEY hiphop@$RSYNC_HOST "/home/hiphop/trigger-hiphop"
 
 # cleanup
 rm -rf $HEADERS $SOURCE
