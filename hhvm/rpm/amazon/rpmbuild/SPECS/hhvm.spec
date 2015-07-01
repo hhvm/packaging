@@ -58,6 +58,7 @@ BuildRequires: zlib-devel
 Requires: boost >= 1.50.0
 Requires: curl >= 7.29.0
 Requires: expat >= 2.0.1
+Requires: fastlz
 Requires: gcc >= 4.6.0 ,gcc-c++,make
 Requires: gd >= 2.0.35
 Requires: glog >= 0.3.2
