@@ -4,7 +4,7 @@
 %global package_version 1
 
 Name: hhvm
-Version: 3.6.2
+Version: 3.6.5
 Summary: HHVM is a new open-source virtual machine designed for executing programs written in PHP. HHVM uses a just-in-time (JIT) compilation approach to achieve superior performance while maintaining the flexibility that PHP developers are accustomed to. http://hhvm.com
 Release: %{package_version}%{?dist}
 License: GPL
@@ -32,6 +32,7 @@ BuildRequires: glog-devel >= 0.3.2
 BuildRequires: gmp-devel
 BuildRequires: ImageMagick-devel >= 6.7.8.9
 BuildRequires: fastlz-devel
+BuildRequires: fribidi-devel
 BuildRequires: libcap-devel
 BuildRequires: libdwarf-devel
 BuildRequires: libedit-devel
