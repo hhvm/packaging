@@ -33,7 +33,7 @@ mkdir -p output/ubuntu-14.04-trusty/{hhvm,hhvm-dev}
 
 docker run \
   -v $(pwd)/output/ubuntu-14.04-trusty:/var/hhvm-packages \
-  -v $(pwd)/hhvm:/var/hhvm \
+  -v $(pwd)/hhvm:/var/hhvm:ro \
   $DOCKER_TAG \
   /var/hhvm/deb/package \
   ubuntu \
