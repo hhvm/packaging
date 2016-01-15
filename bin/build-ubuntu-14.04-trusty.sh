@@ -19,30 +19,29 @@ if [ ! -e $DOCKERFILE ]; then
   exit 1
 fi
 
-DOCKER_TAG="hhvm-trusty-pkg/$HHVM_VERSION"
+DOCKER_TAG="hhvm-trusty-pkg/$(md5sum "$DOCKERFILE" | awk '{print $1}')"
 
-if docker images | grep -q "$DOCKER_TAG"; then
-  docker rmi -f "$DOCKER_TAG"
+if ! docker images | grep -q "$DOCKER_TAG"; then
+  docker build \
+    -t "$DOCKER_TAG" \
+    -f $DOCKERFILE \
+    $(pwd)
 fi
-
-docker build \
-  --build-arg "HHVM_VERSION=$HHVM_VERSION" \
-  -t "$DOCKER_TAG" \
-  -f $DOCKERFILE \
-  $(pwd)
 
 rm -rf output/ubuntu-14.04-trusty/
 mkdir -p output/ubuntu-14.04-trusty/{hhvm,hhvm-dev}
 
 docker run \
   -v $(pwd)/output/ubuntu-14.04-trusty:/var/hhvm-packages \
+  -v $(pwd)/hhvm:/var/hhvm \
   $DOCKER_TAG \
-  hhvm/deb/package \
+  /var/hhvm/deb/package \
   ubuntu \
   trusty \
   "${HHVM_VERSION}-1" \
-  "/source/scratch/dir" \
+  "/bogus-source-dir/dir" \
   /var/hhvm-packages/hhvm \
+  "/bogus-build-dir/dir" \
   /var/hhvm-packages/hhvm-dev
 
-ls -l output/ubuntu-14.04-trusty/
+ls -lR output/ubuntu-14.04-trusty/

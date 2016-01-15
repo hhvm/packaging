@@ -6,7 +6,6 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y \
   autoconf \
   automake \
-  bc \
   binutils-dev \
   build-essential \
   cmake \
@@ -59,5 +58,3 @@ RUN apt-get update && apt-get install -y \
   libyaml-dev \
   ocaml-native-compilers \
   zlib1g-dev
-
-ADD ./hhvm hhvm/

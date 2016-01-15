@@ -74,6 +74,11 @@ if [ -z "$BUILD" -o ! -d "$BUILD" ]; then
     BUILD=`mktemp -d`
 fi
 
+echo "SOURCE: $SOURCE"
+echo "BUILD: $BUILD"
+echo "PACKAGE: $PACKAGE"
+echo "DPACKAGE: $DPACKAGE"
+
 cd $SOURCE
 if [ ! -d $SOURCE/.git ]; then
     git clone https://github.com/facebook/hhvm.git $SOURCE
@@ -84,12 +89,7 @@ if [ ! -d $SOURCE/.git ]; then
     fi
 
     # After the checkout since the submodules might be different between versions
-    GIT_MAJOR_MINOR=$(git --version | awk '{print $3}' | cut -f1,2 -d.)
-    if [ "$(echo "$GIT_MAJOR_MINOR >= 1.8" | bc)" -eq "1" ]; then
-      git submodule update --init --recursive --depth=1
-    else
-      git submodule update --init --recursive
-    fi
+    git submodule update --init --recursive
 
     HEADERS=`mktemp -d`
     mkdir $HEADERS/include
