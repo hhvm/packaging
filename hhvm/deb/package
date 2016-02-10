@@ -47,13 +47,17 @@ if [ `echo $VERSION | grep '.*-nightly.*'` ]; then
     echo "Nightly"
 fi
 if [ "$NIGHTLY" = true ]; then
-    GIT_TARGET=master
-    PACKAGE_VERSION=$NIGHTLY_DATE~$RELEASE
+    echo "You are using the wrong branch of the packaging script."
+    exit 1
 else
     GIT_TARGET=HHVM-$HHVM_VERSION
     PACKAGE_VERSION=`echo $VERSION | sed -E 's/-(dbg|dev)$//'`~$RELEASE
     case $STABLE_VERSION in
-        3.3 | 3.6 | 3.9)
+        3.12)
+            LTS=true
+            echo "LTS"
+            ;;
+        *)
             echo "You are using the wrong branch of the packaging script."
             exit 1
             ;;
