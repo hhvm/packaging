@@ -53,7 +53,7 @@ else
     GIT_TARGET=HHVM-$HHVM_VERSION
     PACKAGE_VERSION=`echo $VERSION | sed -E 's/-(dbg|dev)$//'`~$RELEASE
     case $STABLE_VERSION in
-        3.3 | 3.6 | 3.9)
+        3.3 | 3.6 | 3.9 | 3.12)
             echo "You are using the wrong branch of the packaging script."
             exit 1
             ;;
