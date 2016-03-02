@@ -18,9 +18,9 @@ cd $1
 HEADER="hphp/runtime/version.h"
 CMAKE="CMakeLists.txt"
 
-MAJOR=$(grep "#define HHVM_VERSION_MAJOR" "$HEADER" | cut -f 3 -d ' ')
-MINOR=$(grep "#define HHVM_VERSION_MINOR" "$HEADER" | cut -f 3 -d ' ')
-PATCH=$(grep "#define HHVM_VERSION_PATCH" "$HEADER" | cut -f 3 -d ' ')
+MAJOR=$(grep "# define HHVM_VERSION_MAJOR" "$HEADER" | cut -f 4 -d ' ')
+MINOR=$(grep "# define HHVM_VERSION_MINOR" "$HEADER" | cut -f 4 -d ' ')
+PATCH=$(grep "# define HHVM_VERSION_PATCH" "$HEADER" | cut -f 4 -d ' ')
 TRIPLE="$MAJOR.$MINOR.$PATCH"
 
 sed -i 's/HHVM_VERSION_SUFFIX "-dev"/HHVM_VERSION_SUFFIX ""/' "$HEADER"
