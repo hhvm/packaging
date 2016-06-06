@@ -285,7 +285,7 @@ fi
 
 SSH_KEY=$HOME/.ssh/id_rsa_phraseless
 STAGING=/var/tmp/staging/$DISTRO_NAME/
-RSYNC_HOST=ftp.osuosl.org
+RSYNC_HOST=ftp-osl.osuosl.org
 
 mkdir -p $STAGING
 rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@$RSYNC_HOST:data/$DISTRO_NAME/ $STAGING || true
