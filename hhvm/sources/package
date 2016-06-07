@@ -44,17 +44,18 @@ tar cfvj hhvm-${VERSION}.tar.bz2 hhvm-${VERSION}
 
 SSH_KEY=$HOME/.ssh/id_rsa_phraseless
 STAGING=/var/tmp/staging/source/
+RSYNC_HOST=ftp-osl.osuosl.org
 
 mkdir -p $STAGING $STAGING/nightly
-rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/source/ $STAGING || true
+rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@$RSYNC_HOST:data/source/ $STAGING || true
 # do it twice since it takes so long something else might have pushed
-rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@dl.hhvm.com:data/source/ $STAGING
+rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@$RSYNC_HOST:data/source/ $STAGING
 
 cp $SOURCE/hhvm-${VERSION}.tar.bz2 $STAGING/
 
 RSYNC_OPTS=""
-rsync $RSYNC_OPTS -av -e "ssh -i $SSH_KEY" $STAGING hiphop@dl.hhvm.com:data/source/
-ssh -i $SSH_KEY hiphop@dl.hhvm.com "/home/hiphop/trigger-hiphop"
+rsync $RSYNC_OPTS -av -e "ssh -i $SSH_KEY" $STAGING hiphop@$RSYNC_HOST:data/source/
+ssh -i $SSH_KEY hiphop@$RSYNC_HOST "/home/hiphop/trigger-hiphop"
 
 # cleanup
 rm -rf $SOURCE
