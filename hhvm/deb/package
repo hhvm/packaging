@@ -92,7 +92,7 @@ if [ ! -d $SOURCE/.git ]; then
     if [ "$RELEASE" = "wheezy" ]; then
         # These distros don't have a new enough glog
         sudo ln -sf /usr/lib/hhvm/libglog.so.0 /usr/lib/hhvm/libglog.so
-        svn checkout http://google-glog.googlecode.com/svn/trunk/ $HEADERS/google-glog
+        git clone https://github.com/google/glog.git $HEADERS/google-glog
         cd $HEADERS/google-glog
         ./configure --prefix=$HEADERS
         make -j 8
