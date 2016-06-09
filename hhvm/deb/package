@@ -94,6 +94,7 @@ if [ ! -d $SOURCE/.git ]; then
         sudo ln -sf /usr/lib/hhvm/libglog.so.0 /usr/lib/hhvm/libglog.so
         git clone https://github.com/google/glog.git $HEADERS/google-glog
         cd $HEADERS/google-glog
+        git checkout v0.3.3
         ./configure --prefix=$HEADERS
         make -j 8
         make install
