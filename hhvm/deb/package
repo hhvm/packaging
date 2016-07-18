@@ -2,8 +2,35 @@
 set -e
 export PATH=$PATH:/usr/local/bin/
 
+while [ ! -z "$1" ]; do
+  case "$1" in
+    "--stage")
+      HHVM_REPO="git@github.com:hhvm/hhvm-staging.git"
+      echo "Using staging repo: $HHVM_REPO"
+      shift
+      ;;
+    "--dry-run")
+      DRY_RUN=1
+      echo "!!!! Doing a dry run !!!!"
+      shift
+      ;;
+    "--verbose")
+      set -x
+      shift
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+if [ -z "$HHVM_REPO" ]; then
+  HHVM_REPO="https://github.com/facebook/hhvm.git"
+  echo "Using default repo: $HHVM_REPO"
+fi
+
 if [ "$#" -le 2 ]; then
-    echo "$0 DISTRO_NAME RELEASE VERSION [SOURCE_DIR] [PACKAGE_DIR] [BUILD_DIR] [DEV_PACKAGE_DIR]"
+    echo "$0 [--stage|--dry-run|--verbose] DISTRO_NAME RELEASE VERSION [SOURCE_DIR] [PACKAGE_DIR] [BUILD_DIR] [DEV_PACKAGE_DIR]"
     echo "  for example, stable:"
     echo "    $0 ubuntu precise 3.3.0-1"
     echo "  or nightly:"
@@ -76,7 +103,7 @@ fi
 
 cd $SOURCE
 if [ ! -d $SOURCE/.git ]; then
-    git clone https://github.com/facebook/hhvm.git $SOURCE
+    git clone $HHVM_REPO $SOURCE
     git checkout $GIT_TARGET
    
     if [ "$NIGHTLY" = true ]; then
@@ -336,14 +363,20 @@ if [ "$NIGHTLY" = true ]; then
     RSYNC_OPTS="--delete"
 fi
 
+if [ ! -z "$DRY_RUN" ]; then
+  RSYNC_OPTS="$RSYNC_OPTS --dry-run"
+fi
+
 rsync $RSYNC_OPTS -av -e "ssh -i $SSH_KEY" $STAGING hiphop@$RSYNC_HOST:data/$DISTRO_NAME/
-ssh -i $SSH_KEY hiphop@$RSYNC_HOST "/home/hiphop/trigger-hiphop"
+if [ -z "$DRY_RUN" ]; then
+  ssh -i $SSH_KEY hiphop@$RSYNC_HOST "/home/hiphop/trigger-hiphop"
+fi
 
 # cleanup
 rm -rf $HEADERS $SOURCE
 rm -rf $PACKAGE $BUILD $DPACKAGE
 
-if [ "$NIGHTLY" = true -a "$DEBUG" = false ]; then
+if [ -z "$DRY_RUN" -a "$NIGHTLY" = true -a "$DEBUG" = false ]; then
     echo "Pinging FB build tracker"
     curl "https://our.intern.facebook.com/intern/hhvm/ossbuildping/?distro=$RELEASE"
     echo
