@@ -335,6 +335,7 @@ if [ "$DEVONLY" = true ]; then
     fi
 else
     if [ "$NIGHTLY" = true ]; then
+        rm pool/main/h/hhvm-dev-nightly/*dev*${RELEASE}*.deb || true
         if [ "$DEBUG" = true ]; then
             rm pool/main/h/hhvm-nightly-dbg/*${RELEASE}*.deb || true
         else
