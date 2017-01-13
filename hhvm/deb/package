@@ -101,6 +101,11 @@ if [ -z "$BUILD" -o ! -d "$BUILD" ]; then
     BUILD=`mktemp -d`
 fi
 
+echo "SOURCE: $SOURCE"
+echo "BUILD: $BUILD"
+echo "PACKAGE: $PACKAGE"
+echo "DPACKAGE: $DPACKAGE"
+
 cd $SOURCE
 if [ ! -d $SOURCE/.git ]; then
     git clone $HHVM_REPO $SOURCE
@@ -171,10 +176,11 @@ if [ ! -d $SOURCE/.git ]; then
     CMAKE_INCLUDE_PATH=$HEADERS/include/ CMAKE_LIBRARY_PATH="/usr/lib/hhvm/" HPHP_HOME=$SOURCE cmake -Wno-dev -DCMAKE_INSTALL_PREFIX="/usr" -DMYSQL_UNIX_SOCK_ADDR=/var/run/mysqld/mysqld.sock $EXTRA_CMAKE_FLAGS .
 
     HPHP_HOME=$SOURCE make version
-    if [ `echo "$VERSION" | sed s/nightly/dev/` != `$SOURCE/hphp/tools/version/version` ]; then
-      echo "$VERSION does not match version.h"
-      exit
-    fi
+### XXX FIXME XXX
+#    if [ `echo "$VERSION" | sed s/nightly/dev/` != `$SOURCE/hphp/tools/version/version` ]; then
+#      echo "$VERSION does not match version.h"
+#      exit
+#    fi
 fi
 
 if [ ! -f $SOURCE/hphp/hhvm/hhvm ]; then
@@ -269,7 +275,10 @@ if [ ! -d $PACKAGE/root ]; then
 fi
 
 fakeroot -i $FAKEROOT dpkg -b $PACKAGE/root/ hhvm_${PACKAGE_VERSION}_amd64.deb
-dpkg-sig -k 452A652F --sign builder $PACKAGE/hhvm_${PACKAGE_VERSION}_amd64.deb
+
+if [ ! -z "$GPG_KEY_ID"]; then
+  dpkg-sig -k $GPG_KEY_ID --sign builder $PACKAGE/hhvm_${PACKAGE_VERSION}_amd64.deb
+fi
 
 if [ -z "$DPACKAGE" -o ! -d "$DPACKAGE" ]; then
     DPACKAGE=`mktemp -d`
@@ -308,10 +317,21 @@ if [ "$DEBUG" = false ]; then
     fi
 
     fakeroot -i $FAKEROOT dpkg -b $DPACKAGE/root/ hhvm_dev_${PACKAGE_VERSION}_amd64.deb
-    dpkg-sig -k 452A652F --sign builder $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
+    if [ ! -z "$GPG_KEY_ID" ]; then
+      dpkg-sig -k $GPG_KEY_ID --sign builder $DPACKAGE/hhvm_dev_${PACKAGE_VERSION}_amd64.deb
+    fi
 fi
 
-SSH_KEY=$HOME/.ssh/id_rsa_phraseless
+if [ -z "$GPG_KEY_ID" ]; then
+  echo "No GPG key, so not building repo"
+  exit
+fi
+
+if [ -z "$SSH_KEY" ]; then
+  echo "No SSH key, so not building repo"
+  exit
+fi
+
 STAGING=/var/tmp/staging/$DISTRO_NAME/
 RSYNC_HOST=ftp-osl.osuosl.org
 
