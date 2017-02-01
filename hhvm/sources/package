@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 export PATH=$PATH:/usr/local/bin/
 
@@ -35,6 +35,17 @@ git checkout $GIT_TARGET
 
 # After the checkout since the submodules might be different between versions
 git submodule update --init --recursive
+
+# Apply any patches
+for PATCH in $(compgen -G 'third-party/*/patches/*'); do
+    echo PATCH: $PATCH
+    ABS_PATCH="$(cd $(dirname $PATCH) ; pwd -L)/$(basename $PATCH)"
+    GITWORK="$(dirname $(dirname $PATCH))/src"
+    git -C "$GITWORK" config user.email 'hhvm@fb.com'
+    git -C "$GITWORK" config user.name 'hhvm'
+    git -C "$GITWORK" am $ABS_PATCH
+    rm $PATCH
+done
 
 # Cleanup git folders.
 find -name ".git"|xargs rm -rf
