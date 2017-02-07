@@ -225,6 +225,10 @@ if [ ! -d $PACKAGE/root ]; then
         chmod 755 $PACKAGE/root/usr/bin/hh_client
         chmod 755 $PACKAGE/root/usr/bin/hh_server
     fi
+    if [ -f $SOURCE/hphp/hack/bin/hackfmt ]; then
+        cp $SOURCE/hphp/hack/bin/hackfmt $PACKAGE/root/usr/bin/
+        chmod 755 $PACKAGE/root/usr/bin/hackfmt
+    fi
     if [ -f $SOURCE/hphp/hack/bin/hh_format ]; then
         cp $SOURCE/hphp/hack/bin/hh_format $PACKAGE/root/usr/bin/
         chmod 755 $PACKAGE/root/usr/bin/hh_format
