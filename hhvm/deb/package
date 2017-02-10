@@ -120,6 +120,9 @@ if [ ! -d $SOURCE/.git ]; then
     HEADERS=`mktemp -d`
     mkdir $HEADERS/include
 
+    # Ensure that /usr/lib/hhvm exists
+    sudo mkdir -p /usr/lib/hhvm
+
     if [ "$RELEASE" = "wheezy" ]; then
         # These distros don't have a new enough glog
         sudo ln -sf /usr/lib/hhvm/libglog.so.0 /usr/lib/hhvm/libglog.so
