@@ -2,8 +2,35 @@
 set -e
 export PATH=$PATH:/usr/local/bin/
 
+while [ ! -z "$1" ]; do
+    case "$1" in
+        "--stage")
+            HHVM_REPO="git@github.com:hhvm/hhvm-staging.git"
+            echo "Using staging repo: $HHVM_REPO"
+            shift
+            ;;
+        "--dry-run")
+            DRY_RUN=--dry-run
+            echo "!!!! Doing a dry run !!!!"
+            shift
+            ;;
+        "--verbose")
+            set -x
+            shift
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+if [ -z "$HHVM_REPO" ]; then
+  HHVM_REPO="https://github.com/facebook/hhvm.git"
+  echo "Using default repo: $HHVM_REPO"
+fi
+
 if [ "$#" -lt 1 ]; then
-    echo "$0 VERSION [SOURCE_DIR]"
+    echo "$0 [--stage|--dry-run|--verbose] VERSION [SOURCE_DIR]"
     echo "  for example, stable:"
     echo "    $0 3.3.0-1"
     echo "  or nightly:"
@@ -29,7 +56,7 @@ if [ `echo $VERSION | grep '.*-nightly.*'` ]; then
 fi
 
 cd $SOURCE
-git clone https://github.com/facebook/hhvm.git $SOURCE/hhvm-${VERSION}
+git clone "$HHVM_REPO" $SOURCE/hhvm-${VERSION}
 cd $SOURCE/hhvm-${VERSION}
 git checkout $GIT_TARGET
 
@@ -58,15 +85,15 @@ STAGING=/var/tmp/staging/source/
 RSYNC_HOST=ftp-osl.osuosl.org
 
 mkdir -p $STAGING $STAGING/nightly
-rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@$RSYNC_HOST:data/source/ $STAGING || true
-# do it twice since it takes so long something else might have pushed
-rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@$RSYNC_HOST:data/source/ $STAGING
+rsync --exclude='*.bz2' -av -e "ssh -i $SSH_KEY" hiphop@$RSYNC_HOST:data/source/ $STAGING || true
 
 cp $SOURCE/hhvm-${VERSION}.tar.bz2 $STAGING/
+echo Source written to $STAGING/hhvm-${VERSION}.tar.bz2
 
-RSYNC_OPTS=""
-rsync $RSYNC_OPTS -av -e "ssh -i $SSH_KEY" $STAGING hiphop@$RSYNC_HOST:data/source/
-ssh -i $SSH_KEY hiphop@$RSYNC_HOST "/home/hiphop/trigger-hiphop"
+rsync $DRY_RUN -av -e "ssh -i $SSH_KEY" $STAGING hiphop@$RSYNC_HOST:data/source/
+if [ ! -z "$DRY_RUN" ]; then
+    ssh -i $SSH_KEY hiphop@$RSYNC_HOST "/home/hiphop/trigger-hiphop"
+fi
 
 # cleanup
 rm -rf $SOURCE
