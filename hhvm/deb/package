@@ -75,15 +75,17 @@ if [ `echo $VERSION | grep '.*-nightly.*'` ]; then
     echo "Nightly"
 fi
 if [ "$NIGHTLY" = true ]; then
-    GIT_TARGET=master
-    PACKAGE_VERSION=$NIGHTLY_DATE~$RELEASE
+    echo "You are using the wrong branch of the packaging script."
+    exit 1
 else
     GIT_TARGET=HHVM-$HHVM_VERSION
     PACKAGE_VERSION=`echo $VERSION | sed -E 's/-(dbg|dev)$//'`~$RELEASE
-    if [ $(expr $MINOR_VERSION % 3) -eq 0 ]; then
+    if [ $STABLE_VERSION -ne '3.15' ]; then
         echo "You are using the wrong branch of the packaging script."
         exit 1
     fi
+    LTS=true
+    echo "LTS"
 fi
 if [ `echo $VERSION | grep '.*-dev$'` ]; then
     DEVONLY=true
