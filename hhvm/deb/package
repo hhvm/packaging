@@ -46,6 +46,7 @@ DISTRO_DIR=$DIR/$RELEASE
 VERSION=$3 # Version of deb we are building, including minor revision (if applicable), e.g., 3.3.2-1
 HHVM_VERSION=`echo $VERSION | cut -d '-' -f 1` # Version without minor revision, e.g., 3.3.2
 STABLE_VERSION=`echo $VERSION | cut -d '.' -f 1-2` # Stable version series, e.g., 3.3
+MINOR_VERSION=`echo $VERSION | cut -d '.' -f 2` # Minor version, e.g., for 3.4.5-1 -> 4
 SOURCE=$4
 SKELETON=$DIR/skeleton
 PACKAGE=$5
@@ -79,12 +80,10 @@ if [ "$NIGHTLY" = true ]; then
 else
     GIT_TARGET=HHVM-$HHVM_VERSION
     PACKAGE_VERSION=`echo $VERSION | sed -E 's/-(dbg|dev)$//'`~$RELEASE
-    case $STABLE_VERSION in
-        3.3 | 3.6 | 3.9 | 3.12 | 3.15)
-            echo "You are using the wrong branch of the packaging script."
-            exit 1
-            ;;
-    esac
+    if [ $(expr $MINOR_VERSION % 3) -eq 0 ]; then
+        echo "You are using the wrong branch of the packaging script."
+        exit 1
+    fi
 fi
 if [ `echo $VERSION | grep '.*-dev$'` ]; then
     DEVONLY=true
