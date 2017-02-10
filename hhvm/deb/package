@@ -105,7 +105,7 @@ cd $SOURCE
 if [ ! -d $SOURCE/.git ]; then
     git clone $HHVM_REPO $SOURCE
     git checkout $GIT_TARGET
-   
+
     if [ "$NIGHTLY" = true ]; then
         perl -pi -e 's/([0-9.]*-dev)/\1~nightly.'$NIGHTLY_DATE/ hphp/system/idl/constants.idl.json
     fi
@@ -321,6 +321,18 @@ RSYNC_HOST=ftp-osl.osuosl.org
 
 mkdir -p $STAGING
 rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@$RSYNC_HOST:data/$DISTRO_NAME/ $STAGING || true
+
+# Make a lock on the remote machine so we don't collide with other packagers
+LOCKFILE=/tmp/build-sync.lock
+echo Waiting for lock...
+ssh -i $SSH_KEY hiphop@$RSYNC_HOST <<EOF 2>/dev/null
+until mkdir $LOCKFILE; do
+sleep 1
+done
+EOF
+echo Lock acquired...
+trap "{ ssh -i $SSH_KEY hiphop@$RSYNC_HOST 'rmdir $LOCKFILE' || true; }" EXIT
+
 # do it twice since it takes so long something else might have pushed
 rsync --delete -av -e "ssh -i $SSH_KEY" hiphop@$RSYNC_HOST:data/$DISTRO_NAME/ $STAGING
 
