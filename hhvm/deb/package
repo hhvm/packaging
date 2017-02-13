@@ -80,7 +80,7 @@ if [ "$NIGHTLY" = true ]; then
 else
     GIT_TARGET=HHVM-$HHVM_VERSION
     PACKAGE_VERSION=`echo $VERSION | sed -E 's/-(dbg|dev)$//'`~$RELEASE
-    if [ $STABLE_VERSION -ne '3.15' ]; then
+    if [ "$STABLE_VERSION" != '3.15' ]; then
         echo "You are using the wrong branch of the packaging script."
         exit 1
     fi
@@ -383,7 +383,7 @@ if [ "$NIGHTLY" = true ]; then
     RSYNC_OPTS="--delete"
 fi
 
-if [ ! -z "$DRY_RUN" ]; then
+if [ -n "$DRY_RUN" ]; then
   RSYNC_OPTS="$RSYNC_OPTS --dry-run"
 fi
 
