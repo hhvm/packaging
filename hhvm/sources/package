@@ -91,7 +91,7 @@ cp $SOURCE/hhvm-${VERSION}.tar.bz2 $STAGING/
 echo Source written to $STAGING/hhvm-${VERSION}.tar.bz2
 
 rsync $DRY_RUN -av -e "ssh -i $SSH_KEY" $STAGING hiphop@$RSYNC_HOST:data/source/
-if [ ! -z "$DRY_RUN" ]; then
+if [ -z "$DRY_RUN" ]; then
     ssh -i $SSH_KEY hiphop@$RSYNC_HOST "/home/hiphop/trigger-hiphop"
 fi
 
