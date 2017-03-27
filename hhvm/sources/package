@@ -41,14 +41,15 @@ fi
 DIR=`dirname $0`
 DIR=`readlink -m $DIR`
 VERSION=$1
-HHVM_VERSION=`echo $VERSION | cut -d '-' -f 1`
+HHVM_VERSION=`echo $VERSION | cut -d '-' -f 1` # Version without minor revision, e.g., 3.3.2
+STABLE_VERSION=`echo $VERSION | cut -d '.' -f 1-2` # Stable version series, e.g., 3.3
 SOURCE=$2
 
 if [ -z "$SOURCE" -o ! -d "$SOURCE" ]; then
 	SOURCE=`mktemp -d`
 fi
 
-GIT_TARGET=HHVM-$HHVM_VERSION
+GIT_TARGET=HHVM-$STABLE_VERSION
 
 if [ `echo $VERSION | grep '.*-nightly.*'` ]; then
 	echo "Nighly, doing nothing."
