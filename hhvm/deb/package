@@ -80,7 +80,7 @@ if [ "$NIGHTLY" = true ]; then
 else
     GIT_TARGET=HHVM-$HHVM_VERSION
     PACKAGE_VERSION=`echo $VERSION | sed -E 's/-(dbg|dev)$//'`~$RELEASE
-    if [ $(expr $MINOR_VERSION % 3) -eq 0 ]; then
+    if [ "$STABLE_VERSION" != '3.21' ]; then
         echo "You are using the wrong branch of the packaging script."
         exit 1
     fi
