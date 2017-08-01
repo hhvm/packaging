@@ -133,18 +133,18 @@ if [ ! -d $SOURCE/.git ]; then
         sudo cp -d $HEADERS/lib/libglog.so.0.0.0 /usr/lib/hhvm/
 
         # They also don't have a new enough jemalloc
-        sudo ln -sf /usr/lib/hhvm/libjemalloc.so.1 /usr/lib/hhvm/libjemalloc.so
+        sudo ln -sf /usr/lib/hhvm/libjemalloc.so.2 /usr/lib/hhvm/libjemalloc.so
         cd $HEADERS
-        wget http://www.canonware.com/download/jemalloc/jemalloc-3.6.0.tar.bz2
-        tar xjvf jemalloc-3.6.0.tar.bz2
+        wget http://www.canonware.com/download/jemalloc/jemalloc-4.2.1.tar.bz2
+        tar xjvf jemalloc-4.2.1.tar.bz2
         cd -
-        cd $HEADERS/jemalloc-3.6.0
+        cd $HEADERS/jemalloc-4.2.1
         ./configure --prefix=$HEADERS
-        make -j 8
+        CC=/usr/local/bin/g++ make -j 8
         make install
         cd -
         sudo cp -d $HEADERS/lib/libjemalloc.so /usr/lib/hhvm/
-        sudo cp -d $HEADERS/lib/libjemalloc.so.1 /usr/lib/hhvm/
+        sudo cp -d $HEADERS/lib/libjemalloc.so.2 /usr/lib/hhvm/
 
         # Or boost :(
         cd $HEADERS
@@ -247,7 +247,7 @@ if [ ! -d $PACKAGE/root ]; then
     if [ "$RELEASE" = "wheezy" ]; then
       mkdir -p $PACKAGE/root/usr/lib/hhvm/
       cp -L /usr/lib/hhvm/libglog.so.0 $PACKAGE/root/usr/lib/hhvm/
-      cp -L /usr/lib/hhvm/libjemalloc.so.1 $PACKAGE/root/usr/lib/hhvm/
+      cp -L /usr/lib/hhvm/libjemalloc.so.2 $PACKAGE/root/usr/lib/hhvm/
     fi
 
     if [ "$NIGHTLY" = true ]; then
