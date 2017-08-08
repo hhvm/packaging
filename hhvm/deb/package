@@ -221,26 +221,14 @@ if [ ! -d $PACKAGE/root ]; then
         cp $SOURCE/hphp/tools/oss-repo-mode $PACKAGE/root/usr/bin/hhvm-repo-mode
         chmod 755 $PACKAGE/root/usr/bin/hhvm-repo-mode
     fi
-    if [ -f $SOURCE/hphp/hack/bin/hh_server ]; then
-        cp $SOURCE/hphp/hack/bin/hh_client $PACKAGE/root/usr/bin/
-        cp $SOURCE/hphp/hack/bin/hh_server $PACKAGE/root/usr/bin/
-        chmod 755 $PACKAGE/root/usr/bin/hh_client
-        chmod 755 $PACKAGE/root/usr/bin/hh_server
-    fi
-    if [ -f $SOURCE/hphp/hack/bin/hackfmt ]; then
-        cp $SOURCE/hphp/hack/bin/hackfmt $PACKAGE/root/usr/bin/
-        chmod 755 $PACKAGE/root/usr/bin/hackfmt
-    fi
-    if [ -f $SOURCE/hphp/hack/bin/hh_format ]; then
-        cp $SOURCE/hphp/hack/bin/hh_format $PACKAGE/root/usr/bin/
-        chmod 755 $PACKAGE/root/usr/bin/hh_format
-    fi
-    if [ -f $SOURCE/hphp/hack/bin/h2tp ]; then
-      cp $SOURCE/hphp/hack/bin/h2tp $PACKAGE/root/usr/bin/
-      chmod 755 $PACKAGE/root/usr/bin/h2tp
-      mkdir -p $PACKAGE/root/usr/share/hhvm/hack/
-      cp -r $SOURCE/hphp/hack/src/h2tp/resources $PACKAGE/root/usr/share/hhvm/hack/hacklib
-    fi
+    HACK_BINS="hh_client hh_server hackfmt hh_parse hh_format"
+    for HACK_BIN in $HACK_BINS; do
+        if [ -f "$SOURCE/hphp/hack/bin/$HACK_BIN" ]; then
+            install -m 755 \
+                "$SOURCE/hphp/hack/bin/$HACK_BIN" \
+                "$PACKAGE/root/usr/bin/$HACK_BIN"
+        fi
+    done
     mkdir -p $PACKAGE/root/usr/share/hhvm/hack/
     cp -r $SOURCE/hphp/hack/editor-plugins/emacs $PACKAGE/root/usr/share/hhvm/hack/
 
