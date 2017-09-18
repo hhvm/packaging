@@ -135,7 +135,7 @@ if [ ! -d $SOURCE/.git ]; then
         # They also don't have a new enough jemalloc
         sudo ln -sf /usr/lib/hhvm/libjemalloc.so.2 /usr/lib/hhvm/libjemalloc.so
         cd $HEADERS
-        wget http://www.canonware.com/download/jemalloc/jemalloc-4.2.1.tar.bz2
+        wget https://github.com/jemalloc/jemalloc/releases/download/4.2.1/jemalloc-4.2.1.tar.bz2
         tar xjvf jemalloc-4.2.1.tar.bz2
         cd -
         cd $HEADERS/jemalloc-4.2.1
