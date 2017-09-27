@@ -150,7 +150,7 @@ if [ ! -d $SOURCE/.git ]; then
 
         # Or boost :(
         cd $HEADERS
-        wget http://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.bz2/download -O boost_1_55_0.tar.bz2
+        wget https://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.bz2/download -O boost_1_55_0.tar.bz2
         tar xf boost_1_55_0.tar.bz2
         cd -
         cd $HEADERS/boost_1_55_0/
