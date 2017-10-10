@@ -84,6 +84,8 @@ else
         echo "You are using the wrong branch of the packaging script."
         exit 1
     fi
+    LTS=true
+    echo "LTS"
 fi
 if [ `echo $VERSION | grep '.*-dev$'` ]; then
     DEVONLY=true
