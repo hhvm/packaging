@@ -13,7 +13,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 VERSION="$(date +%Y.%m.%d)"
 PKGVER="1~jessie"
-BUILD_DEPS="hhvm-nightly-build-deps_1.0_all.deb"
+BUILD_DEPS="hhvm-nightly-build-deps_${VERSION}-${PKGVER}_all.deb"
 cd "$(mktemp -d hhvmpkg.XXXXXXXX --tmpdir)"
 
 # Environment set up

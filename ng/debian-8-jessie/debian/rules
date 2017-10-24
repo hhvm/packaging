@@ -9,4 +9,4 @@ override_dh_auto_configure:
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo
 
 override_dh_strip:
-	dh_strip --dbg-package=hhvm-dbg
+	dh_strip --dbg-package=hhvm-nightly-dbg
