@@ -10,6 +10,7 @@
 set -ex
 
 export DEBIAN_FRONTEND=noninteractive
+export DEB_BUILD_OPTIONS="parallel=$(egrep -c '^processor' /proc/cpuinfo)"
 
 VERSION="$(date +%Y.%m.%d)"
 PKGVER="1~jessie"
