@@ -1,4 +1,4 @@
-Source: hhvm
+Source: hhvm-nightly
 Maintainer: HHVM Open Source <hhvm-oss@fb.com>
 Section: web
 Priority: optional
@@ -63,22 +63,22 @@ Build-Depends:
   libpq-dev,
   libsodium-dev
 
-Package: hhvm
+Package: hhvm-nightly
 Architecture: any
 Depends: tzdata, lsof, ${shlib:Depends}, ${misc:Depends}
 Description: HHVM virtual machine, runtime, and JIT for the PHP and Hack languages
 
-Package: hhvm-dbg
+Package: hhvm-nightly-dbg
 Architecture: any
-Depends: hhvm (= ${binary:Version}), ${misc:Depends}
+Depends: hhvm-nightly (= ${binary:Version}), ${misc:Depends}
 Recommends: perf, gdb
 Section: debug
 Priority: extra
 Description: Debugging symbols for HHVM.
 
-Package: hhvm-dev
+Package: hhvm-nightly-dev
 Architecture: any
-Depends: hhvm (= ${binary:Version}), ${misc:Depends}
+Depends: hhvm-nightly (= ${binary:Version}), ${misc:Depends}
 Recommends: cmake
 Section: libdevel
 Priority: extra

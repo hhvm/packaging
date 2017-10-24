@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree. An additional grant
+# of patent rights can be found in the PATENTS file in the same directory.
+
+set -ex
+
+export DEBIAN_FRONTEND=noninteractive
+
+VERSION="$(date +%Y.%m.%d)"
+PKGVER="1~jessie"
+BUILD_DEPS="hhvm-nightly-build-deps_1.0_all.deb"
+cd "$(mktemp -d hhvmpkg.XXXXXXXX --tmpdir)"
+
+# Environment set up
+apt-get update -y
+apt-get install -y devscripts
+
+# Source extraction
+cp /var/out/hhvm-nightly_$VERSION.orig.tar.gz .
+tar zxf hhvm-nightly_$VERSION.orig.tar.gz
+cd hhvm-nightly-$VERSION
+cp -R /var/source/debian-8-jessie/debian/ debian/
+
+# Add debian changelog entry
+dch --create -v $VERSION-$PKGVER --package hhvm-nightly --controlmaint --distribution jessie --force-distribution --empty
+
+# Build debian package that depends on build-depends, and install it
+mk-build-deps
+dpkg -i "$BUILD_DEPS" || true
+apt-get install -y -f
+rm "$BUILD_DEPS"
+
+# Build the actual debian packages
+debuild -us -uc

@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree. An additional grant
+# of patent rights can be found in the PATENTS file in the same directory.
+
+ROOT="$(realpath "$(dirname $0)/..")"
+OUT="$ROOT/out/"
+
+docker run -it -v "$OUT":/var/out -v "$ROOT":/var/source:ro debian:jessie /bin/bash -l
