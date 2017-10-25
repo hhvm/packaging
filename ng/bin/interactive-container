@@ -9,10 +9,17 @@
 
 ROOT="$(realpath "$(dirname $0)/..")"
 OUT="$ROOT/out/"
+DISTRO=${1:-"debian-8-jessie"}
+DOCKER_BASE="$(<"${ROOT}/${DISTRO}/DOCKER_BASE")"
+
+if [ ! -d "${ROOT}/${DISTRO}" ]; then
+  echo "Unsupported distro: ${DISTRO}"
+  exit 1
+fi
 
 docker run -it \
   -v "$OUT":/var/out \
   -v "$ROOT":/opt/hhvm-packaging:ro \
-  -v "${ROOT}/debian-8-jessie":/opt/hhvm-distro-packaging:ro \
-  debian:jessie \
+  -v "${ROOT}/${DISTRO}":/opt/hhvm-distro-packaging:ro \
+  "${DOCKER_BASE}" \
   /bin/bash -l

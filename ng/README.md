@@ -30,6 +30,9 @@ You probably want `make-package` to be a symlink to `/opt/hhvm-packaging/bin/mak
  - a `PKGVER` file containing the *package* version - e.g. `1~jessie`
  - a `debian/` subdirectory, containing `control`, `rules`, etc.
 
+If you are able to use an existing distribution's `debian/` directory directly, please make it a symlink to
+`/opt/hhvm-packaging/OTHER_DISTRO_HERE/debian`.
+
 Packages will be build with `debbuild`
 
 Local usage
@@ -40,3 +43,5 @@ Local usage
 3. within the container, install git (e.g. `apt-get update -y; apt-get install -y git`)
 4. run `/opt/hhvm-packaging/bin/make-source-tarball`
 5. run `/opt/hhvm-distro-packaging/make-package`
+
+You can specify a distribution at step 2 - for example, `bin/interactive-container debian-9-stretch'
