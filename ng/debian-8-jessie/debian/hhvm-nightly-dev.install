@@ -1,2 +1,4 @@
-usr/include/* usr/include
-usr/lib/* usr/lib
+/usr/bin/hhvm-gdb /usr/bin
+/usr/bin/hphpize /usr/bin
+/usr/include/hphp /usr/include
+/usr/lib/x86_64-linux-gnu/hhvm /usr/lib/x86_64-linux-gnu
