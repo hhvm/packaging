@@ -17,7 +17,9 @@ For example, when building for Debian Jessie, the `debian-8-jessie/`
 subdirectory is mounted to /opt/hhvm-distro-packaging.
 
 The package building process will execute
-`/opt/hhvm-distro-packaging/make-package` in the container, and will expect that to create packages in `/var/out`.
+`/opt/hhvm-distro-packaging/make-package` in the container, and will
+expect that to create packages in `/var/out`. `make-package` should install
+all required build dependencies.
 
 Debian-like distributions
 -------------------------
@@ -29,3 +31,12 @@ You probably want `make-package` to be a symlink to `/opt/hhvm-packaging/bin/mak
  - a `debian/` subdirectory, containing `control`, `rules`, etc.
 
 Packages will be build with `debbuild`
+
+Local usage
+===========
+
+1. [Install Docker](https://www.docker.com/get-docker)
+2. run `bin/interactive-container`; you now have a shell in the container
+3. within the container, install git (e.g. `apt-get update -y; apt-get install -y git`)
+4. run `/opt/hhvm-packaging/bin/make-source-tarball`
+5. run `/opt/hhvm-distro-packaging/make-package`
