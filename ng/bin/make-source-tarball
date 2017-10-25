@@ -10,7 +10,7 @@
 set -ex
 
 ROOT="$(realpath "$(dirname $0)/..")"
-if [ "$ROOT" == "/var/source" ]; then
+if [ "$ROOT" == "/opt/hhvm-packaging" ]; then
   OUT=/var/out
 else
   OUT="$ROOT/out/"

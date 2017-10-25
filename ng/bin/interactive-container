@@ -10,4 +10,9 @@
 ROOT="$(realpath "$(dirname $0)/..")"
 OUT="$ROOT/out/"
 
-docker run -it -v "$OUT":/var/out -v "$ROOT":/var/source:ro debian:jessie /bin/bash -l
+docker run -it \
+  -v "$OUT":/var/out \
+  -v "$ROOT":/opt/hhvm-packaging:ro \
+  -v "${ROOT}/debian-8-jessie":/opt/hhvm-distro-packaging:ro \
+  debian:jessie \
+  /bin/bash -l
