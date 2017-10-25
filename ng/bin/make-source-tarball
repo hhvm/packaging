@@ -10,15 +10,20 @@
 set -ex
 
 ROOT="$(realpath "$(dirname $0)/..")"
-OUT="$ROOT/out/"
+if [ "$ROOT" == "/var/source" ]; then
+  OUT=/var/out
+else
+  OUT="$ROOT/out/"
+fi
 TEMPDIR="$(mktemp -d)"
 VERSION="$(date +%Y.%m.%d)"
+TAR=${TAR:-tar}
 cd "$TEMPDIR"
 git clone https://github.com/facebook/hhvm.git hhvm-nightly-$VERSION
 cd hhvm-nightly-$VERSION
 git submodule update --init --recursive
 find . -name '.git' | xargs rm -rf
 cd ..
-gtar zcf "$OUT/hhvm-nightly_$VERSION.orig.tar.gz" hhvm-nightly-$VERSION
+$TAR zcf "$OUT/hhvm-nightly_$VERSION.orig.tar.gz" hhvm-nightly-$VERSION
 cd
 rm -rf "$TEMPDIR"
