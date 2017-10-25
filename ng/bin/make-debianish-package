@@ -15,7 +15,9 @@ export DEB_BUILD_OPTIONS="parallel=$(egrep -c '^processor' /proc/cpuinfo)"
 VERSION="$(date +%Y.%m.%d)"
 PKGVER="1~jessie"
 BUILD_DEPS="hhvm-nightly-build-deps_${VERSION}-${PKGVER}_all.deb"
-cd "$(mktemp -d hhvmpkg.XXXXXXXX --tmpdir)"
+OUT="/var/out"
+TEMP="$(mktemp -d hhvmpkg.XXXXXXXX --tmpdir)"
+cd "$TEMP"
 
 # Environment set up
 apt-get update -y
@@ -34,7 +36,11 @@ dch --create -v $VERSION-$PKGVER --package hhvm-nightly --controlmaint --distrib
 mk-build-deps
 dpkg -i "$BUILD_DEPS" || true
 apt-get install -y -f
-rm "$BUILD_DEPS"
+mv "$BUILD_DEPS" "$OUT"
 
 # Build the actual debian packages
 debuild -us -uc
+cd ..
+cp *.{deb,dsc,debian.tar.xz,build,changes} "$OUT"
+set +ex
+echo "Build tree: $TEMP"
