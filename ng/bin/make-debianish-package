@@ -22,7 +22,7 @@ cd "$TEMP"
 
 # Environment set up
 apt-get update -y
-apt-get install -y devscripts
+apt-get install -y devscripts equivs
 
 # Source extraction
 cp /var/out/hhvm-nightly_$VERSION.orig.tar.gz .
