@@ -17,7 +17,9 @@ if [ ! -d "${ROOT}/${DISTRO}" ]; then
   exit 1
 fi
 
+# unconfined security opt so gdb works
 docker run -it \
+  --security-opt seccomp=unconfined \
   -v "$OUT":/var/out \
   -v "$ROOT":/opt/hhvm-packaging:ro \
   -v "${ROOT}/${DISTRO}":/opt/hhvm-distro-packaging:ro \
