@@ -25,7 +25,7 @@ apt-get update -y
 apt-get install -y devscripts equivs
 
 # Source extraction
-cp /var/out/hhvm-nightly_$VERSION.orig.tar.gz .
+cp /var/out/hhvm-nightly-$VERSION.tar.gz hhvm-nightly_$VERSION.orig.tar.gz
 tar zxf hhvm-nightly_$VERSION.orig.tar.gz
 cd hhvm-nightly-$VERSION
 cp -R /opt/hhvm-distro-packaging/debian/ debian/
