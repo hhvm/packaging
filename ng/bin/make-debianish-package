@@ -29,6 +29,7 @@ cp /var/out/hhvm-nightly-$VERSION.tar.gz hhvm-nightly_$VERSION.orig.tar.gz
 tar zxf hhvm-nightly_$VERSION.orig.tar.gz
 cd hhvm-nightly-$VERSION
 cp -R /opt/hhvm-distro-packaging/debian/ debian/
+cp -R /opt/hhvm-packaging/skeleton/ debian/skeleton
 
 # Add debian changelog entry
 dch --create -v $VERSION-$PKGVER --package hhvm-nightly --controlmaint --distribution "$DISTRIBUTION" --force-distribution --empty
