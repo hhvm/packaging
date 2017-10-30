@@ -55,3 +55,19 @@ Building packages non-interactively
 4. run `bin/make-package-in-throwaway-container DISTRO_ID` (for each distribution)
 
 `DISTRO_ID` is the name of one of the distribution-specific subdirectories, e.g. `debian-9-stretch`.
+
+Docker base images
+==================
+
+Required for:
+ - Debian Wheezy
+
+Some distributions do not have a recent enough GCC, so we use a custom base image and lie about build-depends. To build these:
+
+```
+docker build --tag debian-7-wheezy:gcc5 \
+  -f ./dockerfiles/debian-7-wheezy.Dockerfile \
+  ./dockerfiles
+```
+
+This must be done before following the instructions above.
