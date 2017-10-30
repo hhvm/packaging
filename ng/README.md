@@ -71,3 +71,14 @@ docker build --tag debian-7-wheezy:gcc5 \
 ```
 
 This must be done before following the instructions above.
+
+AWS task images
+---------------
+
+These should be built like this:
+
+```
+docker build -t hhvm-build-source . -f aws/dockerfiles/hhvm-build-source.Dockerfile
+```
+
+For instructions on pushing these to AWS, see 'push commands' under the AWS repository in the ECS dashboard.
