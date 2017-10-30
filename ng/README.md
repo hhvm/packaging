@@ -35,13 +35,23 @@ If you are able to use an existing distribution's `debian/` directory directly, 
 
 Packages will be build with `debbuild`
 
-Local usage
-===========
+Local interactive usage
+=======================
 
 1. [Install Docker](https://www.docker.com/get-docker)
-2. run `bin/interactive-container`; you now have a shell in the container
+2. run `bin/make-interactive-container`; you now have a shell in the container
 3. within the container, install git (e.g. `apt-get update -y; apt-get install -y git`)
 4. run `/opt/hhvm-packaging/bin/make-source-tarball`
 5. run `/opt/hhvm-distro-packaging/make-package`
 
 You can specify a distribution at step 2 - for example, `bin/interactive-container debian-9-stretch'
+
+Building packages non-interactively
+===================================
+
+1. [Install Docker](https://www.docker.com/get-docker)
+2. If you are on MacOS, `brew install gnu-tar`, and `export TAR=gtar`
+3. `bin/make-source-tarball` (just once)
+4. run `bin/make-package-in-throwaway-container DISTRO_ID` (for each distribution)
+
+`DISTRO_ID` is the name of one of the distribution-specific subdirectories, e.g. `debian-9-stretch`.
