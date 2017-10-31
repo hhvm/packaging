@@ -37,6 +37,7 @@ aws ec2 run-instances \
   --iam-instance-profile "Arn=arn:aws:iam::223121549624:instance-profile/hhvm-binary-package-builder" \
   --key-name "$KEYPAIR" \
   --block-device-mapping="DeviceName=/dev/sda1,VirtualName=,Ebs={VolumeSize=100,VolumeType=gp2,DeleteOnTermination=true}" \
-  --user-data "file://${INIT_SCRIPT}"
+  --user-data "file://${INIT_SCRIPT}" \
+  --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=hhvm-build-$VERSION-$DISTRO}]"
 
 rm "${INIT_SCRIPT}"
