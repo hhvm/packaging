@@ -18,6 +18,7 @@ if [ ! -d "${ROOT}/${DISTRO}" ]; then
 fi
 
 docker run -it \
+  -e "VERSION" \
   -v "$OUT":/var/out \
   -v "$ROOT":/opt/hhvm-packaging:ro \
   -v "${ROOT}/${DISTRO}":/opt/hhvm-distro-packaging:ro \
