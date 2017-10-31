@@ -27,7 +27,7 @@ aws s3 cp s3://hhvm-downloads/source/nightlies/hhvm-nightly-${VERSION}.tar.gz ou
 
 bin/make-package-in-throwaway-container "$DISTRO"
 
-rm out/hhvm-nightly-${VERSION.tar.gz}
+rm out/hhvm-nightly-${VERSION}.tar.gz
 
 aws s3 cp out/* "s3://hhvm-scratch/nightlies/"
 
