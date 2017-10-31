@@ -72,13 +72,12 @@ docker build --tag debian-7-wheezy:gcc5 \
 
 This must be done before following the instructions above.
 
-AWS task images
----------------
+AWS
+===
 
-These should be built like this:
+As we want to execute docker commands, we run directly on EC2, not ECS. AWS
+supports running commands on EC2 instance startup - EC2 calls this
+'user data' - a file or script-as-text in 'user data' will be executed.
 
-```
-docker build -t hhvm-build-source . -f aws/dockerfiles/hhvm-build-source.Dockerfile
-```
-
-For instructions on pushing these to AWS, see 'push commands' under the AWS repository in the ECS dashboard.
+The scripts we use are in the `aws/` subdirectory, and expect to be ran on
+Ubuntu 16.04 hosts.

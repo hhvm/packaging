@@ -8,9 +8,13 @@
 # of patent rights can be found in the PATENTS file in the same directory.
 
 set -ex
-export TZ=UTC
 
-mkdir -p /var/out
-/opt/hhvm-packaging/bin/make-source-tarball
-cd /var/out/
-aws s3 cp /var/out/*.tar.gz s3://hhvm-downloads/source/nightlies/
+export TZ=UTC
+export VERSION=${VERSION:-"$(date +%Y.%m.%d)"}
+
+apt-get update -y
+apt-get install -y curl wget git awscli
+git clone https://github.com/hhvm/packaging hhvm-packaging
+cd hhvm-packaging/ng
+bin/make-source-tarball
+aws s3 cp out/*.tar.gz s3://hhvm-downloads/source/nightlies/
