@@ -16,7 +16,7 @@ else
   OUT="$ROOT/out/"
 fi
 TEMPDIR="$(mktemp -d)"
-VERSION="$(date +%Y.%m.%d)"
+VERSION=${VERSION:-"$(date +%Y.%m.%d)"}
 TAR=${TAR:-tar}
 cd "$TEMPDIR"
 git clone https://github.com/facebook/hhvm.git hhvm-nightly-$VERSION
