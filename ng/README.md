@@ -81,3 +81,13 @@ supports running commands on EC2 instance startup - EC2 calls this
 
 The scripts we use are in the `aws/` subdirectory, and expect to be ran on
 Ubuntu 16.04 hosts.
+
+Manually triggering a package build on AWS
+------------------------------------------
+
+Assuming the `hhvm-downloads` S3 bucket contains the relevant source
+tarball and you have the AWS CLI configured:
+
+```
+DISTRO=debian-8-jessie VERSION=2017.10.30 bin/make-package-on-aws
+```

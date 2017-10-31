@@ -8,6 +8,7 @@
 # of patent rights can be found in the PATENTS file in the same directory.
 
 set -ex
+shutdown -h 180 # auto-shutdown after 3 hours
 
 export TZ=UTC
 export VERSION=${VERSION:-"$(date +%Y.%m.%d)"}
@@ -29,3 +30,5 @@ bin/make-package-in-throwaway-container "$DISTRO"
 rm out/hhvm-nightly-${VERSION.tar.gz}
 
 aws s3 cp out/* "s3://hhvm-scratch/nightlies/"
+
+shutdown -h now

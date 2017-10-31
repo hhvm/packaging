@@ -9,6 +9,8 @@
 
 set -ex
 
+shutdown -h 30 # auto-shutdown after 30 minutes
+
 export TZ=UTC
 export VERSION=${VERSION:-"$(date +%Y.%m.%d)"}
 
@@ -18,3 +20,5 @@ git clone https://github.com/hhvm/packaging hhvm-packaging
 cd hhvm-packaging/ng
 bin/make-source-tarball
 aws s3 cp out/*.tar.gz s3://hhvm-downloads/source/nightlies/
+
+shutdown -h now
