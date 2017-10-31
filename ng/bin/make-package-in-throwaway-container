@@ -17,7 +17,7 @@ if [ ! -d "${ROOT}/${DISTRO}" ]; then
   exit 1
 fi
 
-docker run -it \
+docker run \
   -e "VERSION" \
   -v "$OUT":/var/out \
   -v "$ROOT":/opt/hhvm-packaging:ro \
