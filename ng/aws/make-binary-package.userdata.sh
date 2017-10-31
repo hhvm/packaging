@@ -29,6 +29,6 @@ bin/make-package-in-throwaway-container "$DISTRO"
 
 rm out/hhvm-nightly-${VERSION}.tar.gz
 
-aws s3 cp out/* "s3://hhvm-scratch/nightlies/"
+aws s3 cp --include '*' --recursive ./ s3://hhvm-scratch/nightlies/
 
 shutdown -h now
