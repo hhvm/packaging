@@ -10,17 +10,15 @@
 set -ex 
 
 cd /tmp
-wget http://mirrors.ocf.berkeley.edu/gnu/gcc/gcc-5.5.0/gcc-5.5.0.tar.gz
-tar zxf gcc-5.5.0.tar.gz
+VERSION=4.5.0
 
-cd gcc-5.5.0
-contrib/download_prerequisites
+wget -q https://github.com/jemalloc/jemalloc/releases/download/$VERSION/jemalloc-$VERSION.tar.bz2
+tar jxf jemalloc-$VERSION.tar.bz2
+cd jemalloc-$VERSION
 
-mkdir ../objdir
-cd ../objdir
-
-$(pwd)/../gcc-5.5.0/configure --enable-language=c,c++
+./configure \
+  --enable-static \
+  --disable-shared \
+  --libdir=/usr/local/lib64
 make -j8
 make install
-cd /tmp
-rm -rf /tmp/{gcc-5.5.0,objdir,gcc-5.5.0.tar.gz}

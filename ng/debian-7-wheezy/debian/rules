@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+%:
+	dh $@ --buildsystem=cmake --parallel
+
+override_dh_auto_configure:
+	debian/build-deps/build-gcc
+	debian/build-deps/build-glog
+	debian/build-deps/build-jemalloc
+	debian/build-deps/build-boost
+	dh_auto_configure -- \
+	-Wno-dev \
+	-DMYSQL_UNIX_SOCK_ADDR=/var/run/mysqld/mysqld.sock \
+	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  -DSTATIC_CXX_LIB=On \
+  -DBoost_USE_STATIC_LIBS=On
+
+override_dh_strip:
+	dh_strip --dbg-package=hhvm-nightly-dbg

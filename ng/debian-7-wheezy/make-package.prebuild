@@ -7,9 +7,5 @@
 # LICENSE file in the root directory of this source tree. An additional grant
 # of patent rights can be found in the PATENTS file in the same directory.
 
-set -ex 
-
-apt-get update -y
-apt-get install -y wget build-essential gcc-multilib unzip zip git autotools-dev autoconf
-apt-get clean
-rm -rf /var/lib/apt/lists/*
+mkdir debian/build-deps/
+cp /opt/hhvm-packaging/dockerfiles/bin/* debian/build-deps/

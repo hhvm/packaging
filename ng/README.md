@@ -65,7 +65,7 @@ Required for:
 Some distributions do not have a recent enough GCC, so we use a custom base image and lie about build-depends. To build these:
 
 ```
-docker build --tag debian-7-wheezy:gcc5 \
+docker build --tag debian-7-wheezy:hhvm \
   -f ./dockerfiles/debian-7-wheezy.Dockerfile \
   ./dockerfiles
 ```

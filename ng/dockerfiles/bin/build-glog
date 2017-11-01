@@ -9,7 +9,15 @@
 
 set -ex 
 
-apt-get update -y
-apt-get install -y wget build-essential gcc-multilib unzip zip git autotools-dev autoconf
-apt-get clean
-rm -rf /var/lib/apt/lists/*
+cd /tmp
+VERSION=0.3.5
+git clone https://github.com/google/glog.git google-glog
+cd google-glog
+git checkout v$VERSION
+autoreconf
+./configure \
+  --enable-static \
+  --disable-shared \
+  --libdir=/usr/local/lib64
+make -j8
+make install
