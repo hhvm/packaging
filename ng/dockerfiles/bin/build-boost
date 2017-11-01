@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 #
 # Copyright (c) 2017-present, Facebook, Inc.
 # All rights reserved.
@@ -12,8 +12,11 @@ set -ex
 cd /tmp
 VERSION=1.65.1
 VERSION_US=$(echo $VERSION | tr . _)
-wget https://dl.bintray.com/boostorg/release/$VERSION/source/boost_${VERSION_US}.tar.bz2
-tar jxf boost-${VERSION}.tar.bz2
+
+wget -q https://dl.bintray.com/boostorg/release/$VERSION/source/boost_${VERSION_US}.tar.bz2
+tar jxf boost_${VERSION_US}.tar.bz2
+
+cd boost_${VERSION_US}
 
 ./bootstrap.sh --without-libraries=python
 ./b2 variant=release threading=multi link=static --layout=tagged -j8
