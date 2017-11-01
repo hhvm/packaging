@@ -1,0 +1,35 @@
+{
+  "StartAt": "Get Version Number For Build",
+  "States": {
+    "Get Version Number For Build": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-get-build-version",
+      "Next": "Create Source Tarball"
+    },
+    "Create Source Tarball": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-build-source-tarball",
+      "Next": "Wait For Source Tarball"
+    },
+    "Wait For Source Tarball": {
+      "Type": "Wait",
+      "Seconds": 120,
+      "Next": "Check For Source Tarball"
+    },
+    "Check For Source Tarball": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-have-source-tarball",
+      "Retry": [{
+        "ErrorEquals": [ "NotFound" ],
+        "IntervalSeconds": 30,
+        "MaxAttempts": 10
+      }],
+      "Next": "Trigger Builds"
+    },
+    "Trigger Builds": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-build-binary-packages",
+      "End": true
+    }
+  }
+}
