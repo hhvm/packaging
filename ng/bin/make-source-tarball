@@ -25,5 +25,5 @@ git submodule update --init --recursive
 find . -name '.git' | xargs rm -rf
 cd ..
 $TAR zcf "$OUT/hhvm-nightly-$VERSION.tar.gz" hhvm-nightly-$VERSION
-cd
+cd /
 rm -rf "$TEMPDIR"
