@@ -6,6 +6,10 @@ All linux builds will be in Docker containers, on AWS.
 Configuration
 =============
 
+Distribution subdirectories should be consistently named: `DISTRO-NUMERIC_VERSION[-NAME]` - for example, `debian-9-stretch`. There are two required files:
+ - `make-package`: create a package from `/var/out/hhvm-nightly-$VERSION.tar.gz`, and put the output in `/var/out`
+ - `DOCKER_BASE`: the name of a public docker image that should be used for the build - for example, `debian:stretch`. It needs to be possible to pass this to `docker run`, for example, `docker run -it debian:stretch /bin/bash -l` should work.
+
 Docker containers will have the following directories bind-mounted:
 
  - `/var/out`: read-write; build artifacts (e.g. packages) go here.
@@ -19,7 +23,8 @@ subdirectory is mounted to /opt/hhvm-distro-packaging.
 The package building process will execute
 `/opt/hhvm-distro-packaging/make-package` in the container, and will
 expect that to create packages in `/var/out`. `make-package` should install
-all required build dependencies.
+all required build dependencies. Use the native package manager's support
+for `build-depends` or similar where possible.
 
 Debian-like distributions
 -------------------------
