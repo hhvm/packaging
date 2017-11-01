@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree. An additional grant
+# of patent rights can be found in the PATENTS file in the same directory.
+
+cd /tmp
+MINOR_VERSION=3.9
+FULL_VERSION=${MINOR_VERSION}.4
+
+wget -q https://cmake.org/files/v${MINOR_VERSION}/cmake-${FULL_VERSION}.tar.gz
+tar zxf cmake-${FULL_VERSION}.tar.gz
+cd cmake-${FULL_VERSION}
+
+./bootstrap
+make -j8
+make install
