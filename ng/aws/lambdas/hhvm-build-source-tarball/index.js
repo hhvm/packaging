@@ -36,9 +36,9 @@ function make_source_tarball(version, user_data, callback) {
   const ec2 = new AWS.EC2();
   ec2.runInstances(params, function(err, data) {
     if (err) {
-    callback(err, 'failed to schedule instance');
+      callback(err, 'failed to schedule instance');
     } else {
-    callback(null, "data");
+      callback(null, {version: version});
     }
   });
 }
