@@ -14,7 +14,7 @@ function make_binary_package(distro, version, user_data, callback) {
   } else {
     user_data = "VERSION="+version+"\n"+user_data;
   }
-  user_data = "#!/bin/bash\nDISTRO="+distro+"=n"+user_data;
+  user_data = "#!/bin/bash\nDISTRO="+distro+"\n"+user_data;
 
   const params = {
     ImageId: /* ubuntu 16.04 */ 'ami-6e1a0117',
