@@ -16,13 +16,28 @@ if [ -z "$DISTRO" ]; then
   exit 1
 fi
 
-if [ -z "$VERSION" ]; then
-  PAYLOAD="$(echo "{\"distro\": \"${DISTRO}\"}")"
-else
-  PAYLOAD="$(echo "{\"distro\": \"${DISTRO}\", \"version\": \"${VERSION}\"}")"
-fi
+UBUNTU_16_04_AMI=ami-6e1a0117
+INSTANCE_TYPE=c4.2xlarge # 8 cores, 15GB of RAM
+KEYPAIR="hhvm-package-builders"
 
-aws lambda invoke \
-  --function-name hhvm-build-binary-package \
-  --payload "${PAYLOAD}" \
-  /dev/stdout --region us-west-2
+INIT_SCRIPT=$(mktemp -t hhvm-aws-init-script)
+cat > $INIT_SCRIPT <<EOF
+#!/bin/bash
+VERSION=${VERSION}
+DISTRO=${DISTRO}
+EOF
+cat "$ROOT/aws/make-binary-package.userdata.sh" >> $INIT_SCRIPT
+
+aws ec2 run-instances \
+  --region us-west-2 \
+  --image-id $UBUNTU_16_04_AMI \
+  --instance-type $INSTANCE_TYPE \
+  --security-groups hhvm-binary-package-builders \
+  --instance-initiated-shutdown-behavior terminate \
+  --iam-instance-profile "Arn=arn:aws:iam::223121549624:instance-profile/hhvm-binary-package-builder" \
+  --key-name "$KEYPAIR" \
+  --block-device-mapping="DeviceName=/dev/sda1,VirtualName=,Ebs={VolumeSize=50,VolumeType=gp2,DeleteOnTermination=true}" \
+  --user-data "file://${INIT_SCRIPT}" \
+  --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=hhvm-build-$VERSION-$DISTRO}]"
+
+rm "${INIT_SCRIPT}"

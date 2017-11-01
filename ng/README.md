@@ -82,9 +82,3 @@ DISTRO=debian-8-jessie VERSION=2017.10.30 bin/make-package-on-aws
 ```
 
 This will put the packages into the private `hhvm-scratch` S3 bucket.
-
-Automation Architecture
------------------------
-
-We use AWS step functions (state machines) to coordinate the various processes:
- - hhvm-build-starter: figure out source version, create source tarball, wait for source tarball, trigger builds
