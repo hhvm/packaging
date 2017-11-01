@@ -82,3 +82,28 @@ DISTRO=debian-8-jessie VERSION=2017.10.30 bin/make-package-on-aws
 ```
 
 This will put the packages into the private `hhvm-scratch` S3 bucket.
+
+Automation Architecture
+-----------------------
+
+We have AWS lambda functions (in the `aws/lambdas/` subdirectory) to trigger
+the various EC2 jobs.
+
+These, in turn, are either manually triggered by the `-on-aws` scripts in
+`bin/`, or via CloudWatch events.
+
+There are two kinds of CloudWatch events we use:
+
+ - scheduled: basically a cronjob
+ - S3 upload events: CloudWatch is a logging system, with support for triggering
+   events when something happens; in this case, we log all writes to the HHVM
+   packaging S3 buckets, and trigger events when they happen.
+
+The general flow is:
+
+1. the scheduled event triggers the source-tarball-lambda
+1. the lambda triggers an EC2 job to build the source tarball
+1. the EC2 job creates the source tarball and uploads it to S3
+1. this tarball upload triggers a cloudwatch event
+1. the cloudwatch event triggers the binary packaging lambdas
+1. TODO: repo building
