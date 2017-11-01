@@ -7,8 +7,8 @@ Configuration
 =============
 
 Distribution subdirectories should be consistently named: `DISTRO-NUMERIC_VERSION[-VERSION_NAME]` - for example, `debian-9-stretch`, or `ubuntu-16.04-xenial`. There are two required files:
- - `make-package`: create a package from `/var/out/hhvm-nightly-$VERSION.tar.gz`, and put the output in `/var/out`
- - `DOCKER_BASE`: the name of a public docker image that should be used for the build - for example, `debian:stretch`. It needs to be possible to pass this to `docker run`, for example, `docker run -it debian:stretch /bin/bash -l` should work.
+ - `make-package`: executable script that creates a package from `/var/out/hhvm-nightly-$VERSION.tar.gz`, and put the output in `/var/out`
+ - `DOCKER_BASE`: plain text file containing the name of a public docker image that should be used for the build - for example, `debian:stretch`. It needs to be possible to pass this to `docker run`, for example, `docker run -it debian:stretch /bin/bash -l` should work.
 
 Docker containers will have the following directories bind-mounted:
 
