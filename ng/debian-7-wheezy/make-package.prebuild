@@ -8,4 +8,4 @@
 # of patent rights can be found in the PATENTS file in the same directory.
 
 mkdir debian/build-deps/
-cp /opt/hhvm-packaging/dockerfiles/bin/* debian/build-deps/
+cp /opt/hhvm-packaging/build-deps/* debian/build-deps/

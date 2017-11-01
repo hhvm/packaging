@@ -2,24 +2,26 @@
 %:
 	dh $@ --buildsystem=cmake --parallel
 
-export PATH := /usr/local/bin:$(PATH)
+export PATH := /opt/hhvm-build-deps/bin:$(PATH)
+export LD_LIBRARY_PATH := /opt/hhvm-build-deps/lib:/opt/hhvm-build-deps/lib64:$(LD_LIBRARY_PATH)
 override_dh_auto_configure:
 	debian/build-deps/build-gcc
 	debian/build-deps/build-glog
 	debian/build-deps/build-jemalloc
 	debian/build-deps/build-boost
+	debian/build-deps/build-cmake
 	dh_auto_configure -- \
 	-Wno-dev \
-  -DCMAKE_C_COMPILER=/usr/local/bin/gcc \
-  -DCMAKE_CXX_COMPILER=/usr/local/bin/g++ \
-  -DCMAKE_INCLUDE_PATH=/usr/local/include/ \
-  -DCMAKE_LIBRARY_PATH=/usr/local/lib64/:/usr/local/lib/ \
+  -DCMAKE_C_COMPILER=/opt/hhvm-build-deps/bin/gcc \
+  -DCMAKE_CXX_COMPILER=/opt/hhvm-build-deps/bin/g++ \
+  -DCMAKE_INCLUDE_PATH=/opt/hhvm-build-deps/include/ \
+  -DCMAKE_LIBRARY_PATH=/opt/hhvm-build-deps/lib64/:/usr/local/lib/ \
 	-DMYSQL_UNIX_SOCK_ADDR=/var/run/mysqld/mysqld.sock \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
   -DSTATIC_CXX_LIB=On \
   -DBoost_USE_STATIC_LIBS=On \
-  -DLIBGLOG_LIBRARY=/usr/local/lib/libglog.a \
-  -DJEMALLOC_LIB=/usr/local/lib64/libjemalloc.a
+  -DLIBGLOG_LIBRARY=/opt/hhvm-build-deps/lib/libglog.a \
+  -DJEMALLOC_LIB=/opt/hhvm-build-deps/lib/libjemalloc.a
 
 override_dh_strip:
 	dh_strip --dbg-package=hhvm-nightly-dbg

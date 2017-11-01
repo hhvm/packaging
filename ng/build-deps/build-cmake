@@ -7,18 +7,14 @@
 # LICENSE file in the root directory of this source tree. An additional grant
 # of patent rights can be found in the PATENTS file in the same directory.
 
-set -ex 
-
 cd /tmp
-VERSION=4.5.0
+MINOR_VERSION=3.9
+FULL_VERSION=${MINOR_VERSION}.4
 
-wget -q https://github.com/jemalloc/jemalloc/releases/download/$VERSION/jemalloc-$VERSION.tar.bz2
-tar jxf jemalloc-$VERSION.tar.bz2
-cd jemalloc-$VERSION
+wget -q https://cmake.org/files/v${MINOR_VERSION}/cmake-${FULL_VERSION}.tar.gz
+tar zxf cmake-${FULL_VERSION}.tar.gz
+cd cmake-${FULL_VERSION}
 
-./configure \
-  --enable-static \
-  --disable-shared \
-  --libdir=/usr/local/lib64
+./bootstrap --prefix=/opt/hhvm-build-deps
 make -j8
 make install

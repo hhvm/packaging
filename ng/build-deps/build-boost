@@ -18,7 +18,7 @@ tar jxf boost_${VERSION_US}.tar.bz2
 
 cd boost_${VERSION_US}
 
-./bootstrap.sh --without-libraries=python
+./bootstrap.sh --prefix=/opt/hhvm-build-deps --without-libraries=python
 ./b2 variant=release threading=multi link=static --layout=tagged -j8
 ./b2 variant=release threading=multi link=static --layout=tagged install
 

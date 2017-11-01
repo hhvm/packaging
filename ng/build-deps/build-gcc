@@ -25,7 +25,9 @@ unset CFLAGS_FOR_BUILD
 unset CXXFLAGS_FOR_BUILD
 unset CFLAGS_FOR_TARGET
 unset CXXFLAGS_FOR_TARGET
-$(pwd)/../gcc-5.5.0/configure --enable-language=c,c++
+$(pwd)/../gcc-5.5.0/configure \
+  --prefix=/opt/hhvm-build-deps \
+  --enable-language=c,c++
 make -j8
 make install
 cd /tmp
