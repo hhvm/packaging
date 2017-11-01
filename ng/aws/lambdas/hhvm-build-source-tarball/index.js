@@ -6,6 +6,12 @@ const rp = require('request-promise');
 const USERDATA_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/ng/aws/make-source-tarball.userdata.sh';
 
 function make_source_tarball(version, user_data, callback) {
+  if (version === undefined) {
+    version = 'nightly';
+  } else {
+    user_data = "#!/bin/bash\nVERSION="+version+"\n"+user_data;
+  }
+
   const params = {
     ImageId: /* ubuntu 16.04 */ 'ami-6e1a0117',
     MaxCount: 1,
@@ -24,7 +30,7 @@ function make_source_tarball(version, user_data, callback) {
         }]
       }
     ],
-    UserData: (new Buffer("#!/bin/bash\nVERSION="+version+"\n"+user_data)).toString('base64')
+    UserData: (new Buffer(user_data)).toString('base64')
   };
 
   const ec2 = new AWS.EC2();
