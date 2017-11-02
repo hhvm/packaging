@@ -9,11 +9,13 @@
 
 set -ex 
 
-cd /tmp
-wget -q http://mirrors.ocf.berkeley.edu/gnu/gcc/gcc-5.5.0/gcc-5.5.0.tar.gz
-tar zxf gcc-5.5.0.tar.gz
+VERSION=4.9.4
 
-cd gcc-5.5.0
+cd /tmp
+wget -q http://mirrors.ocf.berkeley.edu/gnu/gcc/gcc-$VERSION/gcc-$VERSION.tar.gz
+tar zxf gcc-$VERSION.tar.gz
+
+cd gcc-$VERSION
 contrib/download_prerequisites
 
 mkdir ../objdir
@@ -25,10 +27,10 @@ unset CFLAGS_FOR_BUILD
 unset CXXFLAGS_FOR_BUILD
 unset CFLAGS_FOR_TARGET
 unset CXXFLAGS_FOR_TARGET
-$(pwd)/../gcc-5.5.0/configure \
+$(pwd)/../gcc-$VERSION/configure \
   --prefix=/opt/hhvm-build-deps \
   --enable-language=c,c++
 make -j8
 make install
 cd /tmp
-rm -rf /tmp/{gcc-5.5.0,objdir,gcc-5.5.0.tar.gz}
+rm -rf /tmp/{gcc-$VERSION,objdir,gcc-$VERSION.tar.gz}
