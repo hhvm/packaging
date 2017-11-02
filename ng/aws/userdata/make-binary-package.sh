@@ -17,8 +17,8 @@ if [ -z "$DISTRO" ]; then
   exit 1
 fi
 
-apt-get clean
 apt-get update -y
+apt-get clean
 apt-get install -y docker.io curl wget git awscli
 
 git clone https://github.com/hhvm/packaging hhvm-packaging
