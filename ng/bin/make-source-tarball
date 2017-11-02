@@ -22,7 +22,14 @@ cd "$TEMPDIR"
 git clone https://github.com/facebook/hhvm.git hhvm-nightly-$VERSION
 cd hhvm-nightly-$VERSION
 git submodule update --init --recursive
+
+# Delete stuff we dont' need
 find . -name '.git' | xargs rm -rf
+# ~ 500mb here
+rm -rf third-party/webscalesqlclient/src/{rocksdb,xtrabackup,rqg,mysql-test}
+# ~ 250mb here
+rm -rf hphp/test/{slow,quick,zend,zend7}
+
 cd ..
 $TAR zcf "$OUT/hhvm-nightly-$VERSION.tar.gz" hhvm-nightly-$VERSION
 cd /
