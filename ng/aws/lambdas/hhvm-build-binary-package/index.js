@@ -3,7 +3,7 @@ const AWS = require('aws-sdk');
 const promise = require('promise');
 const rp = require('request-promise');
 
-const USERDATA_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/ng/aws/make-binary-package.userdata.sh';
+const USERDATA_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/ng/aws/userdata/make-binary-package.sh';
 
 function make_binary_package(distro, version, user_data, callback) {
   if (distro === undefined) {

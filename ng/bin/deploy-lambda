@@ -23,5 +23,6 @@ if [ ! -d "$LAMBDA_ROOT" ]; then
   exit 1
 fi
 cd $LAMBDA_ROOT
+yarn
 zip -r lambda.zip *
 aws lambda update-function-code --function-name "$LAMBDA" --zip-file "fileb://$(pwd)/lambda.zip" --publish --region us-west-2
