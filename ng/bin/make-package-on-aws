@@ -20,7 +20,7 @@ UBUNTU_16_04_AMI=ami-6e1a0117
 INSTANCE_TYPE=c4.2xlarge # 8 cores, 15GB of RAM
 KEYPAIR="hhvm-package-builders"
 
-INIT_SCRIPT=$(mktemp -t hhvm-aws-init-script)
+INIT_SCRIPT=$(mktemp -t hhvm-aws-init-script.XXXXXX)
 cat > $INIT_SCRIPT <<EOF
 #!/bin/bash
 VERSION=${VERSION}
