@@ -4,12 +4,13 @@
 
 export PATH := /opt/hhvm-build-deps/bin:$(PATH)
 export LD_LIBRARY_PATH := /opt/hhvm-build-deps/lib:/opt/hhvm-build-deps/lib64:$(LD_LIBRARY_PATH)
+
 override_dh_auto_configure:
+	debian/build-deps/build-cmake
 	debian/build-deps/build-gcc
 	debian/build-deps/build-glog
 	debian/build-deps/build-jemalloc
 	debian/build-deps/build-boost
-	debian/build-deps/build-cmake
 	dh_auto_configure -- \
 	-Wno-dev \
   -DCMAKE_C_COMPILER=/opt/hhvm-build-deps/bin/gcc \
