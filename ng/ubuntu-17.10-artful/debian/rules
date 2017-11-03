@@ -7,6 +7,7 @@ override_dh_auto_configure:
 	-Wno-dev \
   -DCMAKE_C_COMPILER=gcc-5 \
   -DCMAKE_CXX_COMPILER=g++-5 \
+  -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_C99_MATH=1 -Doff_t=__off_t -D_GLIBCXX_USE_C99=1" \
 	-DMYSQL_UNIX_SOCK_ADDR=/var/run/mysqld/mysqld.sock \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo
 
