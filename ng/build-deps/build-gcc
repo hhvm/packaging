@@ -15,6 +15,11 @@ cd /tmp
 wget -q http://mirrors.ocf.berkeley.edu/gnu/gcc/gcc-$VERSION/gcc-$VERSION.tar.gz
 tar zxf gcc-$VERSION.tar.gz
 
+unset CFLAGS
+unset CXXFLAGS
+unset LDFLAGS
+env
+
 cd gcc-$VERSION
 contrib/download_prerequisites
 
