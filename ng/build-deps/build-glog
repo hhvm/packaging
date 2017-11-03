@@ -16,7 +16,7 @@ cd google-glog
 git checkout v$VERSION
 
 autoreconf
-./configure \
+CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure \
   --prefix=/opt/hhvm-build-deps \
   --enable-static \
   --disable-shared

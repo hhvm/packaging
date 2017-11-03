@@ -16,7 +16,7 @@ wget -q https://github.com/jemalloc/jemalloc/releases/download/$VERSION/jemalloc
 tar jxf jemalloc-$VERSION.tar.bz2
 cd jemalloc-$VERSION
 
-./configure \
+CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure \
   --prefix=/opt/hhvm-build-deps \
   --enable-static \
   --disable-shared
