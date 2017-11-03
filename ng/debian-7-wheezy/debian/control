@@ -17,7 +17,6 @@ Build-Depends:
   debhelper (>= 9),
   g++,
   gawk,
-  gcc-multilib,
   git,
   gperf,
   libbz2-dev,
