@@ -11,12 +11,8 @@ set -ex
 
 shutdown -h 180 # 3 hour timeout
 
-apt-get update -y
-apt-get install -y reprepro awscli
-
 git clone https://github.com/hhvm/packaging hhvm-packaging
 ln -s $(pwd)/hhvm-packaging/ng /opt/hhvm-packaging
-
 
 /opt/hhvm-packaging/aws/bin/update-repos
 

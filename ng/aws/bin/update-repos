@@ -9,6 +9,9 @@
 
 set -ex
 
+apt-get update -y
+apt-get install -y reprepro awscli
+
 aws configure set default.region us-west-2
 
 aws kms decrypt --ciphertext-blob "fileb:///opt/hhvm-packaging/aws/gpg-key.kms-ciphertext" --query Plaintext --output text | base64 --decode | gpg --import
