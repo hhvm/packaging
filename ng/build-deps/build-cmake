@@ -15,6 +15,6 @@ wget -q https://cmake.org/files/v${MINOR_VERSION}/cmake-${FULL_VERSION}.tar.gz
 tar zxf cmake-${FULL_VERSION}.tar.gz
 cd cmake-${FULL_VERSION}
 
-LDFLAGS=-pthread ./bootstrap --prefix=/opt/hhvm-build-deps --parallel=8
-make -j8
+LDFLAGS=-pthread ./bootstrap --prefix=/opt/hhvm-build-deps --parallel=16
+make -j16
 make install

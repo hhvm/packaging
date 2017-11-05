@@ -20,5 +20,5 @@ CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure \
   --prefix=/opt/hhvm-build-deps \
   --enable-static \
   --disable-shared
-make -j8
+make -j16
 make install

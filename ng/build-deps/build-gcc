@@ -36,7 +36,7 @@ $(pwd)/../gcc-$VERSION/configure \
   --prefix=/opt/hhvm-build-deps \
   --enable-language=c,c++ \
   --disable-multilib
-make -j8
+make -j16
 make install
 cd /tmp
 rm -rf /tmp/{gcc-$VERSION,objdir,gcc-$VERSION.tar.gz}
