@@ -25,6 +25,7 @@ aws ec2 attach-volume \
   --device /dev/sdf \
   --instance-id "$INSTANCE_ID" \
   --volume-id "$VOLUME_ID"
+sleep 10 # wait for EC2 to attach
 
 mkdir /mnt/dl.hhvm.com
 mount /dev/xvdf /mnt/dl.hhvm.com
