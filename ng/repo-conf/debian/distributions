@@ -1,0 +1,136 @@
+Origin: HHVM
+Label: HHVM
+Codename: wheezy
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: jessie
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: stretch
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: wheezy-lts-3.3
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.3 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: jessie-lts-3.3
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.3 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: wheezy-lts-3.6
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.6 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: jessie-lts-3.6
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.6 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: wheezy-lts-3.9
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.9 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: jessie-lts-3.9
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.9 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: wheezy-lts-3.12
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.12 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: jessie-lts-3.12
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.12 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: wheezy-lts-3.15
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.15 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: jessie-lts-3.15
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.15 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: wheezy-lts-3.18
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.18 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: jessie-lts-3.18
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.18 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: wheezy-lts-3.21
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.21 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: jessie-lts-3.21
+Architectures: amd64
+Components: main
+Description: Apt repository for HHVM (3.21 LTS)
+SignWith: D386EB94
+
