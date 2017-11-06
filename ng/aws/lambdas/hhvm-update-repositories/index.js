@@ -10,6 +10,12 @@ exports.handler = (event, context, callback) => {
   .then(userdata => {
     const params = {
       ImageId: /* ubuntu 16.04 */ 'ami-6e1a0117',
+      Placement: {
+        // This is required as we have a persistent EBS volume containing
+        // the repositories, and the instance must be in the same
+        // availability zone as an EBS volume to attach it.
+        AvailabilityZone: 'us-west-2a'
+      },
       MaxCount: 1,
       MinCount: 1,
       InstanceType: 't2.micro',
