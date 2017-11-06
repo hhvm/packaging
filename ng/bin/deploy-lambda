@@ -26,5 +26,6 @@ cd $LAMBDA_ROOT
 if [ -e package.json ]; then
   yarn
 fi
+rm -f lambda.zip
 zip -r lambda.zip *
 aws lambda update-function-code --function-name "$LAMBDA" --zip-file "fileb://$(pwd)/lambda.zip" --publish --region us-west-2
