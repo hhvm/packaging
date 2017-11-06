@@ -32,3 +32,6 @@ mount /dev/xvdf /mnt/dl.hhvm.com
 
 aws s3 sync s3://hhvm-downloads/ /mnt/dl.hhvm.com/
 aws s3 sync s3://hhvm-scratch/ /var/hhvm-scratch/
+
+/opt/hhvm-packaging/bin/update-debianish-repo debian
+/opt/hhvm-packaging/bin/update-debianish-repo ubuntu
