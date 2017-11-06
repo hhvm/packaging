@@ -38,7 +38,12 @@ function make_source_tarball(version, user_data, callback) {
     if (err) {
       callback(err, 'failed to schedule instance');
     } else {
-      callback(null, {version: version});
+      callback(null, {
+        version: version,
+        instances: data.Instances.map(function(instance) {
+          return instance.InstanceId;
+        }),
+      });
     }
   });
 }
