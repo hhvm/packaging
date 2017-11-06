@@ -11,8 +11,9 @@ set -e
 
 ROOT="$(realpath "$(dirname $0)/..")"
 VERSION=${VERSION:-"$(date +%Y.%m.%d)"}
+DISTRO=${DISTRO:-"$1"}
 if [ -z "$DISTRO" ]; then
-  echo "Environment variable DISTRO must be set"
+  echo "Environment variable DISTRO must be set or passed as an argument"
   exit 1
 fi
 
