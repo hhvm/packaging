@@ -20,6 +20,6 @@ cd boost_${VERSION_US}
 
 CFLAGS=-fPIC CXXFLAGS=-fPIC \
   ./bootstrap.sh --prefix=/opt/hhvm-build-deps --without-libraries=python
-./b2 variant=release threading=multi link=static --layout=tagged -j16
+./b2 variant=release threading=multi link=static --layout=tagged -j8
 ./b2 variant=release threading=multi link=static --layout=tagged install
 

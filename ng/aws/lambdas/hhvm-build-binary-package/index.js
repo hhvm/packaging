@@ -20,7 +20,7 @@ function make_binary_package(distro, version, user_data, callback) {
     ImageId: /* ubuntu 16.04 */ 'ami-6e1a0117',
     MaxCount: 1,
     MinCount: 1,
-    InstanceType: /* 16 cores, 32GB RAM */ 'c4.4xlarge',
+    InstanceType: /* 8 cores, 16GB RAM */ 'c4.2xlarge',
     SecurityGroups: [ 'hhvm-binary-package-builders' ],
     InstanceInitiatedShutdownBehavior: 'terminate',
     IamInstanceProfile: { Arn: 'arn:aws:iam::223121549624:instance-profile/hhvm-binary-package-builder' },
