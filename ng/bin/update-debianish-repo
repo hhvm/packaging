@@ -43,9 +43,19 @@ for VERSION_DIR in "$INCOMING_DIR"/*; do
     (
       cd "$REPO_DIR"
       reprepro include "$REPREPRO_DISTRO" "$DISTRO_DIR"/*.changes
-      aws s3 rm --recursive s3://hhvm-scratch/$VERSION/$DISTRO
     )
   done
 done
 
+for VERSION_DIR in "$INCOMING_DIR"/*; do
+  VERSION=$(basename "$VERSION_DIR")
+  for DISTRO_DIR in "$VERSION_DIR/$DISTRO_BASE-"*; do
+    DISTRO=$(basename "$DISTRO_DIR")
+    aws s3 rm --recursive s3://hhvm-scratch/$VERSION/$DISTRO
+  done
+done
+
+# Put up the big files first, so we don't have a bunch of time where the
+# metadata says there's a new package, but it's not available yet.
+aws s3 sync "$REPO_DIR/" "s3://hhvm-downloads/${DISTRO_BASE}/" --exclude '*' --include '*.deb' --include '*.orig.tar.gz'
 aws s3 sync "$REPO_DIR/" "s3://hhvm-downloads/${DISTRO_BASE}/"
