@@ -78,7 +78,14 @@ Assuming the `hhvm-downloads` S3 bucket contains the relevant source
 tarball and you have the AWS CLI configured:
 
 ```
-DISTRO=debian-8-jessie VERSION=2017.10.30 bin/make-package-on-aws
+VERSION=2017.10.30 bin/make-package-on-aws debian-8-jessie
 ```
 
 This will put the packages into the private `hhvm-scratch` S3 bucket.
+
+Automation Flow
+---------------
+
+We use AWS step functions to coordinate the various steps. Currently, this looks like:
+
+![graphical representation of aws/step-functions/hhvm-start-builds.json](./build-steps.png)
