@@ -11,6 +11,11 @@ set -ex
 
 shutdown -h 120 # 2 hour timeout
 
+if [ -z "$VERSION" ]; then
+  echo "VERSION must be set."
+  exit 1
+fi
+
 apt-get update -y
 apt-get install -y docker.io awscli
 git clone https://github.com/hhvm/packaging hhvm-packaging
@@ -21,6 +26,6 @@ aws configure set default.region us-west-2
 
 docker login -u hhvmawsbot -p "$(aws kms decrypt --ciphertext-blob 'fileb:///opt/hhvm-packaging/aws/docker-pass.kms-ciphertext' --query Plaintext --output text | base64 --decode)"
 
-/opt/hhvm-docker/build-and-tag.sh
+/opt/hhvm-docker/build-and-tag.sh "$VERSION"
 
 shutdown -h now
