@@ -47,3 +47,5 @@ for VERSION_DIR in "$INCOMING_DIR"/*; do
     )
   done
 done
+
+aws s3 sync "$REPO_DIR/" "s3://hhvm-downloads/${DISTRO_BASE}/"
