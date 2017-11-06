@@ -36,13 +36,14 @@ set -ex
 cp "$CONF_DIR/distributions" "$REPO_DIR/conf/distributions"
 
 for VERSION_DIR in "$INCOMING_DIR"/*; do
+  VERSION=$(basename "$VERSION_DIR")
   for DISTRO_DIR in "$VERSION_DIR/$DISTRO_BASE-"*; do
     DISTRO=$(basename "$DISTRO_DIR")
     REPREPRO_DISTRO="$(<"/opt/hhvm-packaging/$DISTRO/DISTRIBUTION")"
     (
       cd "$REPO_DIR"
       reprepro include "$REPREPRO_DISTRO" "$DISTRO_DIR"/*.changes
-      exit
+      aws s3 rm --recursive s3://hhvm-scratch/$VERSION/$DISTRO
     )
   done
 done
