@@ -18,12 +18,12 @@ if [ -z "$DISTRO" ]; then
 fi
 
 if [ -z "$VERSION" ]; then
-  PAYLOAD="$(echo "{\"distro\": \"${DISTRO}\"}")"
+  PAYLOAD="$(echo "{\"distros\": [\"${DISTRO}\"]}")"
 else
-  PAYLOAD="$(echo "{\"distro\": \"${DISTRO}\", \"version\": \"${VERSION}\"}")"
+  PAYLOAD="$(echo "{\"distros\": [\"${DISTRO}\"], \"version\": \"${VERSION}\"}")"
 fi
 
 aws lambda invoke \
-  --function-name hhvm-build-binary-package \
+  --function-name hhvm-build-binary-packages \
   --payload "${PAYLOAD}" \
   /dev/stdout --region us-west-2

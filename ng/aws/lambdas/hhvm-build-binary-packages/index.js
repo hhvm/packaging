@@ -1,11 +1,12 @@
-'use strict'
+'use strict';
 const AWS = require('aws-sdk');
 const promise = require('promise');
 const rp = require('request-promise');
 
+const DISTROS_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/ng/CURRENT_TARGETS';
 const USERDATA_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/ng/aws/userdata/make-binary-package.sh';
 
-function make_binary_package(distro, version, user_data, callback) {
+function make_binary_package(distro, version, user_data) {
   if (distro === undefined) {
     throw "distro must be specified";
   }
@@ -46,19 +47,41 @@ function make_binary_package(distro, version, user_data, callback) {
   };
 
   const ec2 = new AWS.EC2();
-  ec2.runInstances(params, function(err, data) {
-    if (err) {
-    callback(err, 'failed to schedule instance');
-    } else {
-    callback(null, "data");
+  return ec2.runInstances(params).promise();
+}
+
+function get_distros(event) {
+  return new promise((resolve, reject) => {
+    if (event.distros) {
+      resolve(event.distros);
+      return;
     }
+
+    rp(DISTROS_URI).then(response => {
+      resolve(response.trim().split("\n"));
+    });
   });
 }
- 
+
 exports.handler = (event, context, callback) => {
-  rp(USERDATA_URI)
-  .then(function(response) {
-    make_binary_package(event.distro, event.version, response, callback);
+  promise.all([
+    get_distros(event),
+    rp(USERDATA_URI)
+  ])
+  .then(values => {
+    const distros = values[0];
+    const user_data = values[1];
+    return promise.all(
+      distros.map(distro => {
+        return make_binary_package(distro, event.version, user_data);
+      })
+    );
+  })
+  .then(values => {
+    event.instances = values.map(ec2_response => {
+      return ec2_response.Instances[0].InstanceId;
+    });
+    callback(null, event);
   })
   .done();
 };

@@ -1,0 +1,77 @@
+{
+  "StartAt": "Get Version Number For Build",
+  "States": {
+    "Get Version Number For Build": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-get-build-version",
+      "Next": "Create Source Tarball"
+    },
+    "Create Source Tarball": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-build-source-tarball",
+      "Next": "Wait For Source Tarball"
+    },
+    "Wait For Source Tarball": {
+      "Type": "Wait",
+      "Seconds": 120,
+      "Next": "Fetch Source Tarball Instance State"
+    },
+    "Fetch Source Tarball Instance State": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:get-instances-state",
+      "Next": "Source Tarball Instance Finished?"
+    },
+    "Source Tarball Instance Finished?": {
+      "Type": "Choice",
+      "Choices": [{
+        "Variable": "$.allInstancesFinished",
+        "BooleanEquals": false,
+        "Next": "Wait For Source Tarball"
+      }],
+      "Default": "Check For Source Tarball"
+    },
+    "Check For Source Tarball": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-have-source-tarball",
+      "Next": "Start Builds"
+    },
+    "Start Builds": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-start-binary-builds",
+      "Next": "Initial Wait For Builds"
+    },
+    "Initial Wait For Builds": {
+      "Type": "Wait",
+      "Seconds": 3600,
+      "Next": "Fetch Build Instance States"
+    },
+    "Fetch Build Instance States": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:get-instances-state",
+      "Next": "Builds Finished?"
+    },
+    "Wait Longer For Builds": {
+      "Type": "Wait",
+      "Seconds": 600,
+      "Next": "Fetch Build Instance States"
+    },
+    "Fetch Build Instance States": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:get-instances-state",
+      "Next": "Builds Finished?"
+    },
+    "Builds Finished?": {
+      "Type": "Choice",
+      "Choices": [{
+        "Variable": "$.allInstancesFinished",
+        "BooleanEquals": false,
+        "Next": "Wait Longer For Builds"
+      }],
+      "Default": "Update Repositories"
+    },
+    "Update Repositories": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}

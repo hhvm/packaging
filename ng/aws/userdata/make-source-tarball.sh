@@ -21,6 +21,4 @@ cd hhvm-packaging/ng
 bin/make-source-tarball
 aws s3 cp out/*.tar.gz s3://hhvm-downloads/source/nightlies/
 
-bin/make-all-packages-on-aws
-
 shutdown -h now
