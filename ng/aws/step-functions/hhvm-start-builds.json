@@ -37,7 +37,7 @@
     },
     "Start Builds": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-start-binary-builds",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-build-binary-packages",
       "Next": "Initial Wait For Builds"
     },
     "Initial Wait For Builds": {
