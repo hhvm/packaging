@@ -10,20 +10,16 @@
 set -e
 
 ROOT="$(realpath "$(dirname $0)/..")"
-VERSION=${VERSION:-"$(date +%Y.%m.%d)"}
-DISTRO=${DISTRO:-"$1"}
-if [ -z "$DISTRO" ]; then
-  echo "Environment variable DISTRO must be set or passed as an argument"
+VERSION=$1
+DISTRO=$2
+if [ -z "$DISTRO" -o -z "$VERSION" ]; then
+  echo "USAGE: $0 VERSION DISTRO"
   exit 1
 fi
 
-if [ -z "$VERSION" ]; then
-  PAYLOAD="$(echo "{\"distros\": [\"${DISTRO}\"]}")"
-else
-  PAYLOAD="$(echo "{\"distros\": [\"${DISTRO}\"], \"version\": \"${VERSION}\"}")"
-fi
+PAYLOAD="{\"distros\": [\"${DISTRO}\"], \"version\": \"${VERSION}\"}"
 
-aws lambda invoke \
-  --function-name hhvm-build-binary-packages \
-  --payload "${PAYLOAD}" \
-  /dev/stdout --region us-west-2
+aws stepfunctions start-execution \
+  --state-machine-arn \
+    arn:aws:states:us-west-2:223121549624:stateMachine:hhvm-builds \
+  --input "${PAYLOAD}"

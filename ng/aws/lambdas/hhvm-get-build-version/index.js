@@ -16,9 +16,9 @@ exports.handler = (event, context, callback) => {
       bucket: 'hhvm-scratch',
       path: 'hhvm-'+version+'.tar.gz'
     };
-  callback(null, {
-    version: version,
-    nightly: nightly,
-    source: source
-  });
+  event.version = version;
+  event.nightly = nightly;
+  event.source = source;
+
+  callback(null, event);
 }

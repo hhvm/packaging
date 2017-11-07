@@ -10,8 +10,15 @@
 set -e
 
 ROOT="$(realpath "$(dirname $0)/..")"
-export VERSION=${VERSION:-"$(date +%Y.%m.%d)"}
 
-for DISTRO in $(<"$ROOT/CURRENT_TARGETS"); do
-  DISTRO=$DISTRO "$ROOT/bin/make-package-on-aws"
-done
+VERSION=$1
+if [ -z "$VERSION" ]; then
+  echo "Usage: $0 VERSION"
+  exit 1
+fi
+
+PAYLOAD="{\"version\": \"${VERSION}\"}"
+aws stepfunctions start-execution \
+  --state-machine-arn \
+    arn:aws:states:us-west-2:223121549624:stateMachine:hhvm-builds \
+  --input "${PAYLOAD}"
