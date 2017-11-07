@@ -27,13 +27,16 @@ if $IS_NIGHTLY; then
   PREFIX=hhvm-nightly
   HEAD=master
 else
-  eval $(ssh-agent)
-  KEYFILE=$(mktemp)
-  aws kms decrypt \
-    --ciphertext-blob "fileb://${ROOT}/aws/staging-repo-read-key.kms-ciphertext" \
-    --query Plaintext --output text \
-    | base64 --decode > $KEYFILE
-  ssh-add "$KEYFILE"
+  if "${IS_AWS:-false}" then
+    eval $(ssh-agent)
+    KEYFILE=$(mktemp)
+    aws kms decrypt \
+      --region us-west-2 \
+      --ciphertext-blob "fileb://${ROOT}/aws/staging-repo-read-key.kms-ciphertext" \
+      --query Plaintext --output text \
+      | base64 --decode > $KEYFILE
+    ssh-add "$KEYFILE"
+  fi
 
   REPO=git@github.com:hhvm/hhvm-staging.git
   PREFIX=hhvm
