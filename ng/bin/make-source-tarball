@@ -27,7 +27,7 @@ if $IS_NIGHTLY; then
   PREFIX=hhvm-nightly
   HEAD=master
 else
-  if "${IS_AWS:-false}" then
+  if "${IS_AWS:-false}"; then
     eval $(ssh-agent)
     KEYFILE=$(mktemp)
     aws kms decrypt \
