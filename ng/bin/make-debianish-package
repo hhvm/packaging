@@ -12,13 +12,19 @@ set -ex
 export DEBIAN_FRONTEND=noninteractive
 export DEB_BUILD_OPTIONS="parallel=$(egrep -c '^processor' /proc/cpuinfo)"
 
+if $IS_NIGHTLY; then
+  PKGBASE="hhvm-nightly"
+else
+  PKGBASE="hhvm"
+fi
+
 VERSION=${VERSION:-"$(date +%Y.%m.%d)"}
 DISTRO_ROOT=/opt/hhvm-distro-packaging
 PKGVER="$(<"$DISTRO_ROOT/PKGVER")"
 DISTRIBUTION="$(<"$DISTRO_ROOT/DISTRIBUTION")"
-BUILD_DEPS_NEW="hhvm-nightly-build-deps_${VERSION}-${PKGVER}_all.deb"
+BUILD_DEPS_NEW="${PKGBASE}-build-deps_${VERSION}-${PKGVER}_all.deb"
 # Not needed after Wheezy
-BUILD_DEPS_OLD="hhvm-nightly-build-deps_1.0_all.deb"
+BUILD_DEPS_OLD="${PKGBASE}-build-deps_1.0_all.deb"
 OUT="/var/out"
 TEMP="$(mktemp -d hhvmpkg.XXXXXXXX --tmpdir)"
 cd "$TEMP"
@@ -29,14 +35,23 @@ apt-get clean
 apt-get install -y devscripts equivs
 
 # Source extraction
-cp /var/out/hhvm-nightly-$VERSION.tar.gz hhvm-nightly_$VERSION.orig.tar.gz
-tar zxf hhvm-nightly_$VERSION.orig.tar.gz
-cd hhvm-nightly-$VERSION
+cp /var/out/${PKGBASE}-$VERSION.tar.gz ${PKGBASE}_$VERSION.orig.tar.gz
+tar zxf ${PKGBASE}_$VERSION.orig.tar.gz
+cd ${PKGBASE}-$VERSION
 cp -R $DISTRO_ROOT/debian/ debian/
 cp -R /opt/hhvm-packaging/skeleton/ debian/skeleton
 
+if ! $IS_NIGHTLY; then
+  sed -i '/^Conflicts: hhvm$/d' debian/control
+  sed -i 's/hhvm-nightly/hhvm/' debian/control
+  sed -i 's/hhvm-nightly/hhvm/' debian/rules
+  for file in debian/hhvm-nightly*; do
+    mv "$file" "$(echo $file | sed 's/hhvm-nightly/hhvm/')"
+  done
+fi
+
 # Add debian changelog entry
-dch --create -v $VERSION-$PKGVER --package hhvm-nightly --controlmaint --distribution "$DISTRIBUTION" --force-distribution --empty
+dch --create -v $VERSION-$PKGVER --package ${PKGBASE} --controlmaint --distribution "$DISTRIBUTION" --force-distribution --empty
 
 # Build debian package that depends on build-depends, and install it
 mk-build-deps

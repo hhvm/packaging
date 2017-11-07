@@ -6,7 +6,7 @@ const rp = require('request-promise');
 const DISTROS_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/ng/CURRENT_TARGETS';
 const USERDATA_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/ng/aws/userdata/make-binary-package.sh';
 
-function make_binary_package(distro, version, user_data) {
+function make_binary_package(distro, event, user_data) {
   if (distro === undefined) {
     throw "distro must be specified";
   }
@@ -15,7 +15,13 @@ function make_binary_package(distro, version, user_data) {
   } else {
     user_data = "VERSION="+version+"\n"+user_data;
   }
-  user_data = "#!/bin/bash\nDISTRO="+distro+"\n"+user_data;
+  user_data =
+    "#!/bin/bash\n"+
+    "DISTRO="+distro+"\n"+
+    "VERSION="+event.version+"\n"+
+    "IS_NIGHTLY="+(event.nightly ? 'true' : 'false')+"\n"+
+    "S3_SOURCE=s3://"+event.source.bucket+'/'+event.source.path+"\n"+
+    user_data;
 
   const params = {
     ImageId: /* ubuntu 16.04 */ 'ami-6e1a0117',
@@ -72,7 +78,7 @@ exports.handler = (event, context, callback) => {
     const user_data = values[1];
     return promise.all(
       distros.map(distro => {
-        return make_binary_package(distro, event.version, user_data);
+        return make_binary_package(distro, event, user_data);
       })
     );
   })

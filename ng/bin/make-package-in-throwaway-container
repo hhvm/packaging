@@ -11,17 +11,21 @@ ROOT="$(realpath "$(dirname $0)/..")"
 OUT="$ROOT/out/"
 DISTRO=${1:-"debian-8-jessie"}
 DOCKER_BASE="$(<"${ROOT}/${DISTRO}/DOCKER_BASE")"
+IS_NIGHTLY=${IS_NIGHTLY:-true}
 
 if [ ! -d "${ROOT}/${DISTRO}" ]; then
   echo "Unsupported distro: ${DISTRO}"
   exit 1
 fi
 
+export VERSION
+export IS_NIGHTLY
+
 docker run \
   -e "VERSION" \
+  -e "IS_NIGHTLY" \
   -v "$OUT":/var/out \
   -v "$ROOT":/opt/hhvm-packaging:ro \
   -v "${ROOT}/${DISTRO}":/opt/hhvm-distro-packaging:ro \
-  --rm \
   "${DOCKER_BASE}" \
   /opt/hhvm-distro-packaging/make-package

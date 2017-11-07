@@ -11,11 +11,16 @@ set -ex
 shutdown -h 180 # auto-shutdown after 3 hours
 
 export TZ=UTC
-export VERSION=${VERSION:-"$(date +%Y.%m.%d)"}
-if [ -z "$DISTRO" ]; then
-  echo "Environment variable 'DISTRO' must be set"
+if [
+  -z "$DISTRO"
+  -o -z "$VERSION"
+  -o -z "$S3_SOURCE"
+  -o -z "$IS_NIGHTLY"
+]; then
+  echo "DISTRO, VERSION, S3_SOURCE, and IS_NIGHTLY must all be set"
   exit 1
 fi
+SOURCE_BASENAME="$(basename "$S3_SOURCE")"
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -26,11 +31,14 @@ apt-get install -y docker.io curl wget git awscli
 git clone https://github.com/hhvm/packaging hhvm-packaging
 cd hhvm-packaging/ng
 
-aws s3 cp s3://hhvm-downloads/source/nightlies/hhvm-nightly-${VERSION}.tar.gz out/
+aws s3 cp "$S3_SOURCE" out/
+
+export VERSION
+export IS_NIGHTLY
 
 bin/make-package-in-throwaway-container "$DISTRO" > /var/log/hhvm-build
 
-rm out/hhvm-nightly-${VERSION}.tar.gz
+rm "out/${SOURCE_BASENAME}"
 
 aws s3 cp --include '*' --recursive out/ s3://hhvm-scratch/${VERSION}/${DISTRO}/
 
