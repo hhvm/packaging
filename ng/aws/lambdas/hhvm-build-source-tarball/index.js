@@ -5,12 +5,24 @@ const rp = require('request-promise');
 
 const USERDATA_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/ng/aws/userdata/make-source-tarball.sh';
 
-function make_source_tarball(version, user_data, callback) {
-  if (version === undefined) {
-    version = 'nightly';
-  } else {
-    user_data = "#!/bin/bash\nVERSION="+version+"\n"+user_data;
+function make_source_tarball(event, user_data, callback) {
+  if (!(
+    event.version &&
+    event.source &&
+    event.source.bucket &&
+    event.source.path
+  )) {
+    callback("Need version and source on input");
+    return;
   }
+
+  user_data =
+    "#!/bin/bash\n"+
+    "VERSION="+event.version+"\n"+
+    "IS_NIGHTLY="+(event.nightly ? "true" : "false")+"\n"+
+    "S3_BUCKET="+event.source.bucket+"\n"+
+    "S3_PATH="+event.source.path+"\n"+
+    user_data;
 
   const params = {
     ImageId: /* ubuntu 16.04 */ 'ami-6e1a0117',
@@ -26,7 +38,7 @@ function make_source_tarball(version, user_data, callback) {
         ResourceType: 'instance',
         Tags: [{
           Key: 'Name',
-          Value: 'hhvm-build-source-tarball-'+version
+          Value: 'hhvm-build-'+event.version+'-source-tarball'
         }]
       }
     ],
@@ -38,12 +50,8 @@ function make_source_tarball(version, user_data, callback) {
     if (err) {
       callback(err, 'failed to schedule instance');
     } else {
-      callback(null, {
-        version: version,
-        instances: data.Instances.map(function(instance) {
-          return instance.InstanceId;
-        }),
-      });
+      event.instances = data.Instances.map(instance => instance.InstanceId);
+      callback(null, event);
     }
   });
 }
@@ -51,7 +59,7 @@ function make_source_tarball(version, user_data, callback) {
 exports.handler = (event, context, callback) => {
   rp(USERDATA_URI)
   .then(function(response) {
-    make_source_tarball(event.version, response, callback);
+    make_source_tarball(event, response, callback);
   })
   .done();
 };
