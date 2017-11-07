@@ -71,21 +71,18 @@ supports running commands on EC2 instance startup - EC2 calls this
 The scripts we use are in the `aws/` subdirectory, and expect to be ran on
 Ubuntu 16.04 hosts.
 
-Manually triggering a package build on AWS
-------------------------------------------
+Building source tarball and linux packages for new releases
+-----------------------------------------------------------
 
-Assuming the `hhvm-downloads` S3 bucket contains the relevant source
-tarball and you have the AWS CLI configured:
+ - tag the release on the `hhvm-staging` repo
+ - `bin/make-all-packages-on-aws VERSION`
 
-```
-VERSION=2017.10.30 bin/make-package-on-aws debian-8-jessie
-```
+This will follow the automation flow defined in the `hhvm-builds` AWS
+step function (a.k.a. 'state machine'); this currently looks like this:
 
-This will put the packages into the private `hhvm-scratch` S3 bucket.
+![graphical representation of aws/step-functions/hhvm-builds.json](./build-steps.png)
 
-Automation Flow
----------------
+If you need to rebuild just for one distribution:
 
-We use AWS step functions to coordinate the various steps. Currently, this looks like:
-
-![graphical representation of aws/step-functions/hhvm-start-builds.json](./build-steps.png)
+ - edit `DISTRO/PKGVER` if needed and push to github
+ - `bin/make-package-on-aws VERSION DISTRO`
