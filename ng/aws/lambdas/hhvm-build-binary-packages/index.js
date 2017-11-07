@@ -10,11 +10,7 @@ function make_binary_package(distro, event, user_data) {
   if (distro === undefined) {
     throw "distro must be specified";
   }
-  if (version === undefined) {
-    version = 'nightly';
-  } else {
-    user_data = "VERSION="+version+"\n"+user_data;
-  }
+
   user_data =
     "#!/bin/bash\n"+
     "DISTRO="+distro+"\n"+
@@ -36,7 +32,7 @@ function make_binary_package(distro, event, user_data) {
         ResourceType: 'instance',
         Tags: [{
           Key: 'Name',
-          Value: 'hhvm-build-'+version+'-'+distro
+          Value: 'hhvm-build-'+event.version+'-'+distro
         }]
       }
     ],
