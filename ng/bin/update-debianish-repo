@@ -36,12 +36,12 @@ set -ex
 cp "$CONF_DIR/distributions" "$REPO_DIR/conf/distributions"
 
 for VERSION_DIR in "$INCOMING_DIR"/*; do
-  if [ ! -d "$VERSION_DIR"]; then
+  if [ ! -d "$VERSION_DIR" ]; then
     continue;
   fi
   VERSION=$(basename "$VERSION_DIR")
   for DISTRO_DIR in "$VERSION_DIR/$DISTRO_BASE-"*; do
-    if [ ! -d "$DISTRO_DIR"]; then
+    if [ ! -d "$DISTRO_DIR" ]; then
       continue;
     fi
     DISTRO=$(basename "$DISTRO_DIR")
@@ -54,12 +54,12 @@ for VERSION_DIR in "$INCOMING_DIR"/*; do
 done
 
 for VERSION_DIR in "$INCOMING_DIR"/*; do
-  if [ ! -d "$VERSION_DIR"]; then
+  if [ ! -d "$VERSION_DIR" ]; then
     continue;
   fi
   VERSION=$(basename "$VERSION_DIR")
   for DISTRO_DIR in "$VERSION_DIR/$DISTRO_BASE-"*; do
-    if [ ! -d "$DISTRO_DIR"]; then
+    if [ ! -d "$DISTRO_DIR" ]; then
       continue;
     fi
     DISTRO=$(basename "$DISTRO_DIR")
