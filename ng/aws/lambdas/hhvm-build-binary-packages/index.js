@@ -23,7 +23,6 @@ function make_binary_package(distro, version, user_data) {
     MinCount: 1,
     InstanceType: /* 8 cores, 16GB RAM */ 'c4.2xlarge',
     SecurityGroups: [ 'hhvm-binary-package-builders' ],
-    InstanceInitiatedShutdownBehavior: 'terminate',
     IamInstanceProfile: { Arn: 'arn:aws:iam::223121549624:instance-profile/hhvm-binary-package-builder' },
     KeyName: "hhvm-package-builders",
     TagSpecifications: [
