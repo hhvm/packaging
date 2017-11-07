@@ -73,11 +73,6 @@
             "Update Repositories": {
               "Type": "Task",
               "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-update-repositories",
-              "Next": "Publish Docker Images"
-            },
-            "Publish Docker Images": {
-              "Type": "Task",
-              "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-update-docker",
               "End": true
             }
           }
