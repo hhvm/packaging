@@ -12,7 +12,8 @@
       "Next": "Start Builds",
       "Catch": [{
         "ErrorEquals": ["NotFound"],
-        "Next": "Create Source Tarball"
+        "Next": "Create Source Tarball",
+        "ResultPath": null
       }]
     },
     "Create Source Tarball": {
