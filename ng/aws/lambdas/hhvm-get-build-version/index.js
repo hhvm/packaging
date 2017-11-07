@@ -1,10 +1,24 @@
 'use strict'
 
 exports.handler = (event, context, callback) => {
-  if (event.version) {
-    callback(null, { version: event.version });
+  let version = event.version;
+  if (!version) {
+    const s = (new Date()).toISOString()
+    version = s.slice(0,4)+'.'+s.slice(5, 7)+'.'+s.slice(8, 10);
   }
-  const s = (new Date()).toISOString()
-  const version = s.slice(0,4)+'.'+s.slice(5, 7)+'.'+s.slice(8, 10);
-  callback(null, { version: version });
+  const nightly = !! /^\d{4}(\.\d{2}){2}$/.exec(version);
+  const source = nightly
+    ? {
+      bucket: 'hhvm-downloads',
+      path: 'source/nightlies/hhvm-nightly-'+version+'.tar.gz'
+    }
+    : {
+      bucket: 'hhvm-scratch',
+      path: 'hhvm-'+version+'.tar.gz'
+    };
+  callback(null, {
+    version: version,
+    nightly: nightly,
+    source: source
+  });
 }
