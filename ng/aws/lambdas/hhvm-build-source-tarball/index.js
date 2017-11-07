@@ -22,6 +22,7 @@ function make_source_tarball(event, user_data, callback) {
     "IS_NIGHTLY="+(event.nightly ? "true" : "false")+"\n"+
     "S3_BUCKET="+event.source.bucket+"\n"+
     "S3_PATH="+event.source.path+"\n"+
+    "IS_AWS=true\n"+
     user_data;
 
   const params = {
