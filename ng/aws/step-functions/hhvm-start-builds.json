@@ -4,9 +4,9 @@
     "Get Version Number For Build": {
       "Type": "Task",
       "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-get-build-version",
-      "Next": "Check For Source Tarball"
+      "Next": "Have Source Tarball?"
     },
-    "Check For Source Tarball": {
+    "Have Source Tarball?": {
       "Type": "Task",
       "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-have-source-tarball",
       "Next": "Start Builds",
