@@ -17,6 +17,8 @@ if [ -z "$DISTRO" ]; then
   exit 1
 fi
 
+export DEBIAN_FRONTEND=noninteractive
+
 apt-get update -y
 apt-get clean
 apt-get install -y docker.io curl wget git awscli
