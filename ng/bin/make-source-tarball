@@ -17,10 +17,24 @@ else
 fi
 TEMPDIR="$(mktemp -d)"
 VERSION=${VERSION:-"$(date +%Y.%m.%d)"}
+IS_NIGHTLY=${IS_NIGHTLY:-true}
 TAR=${TAR:-tar}
+
 cd "$TEMPDIR"
-git clone https://github.com/facebook/hhvm.git hhvm-nightly-$VERSION
-cd hhvm-nightly-$VERSION
+
+if $IS_NIGHTLY; then
+  REPO=facebook/hhvm
+  PREFIX=hhvm-nightly
+  HEAD=master
+else
+  REPO=hhvm/hhvm-staging
+  PREFIX=hhvm
+  HEAD=HHVM-${VERSION}
+fi
+
+git clone https://github.com/${REPO}.git ${PREFIX}-${VERSION}
+cd ${PREFIX}-$VERSION
+git checkout $HEAD
 git submodule update --init --recursive
 
 # Delete stuff we dont' need
@@ -31,6 +45,6 @@ rm -rf third-party/webscalesqlclient/src/{rocksdb,xtrabackup,rqg,mysql-test}
 rm -rf hphp/test/{slow,quick,zend,zend7}
 
 cd ..
-$TAR zcf "$OUT/hhvm-nightly-$VERSION.tar.gz" hhvm-nightly-$VERSION
+$TAR zcf "${OUT}/${PREFIX}-${VERSION}.tar.gz" "${PREFIX}-${VERSION}"
 cd /
 rm -rf "$TEMPDIR"
