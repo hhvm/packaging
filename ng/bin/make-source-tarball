@@ -23,16 +23,24 @@ TAR=${TAR:-tar}
 cd "$TEMPDIR"
 
 if $IS_NIGHTLY; then
-  REPO=facebook/hhvm
+  REPO=https://github.com/facebook/hhvm.git
   PREFIX=hhvm-nightly
   HEAD=master
 else
-  REPO=hhvm/hhvm-staging
+  eval $(ssh-agent)
+  KEYFILE=$(mktemp)
+  aws kms decrypt \
+    --ciphertext-blob "fileb://${ROOT}/aws/staging-repo-read-key.kms-ciphertext" \
+    --query Plaintext --output text \
+    | base64 --decode > $KEYFILE
+  ssh-add "$KEYFILE"
+
+  REPO=git@github.com:hhvm/hhvm-staging.git
   PREFIX=hhvm
   HEAD=HHVM-${VERSION}
 fi
 
-git clone https://github.com/${REPO}.git ${PREFIX}-${VERSION}
+git clone ${REPO} ${PREFIX}-${VERSION}
 cd ${PREFIX}-$VERSION
 git checkout $HEAD
 git submodule update --init --recursive
