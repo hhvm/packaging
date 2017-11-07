@@ -62,16 +62,37 @@
         "BooleanEquals": false,
         "Next": "Wait Longer For Builds"
       }],
-      "Default": "Update Repositories"
+      "Default": "Post Build"
     },
-    "Update Repositories": {
-      "Type": "Task",
-      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-update-repositories",
-      "Next": "Publish Docker Images"
-    },
-    "Publish Docker Images": {
-      "Type": "Task",
-      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-update-docker",
+    "Post Build": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "Update Repositories",
+          "States": {
+            "Update Repositories": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-update-repositories",
+              "Next": "Publish Docker Images"
+            },
+            "Publish Docker Images": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-update-docker",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Clean Up Build Workers",
+          "States": {
+            "Clean Up Build Workers": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-west-2:223121549624:function:terminate-instances",
+              "End": true
+            }
+          }
+        }
+      ],
       "End": true
     }
   }
