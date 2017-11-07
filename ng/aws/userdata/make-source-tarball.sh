@@ -19,6 +19,7 @@ set -ex
 export TZ=UTC
 export VERSION
 export IS_NIGHTLY
+export IS_AWS=true
 
 apt-get update -y
 apt-get install -y curl wget git awscli
