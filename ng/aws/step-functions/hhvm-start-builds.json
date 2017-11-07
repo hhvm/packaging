@@ -4,7 +4,16 @@
     "Get Version Number For Build": {
       "Type": "Task",
       "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-get-build-version",
-      "Next": "Create Source Tarball"
+      "Next": "Check For Source Tarball"
+    },
+    "Check For Source Tarball": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-have-source-tarball",
+      "Next": "Start Builds",
+      "Catch": [{
+        "ErrorEquals": ["NotFound"],
+        "Next": "Create Source Tarball"
+      }]
     },
     "Create Source Tarball": {
       "Type": "Task",
@@ -28,9 +37,9 @@
         "BooleanEquals": false,
         "Next": "Wait For Source Tarball"
       }],
-      "Default": "Check For Source Tarball"
+      "Default": "Check Source Tarball Created"
     },
-    "Check For Source Tarball": {
+    "Check Source Tarball Created": {
       "Type": "Task",
       "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-have-source-tarball",
       "Next": "Start Builds"
