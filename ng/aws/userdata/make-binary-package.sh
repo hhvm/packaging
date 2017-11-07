@@ -26,7 +26,7 @@ cd hhvm-packaging/ng
 
 aws s3 cp s3://hhvm-downloads/source/nightlies/hhvm-nightly-${VERSION}.tar.gz out/
 
-bin/make-package-in-throwaway-container "$DISTRO"
+bin/make-package-in-throwaway-container "$DISTRO" > /var/log/hhvm-build
 
 rm out/hhvm-nightly-${VERSION}.tar.gz
 
