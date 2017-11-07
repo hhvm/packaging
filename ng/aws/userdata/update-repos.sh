@@ -16,4 +16,9 @@ ln -s $(pwd)/hhvm-packaging/ng /opt/hhvm-packaging
 
 /opt/hhvm-packaging/aws/bin/update-repos
 
+if [ ! -z "$VERSION" ]; then
+  export VERSION
+  /opt/hhvm-packaging/aws/bin/update-docker
+fi
+
 shutdown -h now

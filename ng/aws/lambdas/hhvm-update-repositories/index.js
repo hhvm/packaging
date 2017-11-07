@@ -8,6 +8,9 @@ const USERDATA_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/ng
 exports.handler = (event, context, callback) => {
   rp(USERDATA_URI)
   .then(userdata => {
+    if (event.version) {
+      userdata = "#!/bin/bash\nVERSION="+event.version+"\n"+userdata;
+    }
     const params = {
       ImageId: /* ubuntu 16.04 */ 'ami-6e1a0117',
       Placement: {
