@@ -31,7 +31,7 @@ function make_source_tarball(event, user_data, callback) {
     InstanceType: 't2.micro',
     SecurityGroups: [ 'hhvm-binary-package-builders' ],
     InstanceInitiatedShutdownBehavior: 'terminate',
-    IamInstanceProfile: { Arn: 'arn:aws:iam::223121549624:instance-profile/hhvm-binary-package-builder' },
+    IamInstanceProfile: { Arn: 'arn:aws:iam::223121549624:instance-profile/hhvm-source-tarball-builder' },
     KeyName: "hhvm-package-builders",
     TagSpecifications: [
       {
