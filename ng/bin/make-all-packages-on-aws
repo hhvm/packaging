@@ -21,4 +21,5 @@ PAYLOAD="{\"version\": \"${VERSION}\"}"
 aws stepfunctions start-execution \
   --state-machine-arn \
     arn:aws:states:us-west-2:223121549624:stateMachine:hhvm-builds \
-  --input "${PAYLOAD}"
+  --input "${PAYLOAD}" \
+  --name "${VERSION}-$(whoami)-$(date +%Y-%m-%d-%H-%M-%S-%Z)"
