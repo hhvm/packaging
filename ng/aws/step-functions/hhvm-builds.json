@@ -78,12 +78,34 @@
       "Type": "Parallel",
       "Branches": [
         {
-          "StartAt": "Update Repositories",
+          "StartAt": "Start Repository Update",
           "States": {
-            "Update Repositories": {
+            "Start Repository Update": {
               "Type": "Task",
               "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-update-repositories",
-              "End": true
+              "Next": "Wait For Repositories Worker"
+            },
+            "Wait For Repositories Worker": {
+              "Type": "Wait",
+              "Seconds": 300,
+              "Next": "Fetch Repository Worker State"
+            },
+            "Fetch Repository Worker State": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-west-2:223121549624:function:get-instances-state",
+              "Next": "Repositories Update Finished?"
+            },
+            "Repositories Update Finished?": {
+              "Type": "Choice",
+              "Choices": [{
+                "Variable": "$.allInstancesFinished",
+                "BooleanEquals": false,
+                "Next": "Wait For Repositories Worker"
+              }],
+              "Default": "Finished!"
+            },
+            "Finished!": {
+              "Type": "Succeed"
             }
           }
         },
