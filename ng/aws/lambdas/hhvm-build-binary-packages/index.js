@@ -72,6 +72,9 @@ exports.handler = (event, context, callback) => {
   .then(values => {
     const distros = values[0];
     const user_data = values[1];
+
+    event.distros = distros;
+
     return promise.all(
       distros.map(distro => {
         return make_binary_package(distro, event, user_data);
