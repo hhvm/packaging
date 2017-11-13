@@ -3,7 +3,7 @@ const AWS = require('aws-sdk');
 const promise = require('promise');
 const rp = require('request-promise');
 
-const USERDATA_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/ng/aws/userdata/update-repos.sh';
+const USERDATA_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/aws/userdata/update-repos.sh';
 
 exports.handler = (event, context, callback) => {
   rp(USERDATA_URI)

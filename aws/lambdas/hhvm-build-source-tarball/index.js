@@ -3,7 +3,7 @@ const AWS = require('aws-sdk');
 const promise = require('promise');
 const rp = require('request-promise');
 
-const USERDATA_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/ng/aws/userdata/make-source-tarball.sh';
+const USERDATA_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/aws/userdata/make-source-tarball.sh';
 
 function make_source_tarball(event, user_data, callback) {
   if (!(

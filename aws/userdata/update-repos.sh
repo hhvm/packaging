@@ -12,7 +12,7 @@ set -ex
 shutdown -h 180 # 3 hour timeout
 
 git clone https://github.com/hhvm/packaging hhvm-packaging
-ln -s $(pwd)/hhvm-packaging/ng /opt/hhvm-packaging
+ln -s $(pwd)/hhvm-packaging /opt/hhvm-packaging
 
 /opt/hhvm-packaging/aws/bin/update-repos
 

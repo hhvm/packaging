@@ -27,7 +27,7 @@ apt-get update -y
 apt-get install -y docker-ce
 
 git clone https://github.com/hhvm/packaging hhvm-packaging
-ln -s $(pwd)/hhvm-packaging/ng /opt/hhvm-packaging
+ln -s $(pwd)/hhvm-packaging /opt/hhvm-packaging
 git clone https://github.com/hhvm/hhvm-docker /opt/hhvm-docker
 
 aws configure set default.region us-west-2

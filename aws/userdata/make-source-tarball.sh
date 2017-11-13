@@ -27,7 +27,7 @@ apt-get install -y curl wget git awscli
 aws configure set default.region us-west-2
 
 git clone https://github.com/hhvm/packaging hhvm-packaging
-ln -s $(pwd)/hhvm-packaging/ng /opt/hhvm-packaging
+ln -s $(pwd)/hhvm-packaging /opt/hhvm-packaging
 
 cd /opt/hhvm-packaging
 

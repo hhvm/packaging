@@ -29,7 +29,7 @@ apt-get clean
 apt-get install -y docker.io curl wget git awscli
 
 git clone https://github.com/hhvm/packaging hhvm-packaging
-cd hhvm-packaging/ng
+cd hhvm-packaging
 
 aws s3 cp "$S3_SOURCE" out/
 
