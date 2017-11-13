@@ -24,6 +24,8 @@ export IS_AWS=true
 apt-get update -y
 apt-get install -y curl wget git awscli
 
+aws configure set default.region us-west-2
+
 git clone https://github.com/hhvm/packaging hhvm-packaging
 ln -s $(pwd)/hhvm-packaging/ng /opt/hhvm-packaging
 
