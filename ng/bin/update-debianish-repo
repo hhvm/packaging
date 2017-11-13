@@ -53,6 +53,13 @@ for VERSION_DIR in "$INCOMING_DIR"/*; do
   done
 done
 
+# Put up the big files first, so we don't have a bunch of time where the
+# metadata says there's a new package, but it's not available yet.
+aws s3 sync "$REPO_DIR/" "s3://hhvm-downloads/${DISTRO_BASE}/" --exclude '*' --include '*.deb' --include '*.orig.tar.gz'
+aws s3 sync "$REPO_DIR/" "s3://hhvm-downloads/${DISTRO_BASE}/"
+
+# Only actually clean up once we're published
+
 for VERSION_DIR in "$INCOMING_DIR"/*; do
   if [ ! -d "$VERSION_DIR" ]; then
     continue;
@@ -66,8 +73,3 @@ for VERSION_DIR in "$INCOMING_DIR"/*; do
     aws s3 rm --recursive s3://hhvm-scratch/$VERSION/$DISTRO
   done
 done
-
-# Put up the big files first, so we don't have a bunch of time where the
-# metadata says there's a new package, but it's not available yet.
-aws s3 sync "$REPO_DIR/" "s3://hhvm-downloads/${DISTRO_BASE}/" --exclude '*' --include '*.deb' --include '*.orig.tar.gz'
-aws s3 sync "$REPO_DIR/" "s3://hhvm-downloads/${DISTRO_BASE}/"
