@@ -23,11 +23,25 @@ export IS_AWS=true
 
 apt-get update -y
 apt-get install -y curl wget git awscli
+
+aws s3 cp "$FILE" "s3://${S3_BUCKET}/${S3_PATH}"
+
 git clone https://github.com/hhvm/packaging hhvm-packaging
-cd hhvm-packaging/ng
+ln -s $(pwd)/hhvm-packaging/ng /opt/hhvm-packaging
+
+cd /opt/hhvm-packaging
 
 bin/make-source-tarball
 
-aws s3 cp out/*.tar.gz "s3://${S3_BUCKET}/${S3_PATH}"
+cd out
+
+FILE=$(basename "$S3_PATH")
+aws s3 cp "$FILE" "s3://${S3_BUCKET}/${S3_PATH}"
+
+aws kms decrypt --ciphertext-blob "fileb:///opt/hhvm-packaging/aws/gpg-key.kms-ciphertext" --query Plaintext --output text | base64 --decode | gpg --import
+
+gpg --sign --armor --detach --local-user 0xD386EB94 \
+  -o "$FILE".sig "$FILE"
+aws s3 cp "${FILE}.sig" "s3://${S3_BUCKET}/${S3_PATH}.sig"
 
 shutdown -h now
