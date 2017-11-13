@@ -24,8 +24,6 @@ export IS_AWS=true
 apt-get update -y
 apt-get install -y curl wget git awscli
 
-aws s3 cp "$FILE" "s3://${S3_BUCKET}/${S3_PATH}"
-
 git clone https://github.com/hhvm/packaging hhvm-packaging
 ln -s $(pwd)/hhvm-packaging/ng /opt/hhvm-packaging
 
