@@ -105,6 +105,9 @@ function get_index_html_string(dir, objs) {
   const file_rows = files.sort(
     (a, b) => (a.Key < b.Key) ? -1 : 1
   ).map(item => {
+    if (item.Size === 0) {
+      console.log(item);
+    }
     const basename = path.basename(item.Key);
     return (
       <tr key={item.Key}>
