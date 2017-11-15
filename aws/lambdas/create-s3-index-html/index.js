@@ -77,7 +77,7 @@ function publish_indices(event, objs, callback) {
 }
 
 function get_index_html_string(dir, objs) {
-  const parent_dir_row  = dir === '/' ? null : (
+  const parent_dir_row  = dir === '' ? null : (
     <tr key="parent"><td>{FOLDER_EMOJI} <a href={('/' + path.dirname(dir)).replace(/^\/.$/, '/')}>..</a></td></tr>
   );
 
