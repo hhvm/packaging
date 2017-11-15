@@ -102,10 +102,20 @@
                 "BooleanEquals": false,
                 "Next": "Wait For Repositories Worker"
               }],
-              "Default": "Finished!"
+              "Default": "Set dl.hhvm.com Configuration"
             },
-            "Finished!": {
-              "Type": "Succeed"
+            "Set dl.hhvm.com Configuration": {
+              "Type": "Pass",
+              "Result": {
+                "bucket": "hhvm-downloads",
+                "cloudfront": "E35YBTV6QCR5BA"
+              },
+              "Next": "Update dl.hhvm.com Indices"
+            },
+            "Update dl.hhvm.com Indices": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-west-2:223121549624:function:create-s3-index-html",
+              "End": true
             }
           }
         },
