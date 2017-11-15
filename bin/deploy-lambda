@@ -23,9 +23,16 @@ if [ ! -d "$LAMBDA_ROOT" ]; then
   exit 1
 fi
 cd $LAMBDA_ROOT
+
+INPUTS=index.js
 if [ -e package.json ]; then
   yarn
+  if [ -e .babelrc ]; then
+    yarn build
+    INPUTS=build-out/index.js
+  fi
+  INPUTS="$INPUTS node_modules"
 fi
 rm -f lambda.zip
-zip -r lambda.zip *
+zip -r lambda.zip $INPUTS
 aws lambda update-function-code --function-name "$LAMBDA" --zip-file "fileb://$(pwd)/lambda.zip" --publish --region us-west-2
