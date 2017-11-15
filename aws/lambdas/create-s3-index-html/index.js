@@ -102,7 +102,7 @@ function get_index_html_string(dir, objs) {
     <tr key={subdir}><td>{FOLDER_EMOJI} <a href={subdir+'/'}>{subdir}/</a></td></tr>
   );
 
-  const child_rows = files.sort(
+  const file_rows = files.sort(
     (a, b) => (a.Key < b.Key) ? -1 : 1
   ).map(item => {
     const basename = path.basename(item.Key);
@@ -129,7 +129,7 @@ function get_index_html_string(dir, objs) {
         <table style={{width: '100%', fontFamily: 'monospace'}}>
           {parent_dir_row}
           {dir_rows}
-          {child_rows}
+          {file_rows}
         </table>
         <footer style={{fontSize: 'x-small', fontStyle: 'italic', color: '#aaa', marginTop: '1em'}}>
           Generated at {(new Date()).toISOString()}
