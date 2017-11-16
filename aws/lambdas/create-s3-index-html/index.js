@@ -47,8 +47,10 @@ function publish_indices(event, objs, callback) {
     }
   });
 
+  dirs = Array.from(dirs.values());
+
   const s3 = new AWS.S3();
-  const s3_upload_promises = Array.from(dirs.values()).map(dir => s3.putObject({
+  const s3_upload_promises = dirs.map(dir => s3.putObject({
       ContentType: 'text/html',
       Body: get_index_html_string(dir, objs),
       Bucket: event.bucket,
@@ -66,14 +68,16 @@ function publish_indices(event, objs, callback) {
         InvalidationBatch: {
           CallerReference: 's3-index-update-'+(new Date()).toISOString(),
           Paths: {
-            Quantity: 1,
-            Items: [ '/*' ] // ideally we'd use '/*/', but '*' must be trailing :(
+            Quantity: dirs.length,
+            Items: dirs.map(
+              dir => dir === '' ? '/' : ('/'+dir+'/')
+            )
           }
         }
       },
       (err, data) => callback(err, data)
     );
-  });
+  }).catch(err => callback(err));
 }
 
 function get_index_html_string(dir, objs) {
