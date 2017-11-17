@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree. An additional grant
+# of patent rights can be found in the PATENTS file in the same directory.
+
+ROOT=/opt/hhvm-packaging
+
+if [ -z "$VERSION" ]; then
+  echo VERSION must be set.
+  exit 1
+fi
+
+if [ ! -d "$ROOT" ]; then
+  echo "Expected $ROOT to be a directory."
+  exit 1
+fi
+
+set -ex
+
+echo "github.com,192.30.253.113 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" >> ~/.ssh/known_hosts
+
+eval $(ssh-agent)
+KEYFILE=$(mktemp)
+
+# Read-only key for private repo
+aws kms decrypt \
+  --region us-west-2 \
+  --ciphertext-blob "fileb://${ROOT}/aws/staging-repo-read-key.kms-ciphertext" \
+  --query Plaintext --output text \
+  | base64 --decode > "$KEYFILE"
+ssh-add "$KEYFILE"
+
+git clone git@github.com:hhvm/hhvm-staging.git hhvm
+
+# Switch to the push key for the public repo
+ssh-add -D
+aws kms decrypt \
+  --region us-west-2 \
+  --ciphertext-blob "fileb://${ROOT}/aws/main-repo-push-key.kms-ciphertext" \
+  --query Plaintext --output text \
+  | base64 --decode > "$KEYFILE"
+ssh-add "$KEYFILE"
+
+cd hhvm
+
+git remote add public git@github.com:facebook/hhvm.git
+
+TAG="HHVM-${VERSION}" # e.g. HHVM-3.23.0
+BRANCH="HHVM-$(echo "$VERSION" | cut -f1-2 -d.)" # e.g. HHVM-3.23
+git checkout "$TAG"
+git push public "$TAG"
+git push public "$TAG":"$BRANCH"
