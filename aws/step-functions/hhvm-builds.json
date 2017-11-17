@@ -102,19 +102,45 @@
                 "BooleanEquals": false,
                 "Next": "Wait For Repositories Worker"
               }],
-              "Default": "Set dl.hhvm.com Configuration"
+              "Default": "Update dl.hhvm.com"
             },
-            "Set dl.hhvm.com Configuration": {
-              "Type": "Pass",
-              "Result": {
-                "bucket": "hhvm-downloads",
-                "cloudfront": "E35YBTV6QCR5BA"
-              },
-              "Next": "Update dl.hhvm.com Indices"
-            },
-            "Update dl.hhvm.com Indices": {
-              "Type": "Task",
-              "Resource": "arn:aws:lambda:us-west-2:223121549624:function:create-s3-index-html",
+            "Update dl.hhvm.com": {
+              "Type": "Parallel",
+              "Branches": [
+                {
+                  "StartAt": "Publish Release Source",
+                  "States": {
+                    "Publish Release Source" : {
+                      "Type": "Task",
+                      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-publish-release-source",
+                      "Next": "Set dl.hhvm.com Configuration"
+                    },
+                    "Set dl.hhvm.com Configuration": {
+                      "Type": "Pass",
+                      "Result": {
+                        "bucket": "hhvm-downloads",
+                        "cloudfront": "E35YBTV6QCR5BA"
+                      },
+                      "Next": "Update dl.hhvm.com Indices"
+                    },
+                    "Update dl.hhvm.com Indices": {
+                      "Type": "Task",
+                      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:create-s3-index-html",
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "Invalidate Repository Metadata",
+                  "States": {
+                    "Invalidate Repository Metadata": {
+                      "Type": "Task",
+                      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-invalidate-repository-metadata-on-cloudfront",
+                      "End": true
+                    }
+                  }
+                }
+              ],
               "End": true
             }
           }
