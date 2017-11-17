@@ -55,4 +55,5 @@ git checkout "$TAG"
 git push public "$TAG"
 git push public "$TAG":"$BRANCH"
 
-aws s3 cp "s3://hhvm-scratch/hhvm-${VERSION}.tar.*" "s3://hhvm-downloads/source/"
+aws s3 cp "s3://hhvm-scratch/hhvm-${VERSION}.tar.gz" "s3://hhvm-downloads/source/"
+aws s3 cp "s3://hhvm-scratch/hhvm-${VERSION}.tar.gz.sig" "s3://hhvm-downloads/source/"
