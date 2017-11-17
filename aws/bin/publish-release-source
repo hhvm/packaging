@@ -54,3 +54,5 @@ BRANCH="HHVM-$(echo "$VERSION" | cut -f1-2 -d.)" # e.g. HHVM-3.23
 git checkout "$TAG"
 git push public "$TAG"
 git push public "$TAG":"$BRANCH"
+
+aws s3 cp "s3://hhvm-scratch/hhvm-${VERSION}.tar.*" "s3://hhvm-downloads/source/"
