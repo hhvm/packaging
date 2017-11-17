@@ -26,3 +26,5 @@ git clone https://github.com/hhvm/packaging hhvm-packaging
 ln -s $(pwd)/hhvm-packaging /opt/hhvm-packaging
 
 /opt/hhvm-packaging/aws/bin/publish-release-source
+
+shutdown -h now
