@@ -9,13 +9,12 @@ Overall Process
 7. wait for the step function to build the source tarballs.
 8. start the mac builds
 9. wait for the step function and mac builds to complete
-  This is a good time convert the release notes from quip to markdown for publication. Pay attention to fixed-width text links
-
-  When the step function is finished, you have:
-    - published source tar balls
-    - published linux binaries
-    - published docker images
-    - public tags and branch
+    This is a good time convert the release notes from quip to markdown for publication. Pay attention to fixed-width text links
+    When the step function is finished, you have:
+      - published source tar balls
+      - published linux binaries
+      - published docker images
+      - public tags and branch
 10. update the hhvm/hhvm:latest and hhvm/hhvm-proxygen:latest docker tags, and any relevant -lts versions
 11. publish the release announcement
 
