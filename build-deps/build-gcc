@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree. An additional grant
+# of patent rights can be found in the PATENTS file in the same directory.
+
+set -ex 
+
+VERSION=4.9.4
+
+cd /tmp
+wget -q http://mirrors.ocf.berkeley.edu/gnu/gcc/gcc-$VERSION/gcc-$VERSION.tar.gz
+tar zxf gcc-$VERSION.tar.gz
+
+unset CFLAGS
+unset CXXFLAGS
+unset LDFLAGS
+env
+
+cd gcc-$VERSION
+contrib/download_prerequisites
+
+mkdir ../objdir
+cd ../objdir
+
+unset CFLAGS
+unset CXXFLAGS
+unset CFLAGS_FOR_BUILD
+unset CXXFLAGS_FOR_BUILD
+unset CFLAGS_FOR_TARGET
+unset CXXFLAGS_FOR_TARGET
+$(pwd)/../gcc-$VERSION/configure \
+  --prefix=/opt/hhvm-build-deps \
+  --enable-language=c,c++ \
+  --disable-multilib
+make -j8
+make install
+cd /tmp
+rm -rf /tmp/{gcc-$VERSION,objdir,gcc-$VERSION.tar.gz}

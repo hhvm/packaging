@@ -1,0 +1,17 @@
+{
+  "main": "build-out/index.js",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.150.0",
+    "prettysize": "^1.1.0",
+    "react": "^16.1.1",
+    "react-dom": "^16.1.1"
+  },
+  "scripts": {
+    "build": "babel index.js -d build-out"
+  }
+}

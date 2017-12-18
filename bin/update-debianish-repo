@@ -1,0 +1,75 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.  #
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree. An additional grant
+# of patent rights can be found in the PATENTS file in the same directory.
+
+if [ "$1" != "debian" -a "$1" != "ubuntu" ]; then
+  echo "USAGE: $0 debian|ubuntu"
+  exit 1
+fi
+
+DISTRO_BASE="$1"
+CONF_DIR="/opt/hhvm-packaging/repo-conf/$DISTRO_BASE"
+REPO_DIR="/mnt/dl.hhvm.com/$DISTRO_BASE"
+INCOMING_DIR="/var/hhvm-scratch/pkg${REPO_SUFFIX}"
+
+if [ ! -d "$CONF_DIR" ]; then
+  echo "Error: expected $CONF_DIR to exist."
+  exit 1
+fi
+
+if [ ! -d "$REPO_DIR" ]; then
+  echo "Error: expected $REPO_DIR to exist."
+  exit 1
+fi
+
+if [ ! -d "$INCOMING_DIR" ]; then
+  echo "Error: expected $INCOMING_DIR to exist."
+  exit 1
+fi
+
+set -ex
+
+cp "$CONF_DIR/distributions" "$REPO_DIR/conf/distributions"
+
+for VERSION_DIR in "$INCOMING_DIR"/*; do
+  if [ ! -d "$VERSION_DIR" ]; then
+    continue;
+  fi
+  VERSION=$(basename "$VERSION_DIR")
+  for DISTRO_DIR in "$VERSION_DIR/$DISTRO_BASE-"*; do
+    if [ ! -d "$DISTRO_DIR" ]; then
+      continue;
+    fi
+    DISTRO=$(basename "$DISTRO_DIR")
+    REPREPRO_DISTRO="$(<"/opt/hhvm-packaging/${DISTRO}/DISTRIBUTION")${REPO_SUFFIX}"
+    (
+      cd "$REPO_DIR"
+      reprepro --keepunusednewfiles include "$REPREPRO_DISTRO" "$DISTRO_DIR"/*.changes
+    )
+  done
+done
+
+# Put up the big files first, so we don't have a bunch of time where the
+# metadata says there's a new package, but it's not available yet.
+aws s3 sync "$REPO_DIR/" "s3://hhvm-downloads/${DISTRO_BASE}/" --exclude '*' --include '*.deb' --include '*.orig.tar.gz'
+aws s3 sync "$REPO_DIR/" "s3://hhvm-downloads/${DISTRO_BASE}/"
+
+# Only actually clean up once we're published
+
+for VERSION_DIR in "$INCOMING_DIR"/*; do
+  if [ ! -d "$VERSION_DIR" ]; then
+    continue;
+  fi
+  VERSION=$(basename "$VERSION_DIR")
+  for DISTRO_DIR in "$VERSION_DIR/$DISTRO_BASE-"*; do
+    if [ ! -d "$DISTRO_DIR" ]; then
+      continue;
+    fi
+    DISTRO=$(basename "$DISTRO_DIR")
+    aws s3 rm --recursive s3://hhvm-scratch/$VERSION/$DISTRO
+  done
+done
