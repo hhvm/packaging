@@ -3,8 +3,15 @@ const AWS = require('aws-sdk');
 const promise = require('promise');
 const rp = require('request-promise');
 
-const DISTROS_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/CURRENT_TARGETS';
-const USERDATA_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/aws/userdata/make-binary-package.sh';
+function get_distros_uri(event) {
+  return 'https://raw.githubusercontent.com/hhvm/packaging/'
+    + event.packagingBranch + '/CURRENT_TARGETS';
+}
+
+function get_userdata_uri(event) {
+  return 'https://raw.githubusercontent.com/hhvm/packaging/'
+    + event.packagingBnrach + '/aws/userdata/make-binary-package.sh';
+}
 
 function make_binary_package(distro, event, user_data) {
   if (distro === undefined) {
@@ -17,6 +24,8 @@ function make_binary_package(distro, event, user_data) {
     "VERSION="+event.version+"\n"+
     "IS_NIGHTLY="+(event.nightly ? 'true' : 'false')+"\n"+
     "S3_SOURCE=s3://"+event.source.bucket+'/'+event.source.path+"\n"+
+    "PACKAGING_BRANCH="+event.packagingBranch+"\n"+
+    "REPO_SUFFIX="+event.repositorySuffix+"\n"+
     user_data;
 
   const params = {
@@ -58,7 +67,7 @@ function get_distros(event) {
       return;
     }
 
-    rp(DISTROS_URI).then(response => {
+    rp(get_distros_uri(event)).then(response => {
       resolve(response.trim().split("\n"));
     });
   });
@@ -67,7 +76,7 @@ function get_distros(event) {
 exports.handler = (event, context, callback) => {
   promise.all([
     get_distros(event),
-    rp(USERDATA_URI)
+    rp(get_userdata_uri(event))
   ])
   .then(values => {
     const distros = values[0];

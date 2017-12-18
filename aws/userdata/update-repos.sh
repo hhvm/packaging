@@ -14,6 +14,7 @@ shutdown -h 180 # 3 hour timeout
 git clone https://github.com/hhvm/packaging hhvm-packaging
 ln -s $(pwd)/hhvm-packaging /opt/hhvm-packaging
 
+export REPO_SUFFIX
 /opt/hhvm-packaging/aws/bin/update-repos
 
 if [ ! -z "$VERSION" ]; then

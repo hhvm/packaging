@@ -30,6 +30,7 @@ apt-get install -y docker.io curl wget git awscli
 
 git clone https://github.com/hhvm/packaging hhvm-packaging
 cd hhvm-packaging
+git checkout "$PACKAGING_BRANCH"
 
 aws s3 cp "$S3_SOURCE" out/
 
@@ -40,6 +41,6 @@ bin/make-package-in-throwaway-container "$DISTRO" > /var/log/hhvm-build
 
 rm "out/${SOURCE_BASENAME}"
 
-aws s3 cp --include '*' --recursive out/ s3://hhvm-scratch/${VERSION}/${DISTRO}/
+aws s3 cp --include '*' --recursive out/ s3://hhvm-scratch/pkg{$REPO_SUFFIX}/${VERSION}/${DISTRO}/
 
 shutdown -h now

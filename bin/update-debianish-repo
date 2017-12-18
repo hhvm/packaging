@@ -14,7 +14,7 @@ fi
 DISTRO_BASE="$1"
 CONF_DIR="/opt/hhvm-packaging/repo-conf/$DISTRO_BASE"
 REPO_DIR="/mnt/dl.hhvm.com/$DISTRO_BASE"
-INCOMING_DIR="/var/hhvm-scratch"
+INCOMING_DIR="/var/hhvm-scratch/pkg${REPO_SUFFIX}"
 
 if [ ! -d "$CONF_DIR" ]; then
   echo "Error: expected $CONF_DIR to exist."
@@ -45,7 +45,7 @@ for VERSION_DIR in "$INCOMING_DIR"/*; do
       continue;
     fi
     DISTRO=$(basename "$DISTRO_DIR")
-    REPREPRO_DISTRO="$(<"/opt/hhvm-packaging/$DISTRO/DISTRIBUTION")"
+    REPREPRO_DISTRO="$(<"/opt/hhvm-packaging/${DISTRO}/DISTRIBUTION")${REPO_SUFFIX}"
     (
       cd "$REPO_DIR"
       reprepro --keepunusednewfiles include "$REPREPRO_DISTRO" "$DISTRO_DIR"/*.changes

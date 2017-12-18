@@ -19,6 +19,12 @@ exports.handler = (event, context, callback) => {
   event.version = version;
   event.nightly = nightly;
   event.source = source;
+  if (!event.repositorySuffix) {
+    event.repositorySuffix = '';
+  }
+  if (!event.packagingBranch) {
+    event.packagingBranch = 'master';
+  }
 
   callback(null, event);
 }
