@@ -10,7 +10,7 @@ function get_distros_uri(event) {
 
 function get_userdata_uri(event) {
   return 'https://raw.githubusercontent.com/hhvm/packaging/'
-    + event.packagingBnrach + '/aws/userdata/make-binary-package.sh';
+    + event.packagingBranch + '/aws/userdata/make-binary-package.sh';
 }
 
 function make_binary_package(distro, event, user_data) {
