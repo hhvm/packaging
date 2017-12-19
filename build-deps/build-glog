@@ -15,10 +15,13 @@ git clone https://github.com/google/glog.git google-glog
 cd google-glog
 git checkout v$VERSION
 
-autoreconf
-CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure \
-  --prefix=/opt/hhvm-build-deps \
-  --enable-static \
-  --disable-shared
+cmake . \
+  -DWITH_GFLAGS=OFF \
+  -DBUILD_SHARED_LIBS=OFF \
+  -DCMAKE_C_FLAGS="-fPIC" \
+  -DCMAKE_CXX_FLAGS="-fPIC" \
+  -DCMAKE_C_COMPILER=gcc \
+  -DCMAKE_CXX_COMPILER=g++ \
+  -DCMAKE_INSTALL_PREFIX=/opt/hhvm-build-deps
 make -j8
 make install
