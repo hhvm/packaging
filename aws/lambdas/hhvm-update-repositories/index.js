@@ -11,13 +11,13 @@ exports.handler = (event, context, callback) => {
     if (!event.repositorySuffix) {
       event.repositorySuffix = '';
     }
-    userdata_prefix =
+    let userdata_prefix =
       "#!/bin/bash\n"+
       "REPO_SUFFIX="+event.repositorySuffix+"\n";
     if (event.version) {
       userdata_prefix += "VERSION="+event.version+"\n";
     }
-    userdata = userdata_prefix+userdata;
+    userdata = userdata_prefix + userdata;
 
     const params = {
       ImageId: /* ubuntu 16.04 */ 'ami-6e1a0117',

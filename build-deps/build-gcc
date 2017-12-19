@@ -34,7 +34,7 @@ unset CFLAGS_FOR_TARGET
 unset CXXFLAGS_FOR_TARGET
 $(pwd)/../gcc-$VERSION/configure \
   --prefix=/opt/hhvm-build-deps \
-  --enable-language=c,c++ \
+  --enable-languages=c,c++ \
   --disable-multilib
 make -j8
 make install
