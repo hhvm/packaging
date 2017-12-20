@@ -17,3 +17,4 @@ override_dh_strip:
 override_dh_fixperms:
 	dh_dixperms
 	chown www-data:www-data debian/hhvm-nightly/var/log/hhvm
+	chown www-data:www-data debian/hhvm-nightly/var/cache/hhvm
