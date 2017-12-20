@@ -29,5 +29,6 @@ override_dh_strip:
 	dh_strip --dbg-package=hhvm-nightly-dbg
 
 override_dh_fixperms:
-	dh_dixperms
+	dh_fixperms
 	chown www-data:www-data debian/hhvm-nightly/var/log/hhvm
+	chown www-data:www-data debian/hhvm-nightly/var/cache/hhvm

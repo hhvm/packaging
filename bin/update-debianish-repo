@@ -70,6 +70,6 @@ for VERSION_DIR in "$INCOMING_DIR"/*; do
       continue;
     fi
     DISTRO=$(basename "$DISTRO_DIR")
-    aws s3 rm --recursive s3://hhvm-scratch/$VERSION/$DISTRO
+    aws s3 rm --recursive s3://hhvm-scratch/pkg${REPO_SUFFIX}/$VERSION/$DISTRO
   done
 done
