@@ -41,4 +41,3 @@ $(pwd)/../gcc-$VERSION/configure \
 make -j8
 make install
 cd /tmp
-rm -rf /tmp/{gcc-$VERSION,objdir,gcc-$VERSION.tar.gz}
