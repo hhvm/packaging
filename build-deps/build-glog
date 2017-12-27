@@ -7,10 +7,16 @@
 # LICENSE file in the root directory of this source tree. An additional grant
 # of patent rights can be found in the PATENTS file in the same directory.
 
+VERSION=0.3.5
+BUILD_VER=1
+
 set -ex 
 
+PKG_NAME=glog
+CACHE_TARBALL="/var/nodist/${PKG_NAME}-${VERSION}-$(</opt/hhvm-distro-packaging/DISTRIBUTION)${BUILD_VER}.tar.bz2"
+PKG_DIR=$(mktemp -d)
+
 cd /tmp
-VERSION=0.3.5
 git clone https://github.com/google/glog.git google-glog
 cd google-glog
 git checkout v$VERSION
@@ -24,4 +30,10 @@ cmake . \
   -DCMAKE_CXX_COMPILER=g++ \
   -DCMAKE_INSTALL_PREFIX=/opt/hhvm-build-deps
 make -j8
-make install
+make install DESTDIR="${PKG_DIR}"
+
+cd "${PKG_DIR}"
+mkdir -p "$(dirname "$CACHE_TARBALL")"
+tar jcf "$CACHE_TARBALL" *
+cd /
+tar xfv "$CACHE_TARBALL"

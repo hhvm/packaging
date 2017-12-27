@@ -7,11 +7,23 @@
 # LICENSE file in the root directory of this source tree. An additional grant
 # of patent rights can be found in the PATENTS file in the same directory.
 
+VERSION=5.5.0
+BUILD_VER=1
+
 set -ex 
 
-VERSION=5.5.0
+PKG_NAME=gcc
+CACHE_TARBALL="/var/nodist/${PKG_NAME}-${VERSION}-$(</opt/hhvm-distro-packaging/DISTRIBUTION)${BUILD_VER}.tar.bz2"
+PKG_DIR=$(mktemp -d)
 
 cd /tmp
+if [ -e "$CACHE_TARBALL" ]; then
+  echo "Using ${CACHE_TARBALL}..."
+  cd /
+  tar xfv "$CACHE_TARBALL"
+  exit 0
+fi
+
 wget -q http://mirrors.ocf.berkeley.edu/gnu/gcc/gcc-$VERSION/gcc-$VERSION.tar.gz
 tar zxf gcc-$VERSION.tar.gz
 
@@ -39,5 +51,10 @@ $(pwd)/../gcc-$VERSION/configure \
   --with-default-libstdcxx-abi=gcc4-compatible \
   --disable-libstdcxx-dual-abi
 make -j8
-make install
-cd /tmp
+make install "DESTDIR=${PKG_DIR}"
+
+cd "${PKG_DIR}"
+mkdir -p "$(dirname "$CACHE_TARBALL")"
+tar jcf "$CACHE_TARBALL" *
+cd /
+tar xfv "$CACHE_TARBALL"
