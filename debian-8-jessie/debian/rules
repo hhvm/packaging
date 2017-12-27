@@ -7,6 +7,8 @@ export PATH := /opt/hhvm-build-deps/bin:$(PATH)
 override_dh_auto_configure:
 	debian/build-deps/build-gcc
 	dh_auto_configure -- \
+	-DCMAKE_C_COMPILER=/opt/hhvm-build-deps/bin/gcc \
+	-DCMAKE_CXX_COMPILER=/opt/hhvm-build-deps/bin/g++ \
 	-Wno-dev \
 	-DMYSQL_UNIX_SOCK_ADDR=/var/run/mysqld/mysqld.sock \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo
