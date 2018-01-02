@@ -65,7 +65,6 @@ Build-Depends:
   libxml2-dev,
   libxslt1-dev,
   libyaml-dev,
-  wget,
   zlib1g-dev
 
 Package: hhvm-nightly

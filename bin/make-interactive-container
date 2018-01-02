@@ -9,6 +9,7 @@
 
 ROOT="$(realpath "$(dirname $0)/..")"
 OUT="$ROOT/out/"
+NODIST="$ROOT/nodist/"
 DISTRO=${1:-"debian-8-jessie"}
 DOCKER_BASE="$(<"${ROOT}/${DISTRO}/DOCKER_BASE")"
 
@@ -21,6 +22,7 @@ fi
 docker run -it \
   --security-opt seccomp=unconfined \
   -v "$OUT":/var/out \
+  -v "$NODIST":/var/nodist \
   -v "$ROOT":/opt/hhvm-packaging:ro \
   -v "${ROOT}/${DISTRO}":/opt/hhvm-distro-packaging:ro \
   "${DOCKER_BASE}" \

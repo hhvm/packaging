@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# php5-cli uses a priority of 50, so we pick a much smaller number
+if [ -f /usr/sbin/update-alternatives ]; then
+	/usr/sbin/update-alternatives --install /usr/bin/php php /usr/bin/hhvm 10
+fi
+if [ -f /usr/bin/update-alternatives ]; then
+	/usr/bin/update-alternatives --install /usr/bin/php php /usr/bin/hhvm 10
+fi
+
+echo "********************************************************************"
+echo "* HHVM is installed."
+echo "*"
+echo "* Running PHP web scripts with HHVM is done by having your"
+echo "* webserver talk to HHVM over FastCGI. Install nginx or Apache,"
+echo "* and then:"
+echo "* $ sudo /usr/share/hhvm/install_fastcgi.sh"
+echo "* $ sudo /etc/init.d/hhvm restart"
+echo "* (if using nginx)  $ sudo /etc/init.d/nginx restart"
+echo "* (if using apache) $ sudo /etc/init.d/apache restart"
+echo "*"
+echo "* Detailed FastCGI directions are online at:"
+echo "* https://github.com/facebook/hhvm/wiki/FastCGI"
+echo "*"
+echo "* If you're using HHVM to run web scripts, you probably want it"
+echo "* to start at boot:"
+
+echo "* $ sudo update-rc.d hhvm defaults"
+echo "*"
+echo "* Running command-line scripts with HHVM requires no special setup:"
+echo "* $ hhvm whatever.php"
+echo "*"
+
+echo "* You can use HHVM for /usr/bin/php even if you have php-cli"
+echo "* installed:"
+echo "* $ sudo /usr/bin/update-alternatives \\"
+echo "*    --install /usr/bin/php php /usr/bin/hhvm 60"
+
+echo "********************************************************************"
+
+RUN_AS_USER="www-data"
+RUN_AS_GROUP="www-data"
+
+if [ -f /etc/default/hhvm ]; then
+    . /etc/default/hhvm
+fi
+
+install -d -m 755 -o $RUN_AS_USER -g $RUN_AS_GROUP /var/run/hhvm
+install -d -m 01733 /var/lib/hhvm/sessions
+
+if which invoke-rc.d >/dev/null 2>&1; then
+    invoke-rc.d hhvm start
+fi

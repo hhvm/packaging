@@ -9,6 +9,7 @@
 
 ROOT="$(realpath "$(dirname $0)/..")"
 OUT="$ROOT/out/"
+NODIST="$ROOT/nodist/"
 DISTRO=${1:-"debian-8-jessie"}
 DOCKER_BASE="$(<"${ROOT}/${DISTRO}/DOCKER_BASE")"
 IS_NIGHTLY=${IS_NIGHTLY:-true}
@@ -25,6 +26,7 @@ docker run \
   -e "VERSION" \
   -e "IS_NIGHTLY" \
   -v "$OUT":/var/out \
+  -v "$NODIST":/var/nodist \
   -v "$ROOT":/opt/hhvm-packaging:ro \
   -v "${ROOT}/${DISTRO}":/opt/hhvm-distro-packaging:ro \
   "${DOCKER_BASE}" \

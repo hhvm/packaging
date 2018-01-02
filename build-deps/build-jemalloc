@@ -7,10 +7,22 @@
 # LICENSE file in the root directory of this source tree. An additional grant
 # of patent rights can be found in the PATENTS file in the same directory.
 
+VERSION=4.5.0
+BUILD_VER=1
+
 set -ex 
 
+PKG_NAME=jemalloc
+CACHE_TARBALL="/var/nodist/${PKG_NAME}-${VERSION}-$(</opt/hhvm-distro-packaging/DISTRIBUTION)${BUILD_VER}.tar.bz2"
+PKG_DIR=$(mktemp -d)
+
 cd /tmp
-VERSION=4.5.0
+if [ -e "$CACHE_TARBALL" ]; then
+  echo "Using ${CACHE_TARBALL}..."
+  cd /
+  tar xfv "$CACHE_TARBALL"
+  exit 0
+fi
 
 wget -q https://github.com/jemalloc/jemalloc/releases/download/$VERSION/jemalloc-$VERSION.tar.bz2
 tar jxf jemalloc-$VERSION.tar.bz2
@@ -21,4 +33,10 @@ CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure \
   --enable-static \
   --disable-shared
 make -j8
-make install
+make install "DESTDIR=${PKG_DIR}"
+
+cd "${PKG_DIR}"
+mkdir -p "$(dirname "$CACHE_TARBALL")"
+tar jcf "$CACHE_TARBALL" *
+cd /
+tar xfv "$CACHE_TARBALL"
