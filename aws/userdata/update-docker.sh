@@ -16,6 +16,11 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
+if [ ! -d /opt/hhvm-packaging ]; then
+  echo "/opt/hhvm-packaging must exist."
+  exit 1
+fi
+
 apt-get update -y
 apt-get install -y awscli software-properties-common curl apt-transport-https ca-certificates
 
@@ -26,8 +31,6 @@ add-apt-repository \
 apt-get update -y
 apt-get install -y docker-ce
 
-git clone https://github.com/hhvm/packaging hhvm-packaging
-ln -s $(pwd)/hhvm-packaging /opt/hhvm-packaging
 git clone https://github.com/hhvm/hhvm-docker /opt/hhvm-docker
 
 aws configure set default.region us-west-2
