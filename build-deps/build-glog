@@ -17,6 +17,13 @@ CACHE_TARBALL="/var/nodist/${PKG_NAME}-${VERSION}-$(</opt/hhvm-distro-packaging/
 PKG_DIR=$(mktemp -d)
 
 cd /tmp
+if [ -e "$CACHE_TARBALL" ]; then
+  echo "Using ${CACHE_TARBALL}..."
+  cd /
+  tar xfv "$CACHE_TARBALL"
+  exit 0
+fi
+
 git clone https://github.com/google/glog.git google-glog
 cd google-glog
 git checkout v$VERSION
