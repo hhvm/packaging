@@ -40,4 +40,11 @@ aws kms decrypt \
 
 /opt/hhvm-docker/build-and-tag.sh "$VERSION"
 
+for TAG in $(</opt/hhvm-packaging/DOCKER_TAGS); do
+  docker tag "hhvm/hhvm:$VERSION" "hhvm/hhvm:$TAG"
+  docker tag "hhvm/hhvm-proxygen:$VERSION" "hhvm/hhvm-proxygen:$TAG"
+  docker push "hhvm/hhvm:$TAG"
+  docker push "hhvm/hhvm-proxygen:$TAG"
+done
+
 shutdown -h now
