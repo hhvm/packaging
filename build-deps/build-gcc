@@ -7,8 +7,8 @@
 # LICENSE file in the root directory of this source tree. An additional grant
 # of patent rights can be found in the PATENTS file in the same directory.
 
-VERSION=5.5.0
-BUILD_VER=1
+VERSION=4.9.4
+BUILD_VER=2
 
 set -ex 
 
@@ -47,9 +47,7 @@ unset CXXFLAGS_FOR_TARGET
 $(pwd)/../gcc-$VERSION/configure \
   --prefix=/opt/hhvm-build-deps \
   --enable-languages=c,c++ \
-  --disable-multilib \
-  --with-default-libstdcxx-abi=gcc4-compatible \
-  --disable-libstdcxx-dual-abi
+  --disable-multilib
 make -j8
 make install "DESTDIR=${PKG_DIR}"
 
