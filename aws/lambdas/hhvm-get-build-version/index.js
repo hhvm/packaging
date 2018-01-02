@@ -23,7 +23,11 @@ exports.handler = (event, context, callback) => {
     event.repositorySuffix = '';
   }
   if (!event.packagingBranch) {
-    event.packagingBranch = 'master';
+    if (nightly) {
+      event.packagingBranch = 'master';
+    } else {
+      event.packagingBranch = 'HHVM-'+version.match(/^\d+\.\d+/)[0];
+    }
   }
 
   callback(null, event);
