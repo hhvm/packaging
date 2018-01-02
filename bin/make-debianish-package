@@ -66,7 +66,11 @@ if [ -x "$PREBUILD" ]; then
 fi
 debuild -us -uc
 cd ..
-FILES=$(awk '/^Files:$/ { files=1; next } /^[^ ]/ { files=0; next } files==1 { print $NF }' *.changes)
+FILES=$(awk '/^Files:/ { files=1; next } /^[^ ]/ { files=0; next } files==1 { print $NF }' *.changes)
+if [ -z "$FILES" ]; then
+  echo "Failed to identify neccessary files"
+  exit 1
+fi
 cp *.changes $FILES "$OUT"
 set +ex
 echo "Build tree: $TEMP"
