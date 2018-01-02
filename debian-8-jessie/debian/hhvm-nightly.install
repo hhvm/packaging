@@ -2,7 +2,6 @@
 /usr/bin/hh_client /usr/bin
 /usr/bin/hh_parse /usr/bin
 /usr/bin/hh_server /usr/bin
-/usr/bin/hh_single_compile /usr/bin
 /usr/bin/hhvm /usr/bin
 /usr/bin/hhvm-repo-mode /usr/bin
 debian/third_party_notices.txt /usr/share/doc/hhvm
