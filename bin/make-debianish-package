@@ -66,6 +66,6 @@ if [ -x "$PREBUILD" ]; then
 fi
 debuild -us -uc
 cd ..
-cp *.{deb,dsc,debian.tar.*,build*,changes,orig.tar.*} "$OUT"
+cp *.{deb,dsc,debian.tar.*,build*,changes,orig.tar.*} "$OUT" || true
 set +ex
 echo "Build tree: $TEMP"
