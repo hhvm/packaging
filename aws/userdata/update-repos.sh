@@ -16,16 +16,17 @@ if [ -z "$PACKAGING_BRANCH" ]; then
   exit 1
 fi
 
+if [ -z "$VERSION" ]; then
+  echo "VERSION must be set."
+  exit 1
+fi
+
 git clone https://github.com/hhvm/packaging hhvm-packaging
 ln -s $(pwd)/hhvm-packaging /opt/hhvm-packaging
 (cd hhvm-packaging; git checkout $PACKAGING_BRANCH)
 
-export REPO_SUFFIX
+export VERSION
 /opt/hhvm-packaging/aws/bin/update-repos
-
-if [ ! -z "$VERSION" ]; then
-  export VERSION
-  /opt/hhvm-packaging/aws/bin/update-docker
-fi
+/opt/hhvm-packaging/aws/bin/update-docker
 
 shutdown -h now

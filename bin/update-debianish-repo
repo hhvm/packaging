@@ -11,10 +11,15 @@ if [ "$1" != "debian" -a "$1" != "ubuntu" ]; then
   exit 1
 fi
 
+if [ -z "$VERSION" ]; then
+  echo 'VERSION must be set'
+  exit 1
+fi
+
 DISTRO_BASE="$1"
 CONF_DIR="/opt/hhvm-packaging/repo-conf/$DISTRO_BASE"
 REPO_DIR="/mnt/dl.hhvm.com/$DISTRO_BASE"
-INCOMING_DIR="/var/hhvm-scratch/pkg${REPO_SUFFIX}"
+INCOMING_DIR="/var/hhvm-scratch/$VERSION"
 
 if [ ! -d "$CONF_DIR" ]; then
   echo "Error: expected $CONF_DIR to exist."
@@ -44,11 +49,12 @@ for VERSION_DIR in "$INCOMING_DIR"/*; do
     if [ ! -d "$DISTRO_DIR" ]; then
       continue;
     fi
-    DISTRO=$(basename "$DISTRO_DIR")
-    REPREPRO_DISTRO="$(<"/opt/hhvm-packaging/${DISTRO}/DISTRIBUTION")${REPO_SUFFIX}"
+    DISTRO="$(<"/opt/hhvm-packaging/$(basename "$DISTRO_DIR")/DISTRIBUTION")"
     (
       cd "$REPO_DIR"
-      reprepro --keepunusednewfiles include "$REPREPRO_DISTRO" "$DISTRO_DIR"/*.changes
+      for REPREPRO_DISTRO in $(sed "s/DISTRO/$DISTRO/" /opt/hhvm-packaging/DEBIAN_REPOSITORIES); do
+        reprepro --keepunusednewfiles include "$REPREPRO_DISTRO" "$DISTRO_DIR"/*.changes
+      done
     )
   done
 done
@@ -70,6 +76,6 @@ for VERSION_DIR in "$INCOMING_DIR"/*; do
       continue;
     fi
     DISTRO=$(basename "$DISTRO_DIR")
-    aws s3 rm --recursive s3://hhvm-scratch/pkg${REPO_SUFFIX}/$VERSION/$DISTRO
+    aws s3 rm --recursive s3://hhvm-scratch/$VERSION/$DISTRO
   done
 done

@@ -42,7 +42,7 @@ bin/make-package-in-throwaway-container "$DISTRO" > /var/log/hhvm-build
 
 rm "out/${SOURCE_BASENAME}"
 
-aws s3 cp --include '*' --recursive out/ s3://hhvm-scratch/pkg${REPO_SUFFIX}/${VERSION}/${DISTRO}/
+aws s3 cp --include '*' --recursive out/ s3://hhvm-scratch/${VERSION}/${DISTRO}/
 aws s3 sync nodist/ "s3://hhvm-nodist/${DISTRO}/"
 
 shutdown -h now

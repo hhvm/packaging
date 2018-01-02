@@ -25,7 +25,6 @@ function make_binary_package(distro, event, user_data) {
     "IS_NIGHTLY="+(event.nightly ? 'true' : 'false')+"\n"+
     "S3_SOURCE=s3://"+event.source.bucket+'/'+event.source.path+"\n"+
     "PACKAGING_BRANCH="+event.packagingBranch+"\n"+
-    "REPO_SUFFIX="+event.repositorySuffix+"\n"+
     user_data;
 
   const params = {

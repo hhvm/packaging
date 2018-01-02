@@ -8,12 +8,8 @@ const USERDATA_URI = 'https://raw.githubusercontent.com/hhvm/packaging/master/aw
 exports.handler = (event, context, callback) => {
   rp(USERDATA_URI)
   .then(userdata => {
-    if (!event.repositorySuffix) {
-      event.repositorySuffix = '';
-    }
     let userdata_prefix =
       "#!/bin/bash\n"+
-      "REPO_SUFFIX="+event.repositorySuffix+"\n"+
       "PACKAGING_BRANCH="+event.packagingBranch+"\n";
     if (event.version) {
       userdata_prefix += "VERSION="+event.version+"\n";
