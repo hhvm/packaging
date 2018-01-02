@@ -66,6 +66,7 @@ if [ -x "$PREBUILD" ]; then
 fi
 debuild -us -uc
 cd ..
-cp *.{deb,dsc,debian.tar.*,build*,changes,orig.tar.*} "$OUT" || true
+FILES=$(awk '/^Files:$/ { files=1; next } /^[^ ]/ { files=0; next } files==1 { print $NF }' *.changes)
+cp *.changes $FILES "$OUT"
 set +ex
 echo "Build tree: $TEMP"
