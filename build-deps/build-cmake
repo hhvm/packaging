@@ -1,0 +1,40 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree. An additional grant
+# of patent rights can be found in the PATENTS file in the same directory.
+
+VERSION=3.9.4
+BUILD_VER=1
+
+set -ex
+
+PKG_NAME=cmake
+CACHE_TARBALL="/var/nodist/${PKG_NAME}-${VERSION}-$(</opt/hhvm-distro-packaging/DISTRIBUTION)${BUILD_VER}.tar.bz2"
+PKG_DIR=$(mktemp -d)
+
+cd /tmp
+if [ -e "$CACHE_TARBALL" ]; then
+  echo "Using ${CACHE_TARBALL}..."
+  cd /
+  tar xfv "$CACHE_TARBALL"
+  exit 0
+fi
+
+MINOR_VERSION=$(echo "$VERSION" | cut -f1-2 -d.)
+wget -q https://cmake.org/files/v${MINOR_VERSION}/cmake-${VERSION}.tar.gz
+tar zxf cmake-${VERSION}.tar.gz
+cd cmake-${VERSION}
+
+LDFLAGS=-pthread ./bootstrap --prefix=/opt/hhvm-build-deps --parallel=8
+make -j8
+make install "DESTDIR=${PKG_DIR}"
+
+cd "${PKG_DIR}"
+mkdir -p "$(dirname "$CACHE_TARBALL")"
+tar jcf "$CACHE_TARBALL" *
+cd /
+tar xfv "$CACHE_TARBALL"

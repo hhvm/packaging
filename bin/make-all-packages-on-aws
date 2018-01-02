@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree. An additional grant
+# of patent rights can be found in the PATENTS file in the same directory.
+
+set -e
+
+ROOT="$(realpath "$(dirname $0)/..")"
+
+VERSION=$1
+if [ -z "$VERSION" ]; then
+  echo "Usage: $0 VERSION"
+  exit 1
+fi
+
+PAYLOAD="{\"version\": \"${VERSION}\"}"
+aws stepfunctions start-execution \
+  --state-machine-arn \
+    arn:aws:states:us-west-2:223121549624:stateMachine:hhvm-builds \
+  --input "${PAYLOAD}" \
+  --name "${VERSION}-$(whoami)-$(date +%Y-%m-%d-%H-%M-%S-%Z)"

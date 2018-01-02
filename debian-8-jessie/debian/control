@@ -1,0 +1,91 @@
+# DANGER DANGER DANGER
+# We currently build-depend on libreadline - this is just to make mysql's build system happy
+# We do not (and must not) distribute anything linked with it
+Source: hhvm-nightly
+Maintainer: HHVM Open Source <hhvm-oss@fb.com>
+Section: web
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends:
+  autoconf,
+  automake,
+  binutils-dev,
+  bison,
+  build-essential,
+  cmake,
+  debhelper (>= 9),
+  g++,
+  gawk,
+  git,
+  gperf,
+  libboost-context-dev,
+  libboost-dev,
+  libboost-filesystem-dev,
+  libboost-program-options-dev,
+  libboost-regex-dev,
+  libboost-system-dev,
+  libboost-thread-dev,
+  libbz2-dev,
+  libc-client-dev,
+  libc-client2007e-dev,
+  libcap-dev,
+  libcurl4-openssl-dev,
+  libdwarf-dev,
+  libedit-dev,
+  libeditline-dev,
+  libelf-dev,
+  libevent-dev,
+  libexpat-dev,
+  libgd2-xpm-dev,
+  libgmp3-dev,
+  libgoogle-glog-dev,
+  libgoogle-perftools-dev,
+  libiberty-dev,
+  libiconv-hook-dev,
+  libicu-dev,
+  libinotifytools0-dev,
+  libjemalloc-dev,
+  libkrb5-dev,
+  libldap2-dev,
+  libmagickwand-dev,
+  libmcrypt-dev,
+  libmemcached-dev,
+  libncurses-dev,
+  libnotify-dev,
+  libonig-dev,
+  libpcre3-dev,
+  libpq-dev,
+  libre2-dev,
+  libreadline-dev,
+  libsodium-dev,
+  libsqlite3-dev,
+  libssl-dev,
+  libtbb-dev,
+  libtool,
+  libxml2-dev,
+  libxslt1-dev,
+  libyaml-dev,
+  wget,
+  zlib1g-dev
+
+Package: hhvm-nightly
+Architecture: any
+Conflicts: hhvm
+Depends: tzdata, lsof, ${shlibs:Depends}, ${misc:Depends}
+Description: HHVM virtual machine, runtime, and JIT for the PHP and Hack languages
+
+Package: hhvm-nightly-dbg
+Architecture: any
+Depends: hhvm-nightly (= ${binary:Version}), ${misc:Depends}
+Recommends: perf, gdb
+Section: debug
+Priority: extra
+Description: Debugging symbols for HHVM.
+
+Package: hhvm-nightly-dev
+Architecture: any
+Depends: hhvm-nightly (= ${binary:Version}), ${misc:Depends}
+Recommends: cmake
+Section: libdevel
+Priority: extra
+Description: Header and build system files for HHVM extension.

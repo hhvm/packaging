@@ -1,0 +1,42 @@
+#/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree. An additional grant
+# of patent rights can be found in the PATENTS file in the same directory.
+
+VERSION=1.65.1
+BUILD_VER=1
+
+set -ex 
+
+PKG_NAME=boost
+CACHE_TARBALL="/var/nodist/${PKG_NAME}-${VERSION}-$(</opt/hhvm-distro-packaging/DISTRIBUTION)${BUILD_VER}.tar.bz2"
+PKG_DIR=$(mktemp -d)
+
+cd /tmp
+if [ -e "$CACHE_TARBALL" ]; then
+  echo "Using ${CACHE_TARBALL}..."
+  cd /
+  tar xfv "$CACHE_TARBALL"
+  exit 0
+fi
+
+VERSION_US=$(echo $VERSION | tr . _)
+wget -q https://dl.bintray.com/boostorg/release/$VERSION/source/boost_${VERSION_US}.tar.bz2
+tar jxf boost_${VERSION_US}.tar.bz2
+
+cd boost_${VERSION_US}
+
+CFLAGS=-fPIC CXXFLAGS=-fPIC \
+  ./bootstrap.sh --prefix=/opt/hhvm-build-deps --without-libraries=python
+./b2 variant=release threading=multi link=static --layout=tagged -j8
+./b2 variant=release threading=multi link=static --layout=tagged --prefix="${PKG_DIR}/opt/hhvm-build-deps" install
+
+cd "${PKG_DIR}"
+mkdir -p "$(dirname "$CACHE_TARBALL")"
+tar jcf "$CACHE_TARBALL" *
+cd /
+tar xfv "$CACHE_TARBALL"

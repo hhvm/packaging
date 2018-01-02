@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+%:
+	dh $@ --buildsystem=cmake --parallel
+
+export PATH := /opt/hhvm-build-deps/bin:$(PATH)
+
+override_dh_auto_configure:
+	debian/build-deps/build-gcc
+	dh_auto_configure -- \
+	-DCMAKE_C_COMPILER=/opt/hhvm-build-deps/bin/gcc \
+	-DCMAKE_CXX_COMPILER=/opt/hhvm-build-deps/bin/g++ \
+	-Wno-dev \
+	-DMYSQL_UNIX_SOCK_ADDR=/var/run/mysqld/mysqld.sock \
+	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	-DSTATIC_CXX_LIB=On
+
+override_dh_strip:
+	dh_strip --dbg-package=hhvm-nightly-dbg
+
+override_dh_fixperms:
+	dh_fixperms
+	chown www-data:www-data debian/hhvm-nightly/var/log/hhvm
+	chown www-data:www-data debian/hhvm-nightly/var/cache/hhvm

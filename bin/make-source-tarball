@@ -1,0 +1,63 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree. An additional grant
+# of patent rights can be found in the PATENTS file in the same directory.
+
+set -ex
+
+ROOT="$(realpath "$(dirname $0)/..")"
+if [ "$ROOT" == "/opt/hhvm-packaging" ]; then
+  OUT=/var/out
+else
+  OUT="$ROOT/out/"
+fi
+TEMPDIR="$(mktemp -d)"
+VERSION=${VERSION:-"$(date +%Y.%m.%d)"}
+IS_NIGHTLY=${IS_NIGHTLY:-true}
+TAR=${TAR:-tar}
+
+cd "$TEMPDIR"
+
+if $IS_NIGHTLY; then
+  REPO=https://github.com/facebook/hhvm.git
+  PREFIX=hhvm-nightly
+  HEAD=master
+else
+  if "${IS_AWS:-false}"; then
+    eval $(ssh-agent)
+    KEYFILE=$(mktemp)
+    aws kms decrypt \
+      --region us-west-2 \
+      --ciphertext-blob "fileb://${ROOT}/aws/staging-repo-read-key.kms-ciphertext" \
+      --query Plaintext --output text \
+      | base64 --decode > $KEYFILE
+    ssh-add "$KEYFILE"
+
+    echo "github.com,192.30.253.113 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" >> ~/.ssh/known_hosts
+  fi
+
+  REPO=git@github.com:hhvm/hhvm-staging.git
+  PREFIX=hhvm
+  HEAD=HHVM-${VERSION}
+fi
+
+git clone ${REPO} ${PREFIX}-${VERSION}
+cd ${PREFIX}-$VERSION
+git checkout $HEAD
+git submodule update --init --recursive
+
+# Delete stuff we dont' need
+find . -name '.git' | xargs rm -rf
+# ~ 500mb here
+rm -rf third-party/webscalesqlclient/src/{rocksdb,xtrabackup,rqg,mysql-test}
+# ~ 250mb here
+rm -rf hphp/test/{slow,quick,zend,zend7}
+
+cd ..
+$TAR zcf "${OUT}/${PREFIX}-${VERSION}.tar.gz" "${PREFIX}-${VERSION}"
+cd /
+rm -rf "$TEMPDIR"
