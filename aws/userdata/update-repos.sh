@@ -26,6 +26,7 @@ ln -s $(pwd)/hhvm-packaging /opt/hhvm-packaging
 (cd hhvm-packaging; git checkout $PACKAGING_BRANCH)
 
 export VERSION
+export PACKAGING_BRANCH
 /opt/hhvm-packaging/aws/bin/update-repos
 /opt/hhvm-packaging/aws/bin/update-docker
 
