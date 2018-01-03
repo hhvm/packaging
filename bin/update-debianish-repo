@@ -40,23 +40,17 @@ set -ex
 
 cp "$CONF_DIR/distributions" "$REPO_DIR/conf/distributions"
 
-for VERSION_DIR in "$INCOMING_DIR"/*; do
-  if [ ! -d "$VERSION_DIR" ]; then
+for DISTRO_DIR in "$INCOMING_DIR/$DISTRO_BASE-"*; do
+  if [ ! -d "$DISTRO_DIR" ]; then
     continue;
   fi
-  VERSION=$(basename "$VERSION_DIR")
-  for DISTRO_DIR in "$VERSION_DIR/$DISTRO_BASE-"*; do
-    if [ ! -d "$DISTRO_DIR" ]; then
-      continue;
-    fi
-    DISTRO="$(<"/opt/hhvm-packaging/$(basename "$DISTRO_DIR")/DISTRIBUTION")"
-    (
-      cd "$REPO_DIR"
-      for REPREPRO_DISTRO in $(sed "s/DISTRO/$DISTRO/" /opt/hhvm-packaging/DEBIAN_REPOSITORIES); do
-        reprepro --keepunusednewfiles include "$REPREPRO_DISTRO" "$DISTRO_DIR"/*.changes
-      done
-    )
-  done
+  DISTRO="$(<"/opt/hhvm-packaging/$(basename "$DISTRO_DIR")/DISTRIBUTION")"
+  (
+    cd "$REPO_DIR"
+    for REPREPRO_DISTRO in $(sed "s/DISTRO/$DISTRO/" /opt/hhvm-packaging/DEBIAN_REPOSITORIES); do
+      reprepro --keepunreferencedfiles --keepunusednewfiles --ignore=wrongdistribution include "$REPREPRO_DISTRO" "$DISTRO_DIR"/*.changes
+    done
+  )
 done
 
 # Put up the big files first, so we don't have a bunch of time where the
@@ -66,16 +60,10 @@ aws s3 sync "$REPO_DIR/" "s3://hhvm-downloads/${DISTRO_BASE}/"
 
 # Only actually clean up once we're published
 
-for VERSION_DIR in "$INCOMING_DIR"/*; do
-  if [ ! -d "$VERSION_DIR" ]; then
+for DISTRO_DIR in "$INCOMING_DIR/$DISTRO_BASE-"*; do
+  if [ ! -d "$DISTRO_DIR" ]; then
     continue;
   fi
-  VERSION=$(basename "$VERSION_DIR")
-  for DISTRO_DIR in "$VERSION_DIR/$DISTRO_BASE-"*; do
-    if [ ! -d "$DISTRO_DIR" ]; then
-      continue;
-    fi
-    DISTRO=$(basename "$DISTRO_DIR")
-    aws s3 rm --recursive s3://hhvm-scratch/$VERSION/$DISTRO
-  done
+  DISTRO=$(basename "$DISTRO_DIR")
+  aws s3 rm --recursive s3://hhvm-scratch/$VERSION/$DISTRO
 done
