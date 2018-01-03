@@ -1,22 +1,38 @@
-Overall Process
-===============
+Creating a .new .0 release
+==========================
+
+1. create a `HHVM-$x.$y` branch of this repository
+1. edit `DEBIAN_REPOSITORIES` if changing from an LTS or to an LTS
+1. commit and push the branch
+1. update `DEBIAN_REPOSITORIES` to remove the main `DISTRO` release from older versions
+1. commit and push the branches
+1. create a `HHVM-$x.$y` branch of the hhvm-docker repository
+1. update `DOCKER_TAGS` to include `latest`, and `$x.$y-lts-latest` if appropriate
+1. commit and push the branch
+1. update `DOCKER_TAGS` in any other supported branches to remove the `latest` tag
+1. commit and push the branches
+1. everything needed for a `.z` release
+
+
+Creating a new .z release
+=========================
+
 1. Remove "-dev" suffix from hphp/runtime/version.h, commit to branch as "Releasing $VERSION"
-2. tag it: git tag HHVM-$VERSION
-3. push the tag: git push staging HHVM-$VERSION
-4. re-add the "-dev" suffix, and bump HHVM_VERSION_PATCH. Commit to branch as "Targeting $NEXT_PATCH_VERSION"
-5. push the branch to staging
-6. run `bin/make-all-packages-on-aws $VERSION` from the hhvm-packaging repository
-7. wait for the step function to build the source tarballs.
-8. start the mac builds
-9. wait for the step function and mac builds to complete
+1. tag it: git tag HHVM-$VERSION
+1. push the tag: git push staging HHVM-$VERSION
+1. re-add the "-dev" suffix, and bump HHVM_VERSION_PATCH. Commit to branch as "Targeting $NEXT_PATCH_VERSION"
+1. push the branch to staging
+1. run `bin/make-all-packages-on-aws $VERSION` from the hhvm-packaging repository
+1. wait for the step function to build the source tarballs.
+1. start the mac builds
+1. wait for the step function and mac builds to complete
     This is a good time convert the release notes from quip to markdown for publication. Pay attention to fixed-width text links
     When the step function is finished, you have:
       - published source tar balls
       - published linux binaries
       - published docker images
       - public tags and branch
-10. update the hhvm/hhvm:latest and hhvm/hhvm-proxygen:latest docker tags, and any relevant -lts versions
-11. publish the release announcement
+1. publish the release announcement
 
 
 Mac Builds
