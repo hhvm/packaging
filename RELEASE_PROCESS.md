@@ -1,6 +1,8 @@
 Creating a .new .0 release
 ==========================
 
+1. if this is an LTS release, edit the files under `repo-conf/` to add new LTS apt repositories
+1. commit to master and push
 1. create a `HHVM-$x.$y` branch of this repository
 1. edit `DEBIAN_REPOSITORIES` if changing from an LTS or to an LTS
 1. commit and push the branch
