@@ -36,7 +36,7 @@ exports.handler = (event, context, callback) => {
           ResourceType: 'instance',
           Tags: [{
             Key: 'Name',
-            Value: 'hhvm-update-repos',
+            Value: 'hhvm-'+event.version+'-update-repos',
           }]
         }
       ],
