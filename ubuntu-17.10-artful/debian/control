@@ -1,6 +1,3 @@
-# DANGER DANGER DANGER
-# We currently build-depend on libreadline - this is just to make mysql's build system happy
-# We do not (and must not) distribute anything linked with it
 Source: hhvm-nightly
 Maintainer: HHVM Open Source <hhvm-oss@fb.com>
 Section: web
@@ -57,7 +54,6 @@ Build-Depends:
   libpcre3-dev,
   libpq-dev,
   libre2-dev,
-  libreadline-dev,
   libsodium-dev,
   libsqlite3-dev,
   libssl-dev,
