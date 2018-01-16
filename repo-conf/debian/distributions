@@ -152,7 +152,7 @@ SignWith: D386EB94
 
 Origin: HHVM
 Label: HHVM
-Codename: squeeze-lts-3.24
+Codename: stretch-lts-3.24
 Architectures: amd64 source
 Components: main
 Description: Apt repository for HHVM (3.24 LTS)
