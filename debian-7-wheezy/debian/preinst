@@ -1,7 +1,0 @@
-#!/bin/sh
-
-set -e
-
-if which invoke-rc.d >/dev/null 2>&1 && [ -e "/etc/init.d/hhvm" ]; then
-    invoke-rc.d hhvm stop
-fi
