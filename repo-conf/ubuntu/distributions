@@ -200,6 +200,14 @@ SignWith: D386EB94
 
 Origin: HHVM
 Label: HHVM
+Codename: trusty-lts-3.21
+Architectures: amd64 source
+Components: main
+Description: Apt repository for HHVM (3.21 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
 Codename: xenial-lts-3.21
 Architectures: amd64 source
 Components: main
@@ -212,6 +220,14 @@ Codename:yakkety-lts-3.21
 Architectures: amd64 source
 Components: main
 Description: Apt repository for HHVM (3.21 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: trusty-lts-3.24
+Architectures: amd64 source
+Components: main
+Description: Apt repository for HHVM (3.24 LTS)
 SignWith: D386EB94
 
 Origin: HHVM
