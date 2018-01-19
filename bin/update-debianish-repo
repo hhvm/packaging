@@ -38,9 +38,12 @@ fi
 
 set -ex
 
-if [ "$(git rev-parse HEAD)" == "$(git rev-parse master)" ]; then
-  cp "$CONF_DIR/distributions" "$REPO_DIR/conf/distributions"
-fi
+(
+  cd "$CONF_DIR"
+  if [ "$(git rev-parse HEAD)" == "$(git rev-parse master)" ]; then
+    cp "$CONF_DIR/distributions" "$REPO_DIR/conf/distributions"
+  fi
+)
 
 for DISTRO_DIR in "$INCOMING_DIR/$DISTRO_BASE-"*; do
   if [ ! -d "$DISTRO_DIR" ]; then
