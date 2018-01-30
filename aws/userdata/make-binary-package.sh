@@ -11,11 +11,11 @@ set -ex
 shutdown -h 180 # auto-shutdown after 3 hours
 
 export TZ=UTC
-if [
-  -z "$DISTRO"
-  -o -z "$VERSION"
-  -o -z "$S3_SOURCE"
-  -o -z "$IS_NIGHTLY"
+if [ \
+  -z "$DISTRO" \
+  -o -z "$VERSION" \
+  -o -z "$S3_SOURCE" \
+  -o -z "$IS_NIGHTLY" \
 ]; then
   echo "DISTRO, VERSION, S3_SOURCE, and IS_NIGHTLY must all be set"
   exit 1
