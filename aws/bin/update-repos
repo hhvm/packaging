@@ -37,4 +37,11 @@ export VERSION
 /opt/hhvm-packaging/bin/update-debianish-repo debian
 /opt/hhvm-packaging/bin/update-debianish-repo ubuntu
 
+(
+  # Clean up nightlies from EBS; worst case, they're still on s3
+  cd /mnt/dl.hhvm.com
+  MONTH_BEFORE_LAST=$(date +%Y.%m --date '40 days ago')
+  find source/nightlies/ debian/ ubuntu/ -name "*${MONTH_BEFORE_LAST}*" | xargs rm -f
+)
+
 umount /mnt/dl.hhvm.com
