@@ -52,12 +52,12 @@
     },
     "Initial Wait For Builds": {
       "Type": "Wait",
-      "Seconds": 3600,
+      "Seconds": 1800,
       "Next": "Fetch Build Instance States"
     },
     "Wait Longer For Builds": {
       "Type": "Wait",
-      "Seconds": 600,
+      "Seconds": 300,
       "Next": "Fetch Build Instance States"
     },
     "Fetch Build Instance States": {
