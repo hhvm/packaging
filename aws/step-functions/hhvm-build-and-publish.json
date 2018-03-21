@@ -1,0 +1,20 @@
+{
+  "StartAt": "Get Version Number For Build",
+  "States": {
+    "Get Version Number For Build": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-get-build-version",
+      "Next": "Build"
+    },
+    "Build": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:us-west-2:223121549624:stateMachine:hhvm-build",
+      "Next": "Publish"
+    },
+    "Publish": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:us-west-2:223121549624:stateMachine:hhvm-publish-release",
+      "End": true
+    }
+  }
+}

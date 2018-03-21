@@ -72,33 +72,12 @@
         "BooleanEquals": false,
         "Next": "Wait Longer For Builds"
       }],
-      "Default": "Post Build"
+      "Default": "Clean Up Build Workers"
     },
-    "Post Build": {
-      "Type": "Parallel",
-      "Branches": [
-        {
-          "StartAt": "Publish Release",
-          "States": {
-            "Publish Release": {
-              "Type": "Task",
-              "Resource": "arn:aws:states:us-west-2:223121549624:stateMachine:hhvm-publish-release",
-              "End": true
-            }
-          }
-        },
-        {
-          "StartAt": "Clean Up Build Workers",
-          "States": {
-            "Clean Up Build Workers": {
-              "Type": "Task",
-              "Resource": "arn:aws:lambda:us-west-2:223121549624:function:terminate-instances",
-              "End": true
-            }
-          }
-        }
-      ],
+    "Clean Up Build Workers": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:terminate-instances",
       "End": true
-    }
+   }
   }
 }
