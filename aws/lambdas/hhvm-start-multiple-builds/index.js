@@ -25,11 +25,7 @@ function start_execution(
 }
 
 exports.handler = (event, context, callback) => {
-  const sm_arn = event.stateMachineARN;
-  if (sm_arn === undefined) {
-    callback('stateMachineARN must be defined', event);
-    return;
-  }
+  const sm_arn = 'arn:aws:states:us-west-2:223121549624:stateMachine:hhvm-build';
   const versions = event.versions;
   if (versions === undefined) {
     callback('versions must be defined', event);

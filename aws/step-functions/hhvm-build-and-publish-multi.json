@@ -1,0 +1,57 @@
+{
+  "StartAt": "Start Builds",
+  "States": {
+    "Start Builds": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-start-multiple-builds",
+      "Next": "Initial Wait For Builds"
+    },
+    "Initial Wait For Builds": {
+      "Type": "Wait",
+      "Seconds": 1800,
+      "Next": "Fetch Build States"
+    },
+    "Wait Longer For Builds": {
+      "Type": "Wait",
+      "Seconds": 300,
+      "Next": "Fetch Build States"
+    },
+    "Fetch Build States": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:get-state-machine-executions-state",
+      "Next": "Builds Finished?"
+    },
+    "Builds Finished?": {
+      "Type": "Choice",
+      "Choices": [{
+        "Variable": "$.allStepFunctionExecutionsFinished",
+        "BooleanEquals": false,
+        "Next": "Wait Longer For Builds"
+      }],
+      "Default": "Get First Unpublished Version Number"
+    },
+    "Get First Unpublished Version Number": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:shift-version",
+      "Next": "Have An Unpublished Version?"
+    },
+    "Have An Unpublished Version?": {
+      "Type": "Choice",
+      "Choices": [{
+        "Variable": "$.version",
+        "StringEquals": "",
+        "Next": "Finished"
+      }],
+      "Default": "Publish Release"
+    },
+    "Publish Release": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:us-west-2:223121549624:stateMachine:hhvm-publish-release",
+      "Next": "Get First Unpublished Version Number"
+    },
+    "Finished": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}
