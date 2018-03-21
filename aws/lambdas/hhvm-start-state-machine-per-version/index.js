@@ -11,7 +11,6 @@
 const AWS = require('aws-sdk');
 const promise = require('promise');
 const crypto = require('crypto');
-const rp = require('request-promise');
 
 function start_execution(
   sm_arn,
