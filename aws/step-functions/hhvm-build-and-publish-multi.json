@@ -46,8 +46,32 @@
     },
     "Publish Release": {
       "Type": "Task",
-      "Resource": "arn:aws:states:us-west-2:223121549624:stateMachine:hhvm-publish-release",
-      "Next": "Get First Unpublished Version Number"
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-publish-single-release",
+      "Next": "Initial Wait For Publish Job"
+    },
+    "Initial Wait For Publish Job": {
+      "Type": "Wait",
+      "Seconds": 300,
+      "Next": "Fetch Publish Job State"
+    },
+    "Wait Longer For Publish Job": {
+      "Type": "Wait",
+      "Seconds": 60,
+      "Next": "Fetch Publish Job State"
+    },
+    "Fetch Publish Job State": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:get-state-machine-executions-state",
+      "Next": "Publish Job Finished?"
+    },
+    "Publish Job Finished?": {
+      "Type": "Choice",
+      "Choices": [{
+        "Variable": "$.allStepFunctionExecutionsFinished",
+        "BooleanEquals": false,
+        "Next": "Wait Longer For Publish Job"
+      }],
+      "Default": "Get First Unpublished Version Number"
     },
     "Finished": {
       "Type": "Pass",
