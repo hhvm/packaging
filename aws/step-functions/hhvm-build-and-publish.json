@@ -37,7 +37,7 @@
     },
     "Publish Release": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:us-west-2:223121549624:stateMachine:hhvm-publish-single-release",
+      "Resource": "arn:aws:lambda:us-west-2:223121549624:function:hhvm-publish-single-release",
       "End": true
     }
   }
