@@ -57,7 +57,7 @@
     },
     "Wait Longer For Builds": {
       "Type": "Wait",
-      "Seconds": 300,
+      "Seconds": 60,
       "Next": "Fetch Build Instance States"
     },
     "Fetch Build Instance States": {
