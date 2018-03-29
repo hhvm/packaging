@@ -50,6 +50,7 @@ Build-Depends:
   libxml2-dev,
   libxslt1-dev,
   libyaml-dev,
+  tzdata,
   unzip,
   wget,
   zip,
