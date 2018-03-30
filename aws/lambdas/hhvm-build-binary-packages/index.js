@@ -73,10 +73,16 @@ function get_distros(event) {
 }
 
 exports.handler = (event, context, callback) => {
-  promise.all([
-    get_distros(event),
-    rp(get_userdata_uri(event))
-  ])
+  (new promise(
+    // splay over 10 seconds for when doing multiple release builds at the same time
+    resolve => setTimeout(resolve, Math.random() * 10000)
+  ))
+  .then(
+    promise.all([
+      get_distros(event),
+      rp(get_userdata_uri(event))
+    ])
+  )
   .then(values => {
     const distros = values[0];
     const user_data = values[1];
