@@ -13,7 +13,7 @@
     },
     "Wait For Repositories Worker": {
       "Type": "Wait",
-      "Seconds": 300,
+      "Seconds": 60,
       "Next": "Fetch Repository Worker State"
     },
     "Fetch Repository Worker State": {
