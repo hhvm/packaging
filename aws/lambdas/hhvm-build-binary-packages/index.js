@@ -78,7 +78,7 @@ exports.handler = (event, context, callback) => {
     resolve => setTimeout(resolve, Math.random() * 10000)
   ))
   .then(
-    promise.all([
+    _ => promise.all([
       get_distros(event),
       rp(get_userdata_uri(event))
     ])
