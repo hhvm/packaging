@@ -4,6 +4,7 @@ Section: web
 Priority: optional
 Standards-Version: 3.9.2
 Build-Depends:
+  aspcud,
   autoconf,
   automake,
   binutils-dev,
@@ -62,6 +63,7 @@ Build-Depends:
   libxslt1-dev,
   libyaml-dev,
   tzdata,
+  unzip,
   zlib1g-dev
 
 Package: hhvm-nightly
