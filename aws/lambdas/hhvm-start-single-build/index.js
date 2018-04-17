@@ -34,7 +34,7 @@ exports.handler = (event, context, callback) => {
   const sf = new AWS.StepFunctions();
   sf.startExecution({
     stateMachineArn: sm_arn,
-    input: JSON.stringify({version: version}),
+    input: JSON.stringify(event),
     name: version+'-build-'+crypto.randomBytes(8).toString('hex'),
   }, function(err, data) {
     if (err) {
