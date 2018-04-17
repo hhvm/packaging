@@ -64,6 +64,14 @@ SignWith: D386EB94
 
 Origin: HHVM
 Label: HHVM
+Codename: bionic
+Architectures: amd64 source
+Components: main
+Description: Apt repository for HHVM
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
 Codename: precise-lts-3.3
 Architectures: amd64 source
 Components: main
