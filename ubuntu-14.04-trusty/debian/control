@@ -12,6 +12,7 @@ Build-Depends:
   bison,
   build-essential,
   cmake,
+  curl,
   debhelper (>= 9),
   g++,
   gawk,
