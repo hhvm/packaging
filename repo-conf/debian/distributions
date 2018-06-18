@@ -157,3 +157,19 @@ Architectures: amd64 source
 Components: main
 Description: Apt repository for HHVM (3.24 LTS)
 SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: jessie-lts-3.27
+Architectures: amd64 source
+Components: main
+Description: Apt repository for HHVM (3.27 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: stretch-lts-3.27
+Architectures: amd64 source
+Components: main
+Description: Apt repository for HHVM (3.27 LTS)
+SignWith: D386EB94
