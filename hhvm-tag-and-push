@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+set -e
+
+if [ ! -e hphp/runtime/version.h ]; then
+  echo "Run from inside an HHVM checkout"
+  exit 1
+fi
+
+VERSION=$1
+
+if [ -z "$VERSION" ]; then
+  VERSION="$(awk \
+    '/HHVM_VERSION_MAJOR [0-9]+$/ { MAJOR = $NF };
+     /HHVM_VERSION_MINOR [0-9]+$/ { MINOR = $NF };
+     /HHVM_VERSION_PATCH [0-9]+$/ { PATCH = $NF };
+     END { print MAJOR "." MINOR "." PATCH }' \
+    hphp/runtime/version.h)"
+  echo "It looks like you want to tag >>> $VERSION <<<"
+  echo "Hit ^C to cancel, or enter to continue"
+  read
+fi
+NEXT="$(echo "$VERSION" | gsed -E 's/(^.+\.)([0-9]+)$/echo "\1$((\2 + 1))"/e')"
+
+if [ "$(< .git/HEAD)" != "HHVM-$(echo "$VERSION" | cut -f1-2 -d.")" ]; then
+  echo "Switch to the release branch first."
+  exit 1
+fi
+
+gsed -i 's/HHVM_VERSION_SUFFIX "-dev"$/HHVM_VERSION_SUFFIX ""/' \
+  hphp/runtime/version.h
+git commit hphp/runtime/version.h -m "Releasing $VERSION"
+git tag HHVM-$VERSION
+gsed -i 's/HHVM_VERSION_SUFFIX ""$/HHVM_VERSION_SUFFIX "-dev"/' \
+  hphp/runtime/version.h
+gsed -i -E 's/^(.+HHVM_VERSION_PATCH )([0-9]+)$/echo "\1$((\2+1))"/e' \
+  hphp/runtime/version.h
+git commit hphp/runtime/version.h -m "Targetting $NEXT"
+
+git push staging
+git push staging "HHVM-$VERSION"

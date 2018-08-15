@@ -1,9 +1,18 @@
+Prerequisites:
+- access to hhvm/hhvm-staging
+- a checkout of the HHVM release branch from staging
+- `staging` added as a remote of that checkout:
+  `git remote add staging git@github.com:hhvm/hhvm-staging.git`
+
+The staging repository is the source of truth for release branches; they are
+automatically copied to the public repository by the scripts when appropriate.
+
 Creating a .new .0 release
 ==========================
 
 1. if this is an LTS release, edit the files under `repo-conf/` to add new LTS apt repositories
 1. commit to master and push
-1. create a `HHVM-$x.$y` branch of this repository
+1. create a `HHVM-$x.$y` branch of this repository from the corresponding internal branch point
 1. edit `DEBIAN_REPOSITORIES` if changing from an LTS or to an LTS
 1. commit and push the branch
 1. update `DEBIAN_REPOSITORIES` to remove the main `DISTRO` release from older versions
@@ -19,11 +28,9 @@ Creating a .new .0 release
 Creating a new .z release
 =========================
 
-1. Remove "-dev" suffix from hphp/runtime/version.h, commit to branch as "Releasing $VERSION"
-1. tag it: git tag HHVM-$VERSION
-1. push the tag: git push staging HHVM-$VERSION
-1. re-add the "-dev" suffix, and bump HHVM_VERSION_PATCH. Commit to branch as "Targeting $NEXT_PATCH_VERSION"
-1. push the branch to staging
+1. from a checkout of the HHVM release branch, run
+  `/path/to/hhvm-packaging/hhvm-tag-and-push`. This updates version.h, makes the tag, and updates
+  version.h again, then pushes to the repo again.
 1. run `bin/make-all-packages-on-aws $VERSION` from the hhvm-packaging repository
 1. wait for the step function to build the source tarballs.
 1. start the mac builds
