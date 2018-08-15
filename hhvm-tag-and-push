@@ -26,12 +26,14 @@ if [ -z "$VERSION" ]; then
   echo "Hit ^C to cancel, or enter to continue"
   read
 fi
-NEXT="$(echo "$VERSION" | gsed -E 's/(^.+\.)([0-9]+)$/echo "\1$((\2 + 1))"/e')"
 
-if [ "$(< .git/HEAD)" != "HHVM-$(echo "$VERSION" | cut -f1-2 -d.")" ]; then
+if [ "$(< .git/HEAD)" != "ref: refs/heads/HHVM-$(echo "$VERSION" | cut -f1-2 -d.)" ]; then
   echo "Switch to the release branch first."
+  cat .git/HEAD
   exit 1
 fi
+
+NEXT="$(echo "$VERSION" | gsed -E 's/(^.+\.)([0-9]+)$/echo "\1$((\2 + 1))"/e')"
 
 gsed -i 's/HHVM_VERSION_SUFFIX "-dev"$/HHVM_VERSION_SUFFIX ""/' \
   hphp/runtime/version.h
