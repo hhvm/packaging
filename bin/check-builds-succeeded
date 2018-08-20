@@ -7,7 +7,7 @@ if [ "$VERSION" == "--help" ]; then
 fi
 
 curl --silent \
-  "https://3gmrqerxm6.execute-api.us-west-2.amazonaws.com/prod/build-status/{$VERSION}" \
+  "https://hhvm.com/api/build-status/{$VERSION}" \
   | ( \
     jq 2>/dev/null \
     || json_pp 2>/dev/null \
