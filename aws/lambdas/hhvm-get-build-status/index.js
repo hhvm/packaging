@@ -32,7 +32,7 @@ exports.handler = async (event) => {
   const {nightly, version, branch} = get_version_info(event);
 
   const prefix = nightly ? 'hhvm-nightly-'+version : 'hhvm-'+version;
-  let paths = {
+  const paths = {
     'macos-sierra':
       'homebrew-bottles/'+prefix+'.sierra.bottle.tar.gz',
     'macos-high_sierra':
@@ -47,24 +47,24 @@ exports.handler = async (event) => {
   }
 
   const distros = await get_distros(branch);
-  distros.forEach(distro => {
+  for (const distro of distros) {
     const debianish = distro.match(/^(ubuntu|debian)/);
     if (debianish !== null) {
       paths[distro] = debianish[0] + '/pool/main/h/' +
         (nightly ? 'hhvm-nightly/hhvm-nightly_' : 'hhvm/hhvm_') +
         version + '-1~' + (distro.match(/[a-z]+$/)) + '_amd64.deb';
-      return;
+      continue;
     }
     // If we add a new distro kind without updating monitoring, make
     // the monitoring fail.
     paths[distro] = distro;
-  });
+  }
 
   let success = true;
-  let results = { };
+  let results = {};
   const s3 = new AWS.S3();
   await promise.all(
-    Object.values(paths).map(path => (async function() {
+    Object.values(paths).map(async path => {
       try {
         await s3.headObject(
           { Bucket: 'hhvm-downloads', Key: path }
@@ -74,7 +74,7 @@ exports.handler = async (event) => {
         results[path] = false;
         success = false;
       }
-    })())
+    })
   );
 
   let response = { success, version, succeeded: [], failed: {} };
