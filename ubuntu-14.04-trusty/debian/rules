@@ -23,7 +23,8 @@ override_dh_auto_configure:
   -DSTATIC_CXX_LIB=On \
   -DBoost_USE_STATIC_LIBS=On \
   -DLIBGLOG_LIBRARY=/opt/hhvm-build-deps/lib/libglog.a \
-  -DJEMALLOC_LIB=/opt/hhvm-build-deps/lib/libjemalloc.a
+  -DJEMALLOC_LIB=/opt/hhvm-build-deps/lib/libjemalloc.a \
+  -DATOMIC_LIBRARY=/opt/hhvm-build-deps/lib64/libatomic.a
 
 override_dh_strip:
 	dh_strip --dbg-package=hhvm-nightly-dbg
