@@ -36,11 +36,13 @@ Creating a new .z release
 1. start the mac builds
 1. wait for the step function and mac builds to complete
     This is a good time convert the release notes from quip to markdown for publication. Pay attention to fixed-width text links
-    When the step function is finished, you have:
+    When the step function is finished, you should have:
       - published source tar balls
       - published linux binaries
       - published docker images
       - public tags and branch
+1. check the expected files are available for download:
+   `https://hhvm.com/api/build-status/VERSION`
 1. publish the release announcement
 
 
