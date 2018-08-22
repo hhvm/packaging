@@ -10,9 +10,80 @@ automatically copied to the public repository by the scripts when appropriate.
 Creating a .new .0 release
 ==========================
 
+Before Branch Cut
+-----------------
+
+- Finalize what features are in this release
+- Make sure they're turned on by default
+- Make sure that any changes we pre-announced are included; e.g. if the previous
+  release said "this is opt-in now, but will be mandatory in the next release",
+  it should be included unless there's a strong reason not to.
+
+At Branch Cut (2 weeks before release)
+--------------------------------------
+
+- create a `HHVM-$x.$y` branch of hhvm/hhvm-staging from the corresponding internal branch point
+- create a `HHVM-$x.$y` branch of this repository from master
+
+If there are any commits in the internal release branch that should be copied to
+the github release branch, on a server with access to FB repositories and an ssh
+key that GitHub recognizes:
+
+```
+~/fbcode/opensource/shipit/bin$ php run_shipit.php \
+  --project=hhvm \
+  --destination-github-org=hhvm \
+	--destination-github-project=hhvm-staging \
+  --destination-branch=HHVM-3.27 \
+  --source-branch=releases/hphp/2018-06-04-l \
+  --destination-use-ssh
+```
+
+Replace the source-branch and destination-branch arguments as appropriate for
+this release.
+
+
+Before Release Date
+-------------------
+
+- if there are more internal commits to the branch, re-run the shipit command
+  above
+- prepare release announcement (hhvm/hhvm.com repository). For review:
+  - can create in Quip and export to markdown. Double-check the markdown is valid
+  - can create a pure markdown pull request, but don't merge until release day
+- build HHVM locally from the branch cut
+- get all our active github projects passing tests and typechecker against that
+  build; this will usually mean that they pass on nightly builds in CI, but this
+  might not be the case depending on what other changes are needed
+- tag new releases of any projects that needed changes (updating dependencies
+  is a change)
+
+Some projects are special:
+- check if recent releases are made from master, or a stable branch; for example,
+  hack-codegen currently tags off the 3.x branch. Both the 3.x and master branch
+  need to work, and be careful to tag the release from the correct branch
+- the HSL likely should be retagged even if the previous release worked fine, to
+  ship any feature changes
+- HHAST will need new codegen:
+
+```
+hhast$ bin/update-codegen \
+  --hhvm-path=path/to/checkout/of/release/branch \
+  --rebuild-relationships
+```
+
+If AST fields have been renamed or removed, some linters/migrations may need
+updating after this.
+
+At Release Date
+---------------
+
+Wait for it to be deployed to prod. This usually happens on Thursday, then we
+ship it externally the monday after if there are no known issues. Delay if
+the internal release is delayed.
+
 1. if this is an LTS release, edit the files under `repo-conf/` to add new LTS apt repositories
 1. commit to master and push
-1. create a `HHVM-$x.$y` branch of this repository from the corresponding internal branch point
 1. edit `DEBIAN_REPOSITORIES` if changing from an LTS or to an LTS
 1. commit and push the branch
 1. update `DEBIAN_REPOSITORIES` to remove the main `DISTRO` release from older versions
@@ -22,7 +93,7 @@ Creating a .new .0 release
 1. commit and push the branch
 1. update `DOCKER_TAGS` in any other supported branches to remove the `latest` tag
 1. commit and push the branches
-1. everything needed for a `.z` release
+1. then do everything needed for a `.z` release below
 
 
 Creating a new .z release
