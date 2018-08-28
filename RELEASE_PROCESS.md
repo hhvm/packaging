@@ -100,7 +100,7 @@ Creating a new .z release
 =========================
 
 1. from a checkout of the HHVM release branch, run
-  `/path/to/hhvm-packaging/hhvm-tag-and-push`. This updates version.h, makes the tag, and updates
+  `/path/to/hhvm-packaging/bin/hhvm-tag-and-push`. This updates version.h, makes the tag, and updates
   version.h again, then pushes to the repo again.
 1. run `bin/make-all-packages-on-aws $VERSION` from the hhvm-packaging repository
 1. wait for the step function to build the source tarballs.
