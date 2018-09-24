@@ -33,8 +33,6 @@ exports.handler = async (event) => {
 
   const prefix = nightly ? 'hhvm-nightly-'+version : 'hhvm-'+version;
   const paths = {
-    'macos-sierra':
-      'homebrew-bottles/'+prefix+'.sierra.bottle.tar.gz',
     'macos-high_sierra':
       'homebrew-bottles/'+prefix+'.high_sierra.bottle.tar.gz',
   };
