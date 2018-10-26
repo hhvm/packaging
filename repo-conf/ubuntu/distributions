@@ -1,7 +1,7 @@
 Origin: HHVM
 Label: HHVM
 Codename: precise
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM
 SignWith: D386EB94
@@ -9,7 +9,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: trusty
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM
 SignWith: D386EB94
@@ -17,7 +17,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: vivid
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM
 SignWith: D386EB94
@@ -25,7 +25,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: wily
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM
 SignWith: D386EB94
@@ -33,7 +33,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: xenial
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM
 SignWith: D386EB94
@@ -41,7 +41,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: yakkety
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM
 SignWith: D386EB94
@@ -49,7 +49,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: zesty
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM
 SignWith: D386EB94
@@ -57,7 +57,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: artful
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM
 SignWith: D386EB94
@@ -65,15 +65,23 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: bionic
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM
 SignWith: D386EB94
 
 Origin: HHVM
 Label: HHVM
+Codename: cosmic
+Architectures: i386 amd64 source
+Components: main
+Description: Apt repository for HHVM (3.27 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
 Codename: precise-lts-3.3
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.3 LTS)
 SignWith: D386EB94
@@ -81,7 +89,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: trusty-lts-3.3
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.3 LTS)
 SignWith: D386EB94
@@ -89,7 +97,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: utopic-lts-3.3
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.3 LTS)
 SignWith: D386EB94
@@ -97,7 +105,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: precise-lts-3.6
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.6 LTS)
 SignWith: D386EB94
@@ -105,7 +113,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: trusty-lts-3.6
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.6 LTS)
 SignWith: D386EB94
@@ -113,7 +121,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: trusty-lts-3.9
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.9 LTS)
 SignWith: D386EB94
@@ -121,7 +129,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: vivid-lts-3.9
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.9 LTS)
 SignWith: D386EB94
@@ -129,7 +137,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: trusty-lts-3.12
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.12 LTS)
 SignWith: D386EB94
@@ -137,7 +145,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: vivid-lts-3.12
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.12 LTS)
 SignWith: D386EB94
@@ -145,7 +153,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: wily-lts-3.12
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.12 LTS)
 SignWith: D386EB94
@@ -153,7 +161,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: trusty-lts-3.15
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.15 LTS)
 SignWith: D386EB94
@@ -161,7 +169,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: vivid-lts-3.15
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.15 LTS)
 SignWith: D386EB94
@@ -169,7 +177,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: wily-lts-3.15
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.15 LTS)
 SignWith: D386EB94
@@ -177,7 +185,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: xenial-lts-3.15
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.15 LTS)
 SignWith: D386EB94
@@ -185,7 +193,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: trusty-lts-3.18
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.18 LTS)
 SignWith: D386EB94
@@ -193,7 +201,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: xenial-lts-3.18
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.18 LTS)
 SignWith: D386EB94
@@ -201,7 +209,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename:yakkety-lts-3.18
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.18 LTS)
 SignWith: D386EB94
@@ -209,7 +217,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: trusty-lts-3.21
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.21 LTS)
 SignWith: D386EB94
@@ -217,7 +225,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: xenial-lts-3.21
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.21 LTS)
 SignWith: D386EB94
@@ -225,7 +233,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename:yakkety-lts-3.21
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.21 LTS)
 SignWith: D386EB94
@@ -233,7 +241,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: trusty-lts-3.24
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.24 LTS)
 SignWith: D386EB94
@@ -241,7 +249,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: xenial-lts-3.24
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.24 LTS)
 SignWith: D386EB94
@@ -249,7 +257,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: zesty-lts-3.24
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.24 LTS)
 SignWith: D386EB94
@@ -257,7 +265,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: artful-lts-3.24
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.24 LTS)
 SignWith: D386EB94
@@ -265,7 +273,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: bionic-lts-3.24
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.24 LTS)
 SignWith: D386EB94
@@ -273,7 +281,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: trusty-lts-3.27
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.27 LTS)
 SignWith: D386EB94
@@ -281,7 +289,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: xenial-lts-3.27
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.27 LTS)
 SignWith: D386EB94
@@ -289,7 +297,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: zesty-lts-3.27
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.27 LTS)
 SignWith: D386EB94
@@ -297,7 +305,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: artful-lts-3.27
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.27 LTS)
 SignWith: D386EB94
@@ -305,7 +313,7 @@ SignWith: D386EB94
 Origin: HHVM
 Label: HHVM
 Codename: bionic-lts-3.27
-Architectures: amd64 source
+Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.27 LTS)
 SignWith: D386EB94
