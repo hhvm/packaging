@@ -85,6 +85,9 @@ If you just need to rebuild for one distribution, with no code changes:
 Building source tarballs and linux packages for multiple new releases
 -----------------------------------------------------------
 
+The common case is fixing a bug in multiple releases - for example, the current
+release and all active LTS releases - simultaneously.
+
  - tag all the releases on the `hhvm-staging repo`
  - `bin/make-multiple-releases-on-aws VERSION1 [VERSION2 [...]]`
 
