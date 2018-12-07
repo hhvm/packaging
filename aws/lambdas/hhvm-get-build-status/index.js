@@ -35,8 +35,10 @@ exports.handler = async (event) => {
   const paths = {
     'macos-high_sierra':
       'homebrew-bottles/'+prefix+'.high_sierra.bottle.tar.gz',
+    /* build machine dead :'(
     'macos-mojave':
       'homebrew-bottles/'+prefix+'.mojave.bottle.tar.gz',
+      */
   };
   if (nightly) {
     paths.source = 'source/nightlies/'+prefix+'.tar.gz';
