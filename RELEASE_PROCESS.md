@@ -84,7 +84,7 @@ the internal release is delayed.
 
 1. if this is an LTS release, edit the files under `repo-conf/` to add new LTS apt repositories
 1. commit to master and push
-1. edit `DEBIAN_REPOSITORIES` if changing from an LTS or to an LTS
+1. edit `DEBIAN_REPOSITORIES` in existing release branches if changing from an LTS or to an LTS
 1. commit and push the branch
 1. update `DEBIAN_REPOSITORIES` to remove the main `DISTRO` release from older versions
 1. commit and push the branches
