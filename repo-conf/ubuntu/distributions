@@ -317,3 +317,43 @@ Architectures: i386 amd64 source
 Components: main
 Description: Apt repository for HHVM (3.27 LTS)
 SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: trusty-lts-3.30
+Architectures: i386 amd64 source
+Components: main
+Description: Apt repository for HHVM (3.30 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: xenial-lts-3.30
+Architectures: i386 amd64 source
+Components: main
+Description: Apt repository for HHVM (3.30 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: artful-lts-3.30
+Architectures: i386 amd64 source
+Components: main
+Description: Apt repository for HHVM (3.30 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: bionic-lts-3.30
+Architectures: i386 amd64 source
+Components: main
+Description: Apt repository for HHVM (3.30 LTS)
+SignWith: D386EB94
+
+Origin: HHVM
+Label: HHVM
+Codename: cosmic-lts-3.30
+Architectures: i386 amd64 source
+Components: main
+Description: Apt repository for HHVM (3.30 LTS)
+SignWith: D386EB94
