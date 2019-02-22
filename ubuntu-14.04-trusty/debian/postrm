@@ -5,10 +5,3 @@ set -e
 if [ "$1" = "remove" ]; then
   ldconfig
 fi
-
-if [ -f /usr/sbin/update-alternatives ]; then
-	/usr/sbin/update-alternatives --remove php /usr/bin/hhvm
-fi
-if [ -f /usr/bin/update-alternatives ]; then
-	/usr/bin/update-alternatives --remove php /usr/bin/hhvm
-fi
