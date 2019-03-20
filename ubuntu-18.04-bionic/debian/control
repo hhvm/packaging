@@ -65,6 +65,7 @@ Build-Depends:
   libyaml-dev,
   tzdata,
   unzip,
+  wget,
   zlib1g-dev
 
 Package: hhvm-nightly
