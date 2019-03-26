@@ -16,7 +16,7 @@ if [ -z "$DISTRO" -o -z "$VERSION" ]; then
   exit 1
 fi
 
-PAYLOAD="{\"distros\": [\"${DISTRO}\"], \"version\": \"${VERSION}\"}"
+PAYLOAD="{\"distros\": [\"debian-9-stretch\", \"ubuntu-16.04-xenial\", \"ubuntu-18.04-bionic\", \"ubuntu-18.10-cosmic\"], \"version\": \"${VERSION}\"}"
 
 aws stepfunctions start-execution \
   --state-machine-arn \

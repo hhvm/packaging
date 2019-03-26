@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 #
 # Copyright (c) 2017-present, Facebook, Inc.
 # All rights reserved.
@@ -28,7 +28,7 @@ KEYFILE=$(mktemp)
 # Read-only key for private repo
 aws kms decrypt \
   --region us-west-2 \
-  --ciphertext-blob "fileb://${ROOT}/aws/staging-repo-read-key.kms-ciphertext" \
+  --ciphertext-blob "fileb://${ROOT}/aws/staging-repo-key.kms-ciphertext" \
   --query Plaintext --output text \
   | base64 --decode > "$KEYFILE"
 ssh-add "$KEYFILE"
