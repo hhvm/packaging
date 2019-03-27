@@ -50,6 +50,8 @@ git checkout $HEAD
 if "${IS_AWS:-false}" && $IS_NIGHTLY; then
   git tag "nightly-${VERSION}"
   git push git@github.com:hhvm/hhvm-staging.git "nightly-$VERSION"
+  # might as well update master there too
+  git push git@github.com:hhvm/hhvm-staging.git HEAD:master || true
 fi
 git submodule update --init --recursive
 
