@@ -48,7 +48,8 @@ git clone ${REPO} ${PREFIX}-${VERSION}
 cd ${PREFIX}-$VERSION
 git checkout $HEAD
 if "${IS_AWS:-false}" && $IS_NIGHTLY; then
-  git push git@github.com:hhvm/hhvm-staging.git "HEAD:nightly-${VERSION}"
+  git tag "nightly-${VERSION}"
+  git push git@github.com:hhvm/hhvm-staging.git "nightly-$VERSION"
 fi
 git submodule update --init --recursive
 
