@@ -1,4 +1,6 @@
 #!/usr/bin/make -f
+include /usr/share/dpkg/pkg-info.mk
+
 %:
 	dh $@ --buildsystem=cmake --parallel
 
@@ -13,6 +15,7 @@ override_dh_auto_configure:
 	debian/build-deps/build-boost
 	dh_auto_configure -- \
 	-Wno-dev \
+ 	-DCMAKE_INSTALL_PREFIX=/opt/hhvm/$(DEB_VERSION_UPSTREAM) \
   -DCMAKE_C_COMPILER=/opt/hhvm-build-deps/bin/gcc \
   -DCMAKE_CXX_COMPILER=/opt/hhvm-build-deps/bin/g++ \
   -DCMAKE_CXX_FLAGS="-pthread -lrt" \
@@ -28,6 +31,14 @@ override_dh_auto_configure:
 
 override_dh_strip:
 	dh_strip --dbg-package=hhvm-nightly-dbg
+
+generated=$(patsubst %.in,%,$(wildcard debian/*.in))
+
+$(generated): %: %.in
+	sed 's,__PKGROOT__,/opt/hhvm/$(DEB_VERSION_UPSTREAM),g' $< > $@
+
+override_dh_auto_install: $(generated)
+	dh_auto_install
 
 override_dh_fixperms:
 	dh_fixperms
