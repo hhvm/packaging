@@ -63,6 +63,7 @@ Build-Depends:
   libxml2-dev,
   libxslt1-dev,
   libyaml-dev,
+  rsync,
   tzdata,
   unzip,
   wget,
