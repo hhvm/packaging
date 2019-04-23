@@ -13,18 +13,22 @@ if [ ! -e hphp/runtime/version.h ]; then
   exit 1
 fi
 
-VERSION=$1
+VERSION="$1"
+INFERRED_VERSION="$(awk \
+  '/HHVM_VERSION_MAJOR [0-9]+$/ { MAJOR = $NF };
+   /HHVM_VERSION_MINOR [0-9]+$/ { MINOR = $NF };
+   /HHVM_VERSION_PATCH [0-9]+$/ { PATCH = $NF };
+   END { print MAJOR "." MINOR "." PATCH }' \
+  hphp/runtime/version.h)"
 
 if [ -z "$VERSION" ]; then
-  VERSION="$(awk \
-    '/HHVM_VERSION_MAJOR [0-9]+$/ { MAJOR = $NF };
-     /HHVM_VERSION_MINOR [0-9]+$/ { MINOR = $NF };
-     /HHVM_VERSION_PATCH [0-9]+$/ { PATCH = $NF };
-     END { print MAJOR "." MINOR "." PATCH }' \
-    hphp/runtime/version.h)"
+  VERSION="${INFERRED_VERSION}"
   echo "It looks like you want to tag >>> $VERSION <<<"
   echo "Hit ^C to cancel, or enter to continue"
   read
+elif [ "$VERSION" != "${INFERRED_VERSION}" ]; then
+  echo "Requested version ($VERSION) does not match expected ($INFERRED_VERSION)."
+  exit 1
 fi
 
 if [ "$(< .git/HEAD)" != "ref: refs/heads/HHVM-$(echo "$VERSION" | cut -f1-2 -d.)" ]; then
