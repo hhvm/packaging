@@ -51,6 +51,7 @@ Build-Depends:
   libmemcached-dev,
   libncurses-dev,
   libnotify-dev,
+  libnuma-dev,
   libonig-dev,
   libpcre3-dev,
   libpq-dev,
