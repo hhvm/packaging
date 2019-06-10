@@ -21,4 +21,4 @@ aws stepfunctions start-execution \
   --state-machine-arn \
     arn:aws:states:us-west-2:223121549624:stateMachine:hhvm-build-and-publish-multi \
   --input "${PAYLOAD}" \
-  --name "$(echo "$@" | tr ' ' '_')-$(whoami)-$(date +%Y-%m-%d-%H-%M-%S-%Z)"
+  --name "$(echo "$@" | tr ' ' '_' | head -c 10)-$(whoami)-$(date +%Y-%m-%d-%H-%M-%S-%Z)"
