@@ -16,14 +16,8 @@ if [ -z "$VERSION" ]; then
 fi
 
 DISTRO_BASE="$1"
-CONF_DIR="/opt/hhvm-packaging/repo-conf/$DISTRO_BASE"
 REPO_DIR="/mnt/dl.hhvm.com/$DISTRO_BASE"
 INCOMING_DIR="/var/hhvm-scratch/$VERSION"
-
-if [ ! -d "$CONF_DIR" ]; then
-  echo "Error: expected $CONF_DIR to exist."
-  exit 1
-fi
 
 if [ ! -d "$REPO_DIR" ]; then
   echo "Error: expected $REPO_DIR to exist."
@@ -36,13 +30,6 @@ if [ ! -d "$INCOMING_DIR" ]; then
 fi
 
 set -ex
-
-(
-  cd "$CONF_DIR"
-  if [ "$(git rev-parse HEAD)" == "$(git rev-parse master)" ]; then
-    cp "$CONF_DIR/distributions" "$REPO_DIR/conf/distributions"
-  fi
-)
 
 for DISTRO_DIR in "$INCOMING_DIR/$DISTRO_BASE-"*; do
   if [ ! -d "$DISTRO_DIR" ]; then

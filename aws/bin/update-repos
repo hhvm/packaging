@@ -34,6 +34,9 @@ mount /dev/xvdf /mnt/dl.hhvm.com
 aws s3 sync s3://hhvm-downloads/ /mnt/dl.hhvm.com/ --exclude '*nightly*' --exclude "source/nightlies/*" --exclude "homebrew-bottles/*"
 aws s3 sync s3://hhvm-scratch/ /var/hhvm-scratch/
 
+export PACKAGING_BRANCH
+/opt/hhvm-packaging/aws/bin/create-apt-repos
+
 export VERSION
 /opt/hhvm-packaging/bin/update-debianish-repo debian
 /opt/hhvm-packaging/bin/update-debianish-repo ubuntu
