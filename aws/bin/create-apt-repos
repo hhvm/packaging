@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+set -e
+
+if [ -z "$PACKAGING_BRANCH" ]; then
+  echo "PACKAGING_BRANCH must be set."
+  exit 1
+fi
+
+if [ ! -e /opt/hhvm-packaging/aws ]; then
+  echo "/opt/hhvm-packaging/aws does not exist"
+  exit 1
+fi
+
+if [ ! -e /mnt/dl.hhvm.com/conf/hhvm.gpg.key ]; then
+  echo "/mnt/dl.hhvm.com is not mounted"
+  exit 1
+fi
+
+aws configure set default.region us-west-2
+
+if ! gpg --list-secret-key opensource+hhvm@fb.com >/dev/null 2>/dev/null; then
+  aws kms decrypt --ciphertext-blob "fileb:///opt/hhvm-packaging/aws/gpg-key.kms-ciphertext" --query Plaintext --output text | base64 --decode | gpg --import
+fi
+
+cd /opt/hhvm-packaging
+git checkout "$PACKAGING_BRANCH"
+RESYNC=false
+
+for DISTRO in $(<CURRENT_TARGETS); do
+  ROOT_REPO="$(echo "$DISTRO" | cut -f1 -d-)" # eg 'debian' or 'ubuntu'
+  DISTRO="$(<$DISTRO/DISTRIBUTION)"
+  for REPO in $(<DEBIAN_REPOSITORIES); do
+    REPO="${DISTRO}${REPO#DISTRO}"
+    echo "Looking for repo \"$REPO\" in \"$ROOT_REPO\"..."
+    if [ -d "/mnt/dl.hhvm.com/${ROOT_REPO}/dists/${REPO}" ]; then
+      echo "... exists."
+    else
+      echo "... creating."
+cat >> "/mnt/dl.hhvm.com/${ROOT_REPO}/conf/distributions" <<EOF
+
+Origin: HHVM
+Label: HHVM
+Codename: ${REPO}
+Architectures: i386 amd64 source
+Components: main
+Description: Apt repository for HHVM (${PACKAGING_BRANCH})
+SignWith: D386EB94
+EOF
+      (cd "/mnt/dl.hhvm.com/${ROOT_REPO}"; reprepro export "${REPO}")
+      (
+        cd "/mnt/dl.hhvm.com/${ROOT_REPO}/dists/${REPO}"
+        # `aws s3 sync` on Xenial fails with new empty files
+        for FILE in $(find -type f -empty); do
+          aws s3 cp "s3://hhvm-nodist/empty" "s3://hhvm-downloads/${ROOT_REPO}/dists/${REPO}/${FILE#./}"
+        done
+      )
+      RESYNC=true
+    fi
+  done
+done
+
+if $RESYNC; then
+  aws s3 sync /mnt/dl.hhvm.com/ s3://hhvm-downloads/
+else
+  echo "No changes."
+fi
