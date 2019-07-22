@@ -18,8 +18,19 @@ if ! echo "$VERSION" | grep -q -e '^[0-9]\+\.[0-9]\+$'; then
   echo "Only specify MAJOR.MINOR version, not MAJOR.MINOR.RELEASE"
   exit 1
 fi
+
 MAJOR=$(echo "$VERSION" | cut -f1 -d.)
 MINOR=$(echo "$VERSION" | cut -f2 -d.)
+
+SED=$(if [ "$(uname -s)" == "Darwin" ]; then echo gsed; else echo sed; fi)
+
+if ! which $SED >/dev/null; then
+  echo "'$SED' is required."
+  if [ "$SED" == "gsed" ]; then
+    echo "Try: brew install gnu-sed"
+  fi
+  exit 1
+fi
 
 PKGDIR="$(pwd)"
 if [ ! -e "$PKGDIR/bin/$(basename $0)" ]; then
@@ -66,7 +77,6 @@ git clone git@github.com:hhvm/hhvm-docker.git
   cd hhvm-docker
   statusline "Removing 'latest' from previous release branch tags..."
   git checkout "HHVM-${MAJOR}.$(($MINOR - 1))"
-  SED=$(if [ "$(uname -s)" == "Darwin" ]; then echo gsed; else echo sed; fi)
   $SED -i '/^latest$/d' EXTRA_TAGS
   git commit EXTRA_TAGS -m "Removing 'latest' tag"
   git push
