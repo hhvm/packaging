@@ -11,14 +11,14 @@ Creating a .new .0 release
 Releases are generally on Mondays, from Sunday's nightly builds.
 
 1. Find a suitable nightly build.
-  - This should be Friday-Sunday evening. If there is no suitable build, or they
-   seem too close together (e.g. Tuesday v4.x, Thursday v4.(x+1)), consider
-   delaying until Tuesday and using Monday's nightly build, fixing any
-   outstanding blockers. This may mean changes to Hack, HHVM, or the
-   tools/libraries.
-  - Builds should have succeeded for all
-    supported platforms (e.g. see https://hhvm.com/api/build-status/2019.07.22)
-  - Tools and libraries should be passing on the nightlies
+   - This should be Friday-Sunday evening. If there is no suitable build, or they
+    seem too close together (e.g. Tuesday v4.x, Thursday v4.(x+1)), consider
+    delaying until Tuesday and using Monday's nightly build, fixing any
+    outstanding blockers. This may mean changes to Hack, HHVM, or the
+    tools/libraries.
+   - Builds should have succeeded for all
+     supported platforms (e.g. see https://hhvm.com/api/build-status/2019.07.22)
+   - Tools and libraries should be passing on the nightlies
 1. Create the tags and start the linux builds:
    `bin/promote-nightly-to-release YYYY.MM.DD 4.x` - note that it's `4.x`, not
    `4.x.0`. For example, `bin/promote-nightly-to-release 2019.07.22 4.15`
