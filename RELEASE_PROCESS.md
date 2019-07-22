@@ -18,7 +18,8 @@ Releases are generally on Mondays, from Sunday's nightly builds.
     tools/libraries.
    - Builds should have succeeded for all
      supported platforms (e.g. see https://hhvm.com/api/build-status/2019.07.22)
-   - Tools and libraries should be passing on the nightlies
+   - Tools and libraries should be passing on the nightlies (see
+     https://travis-ci.org/hhvm)
 1. Create the tags and start the linux builds:
    `bin/promote-nightly-to-release YYYY.MM.DD 4.x` - note that it's `4.x`, not
    `4.x.0`. For example, `bin/promote-nightly-to-release 2019.07.22 4.15`
