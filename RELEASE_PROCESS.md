@@ -35,7 +35,7 @@ Releases are generally on Mondays, from Sunday's nightly builds.
    1. Copy `Formula/hhvm-nightly.rb` to `Formula/hhvm-4.x.rb`, replacing `x`
    1. Edit the class name in that file from `HhvmNightly` to `Hhvm4x`, e.g.
       `Hhvm415`
-   1. Run `./build-release.sh 4.x Formula/hhvm-4.x.rb`
+   1. Run `./build-release.sh 4.x.0 Formula/hhvm-4.x.rb`
    1. Wait for both to complete; binaries are automatically uploaded.
    1. One one host, add the bottle `sha256` lines from both builders - e.g.
       one `sha256 "deadbeef" => :high_sierra` line, one
