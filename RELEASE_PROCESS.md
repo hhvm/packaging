@@ -53,3 +53,6 @@ Releases are generally on Mondays, from Sunday's nightly builds.
 1. Once all builds are complete, commit and push the blog post
 1. Announce on Facebook page, sharing to HHVM and Hack Users Group, and from
    Twitter
+1. Update the `version.h` header in master; use
+   `fbcode/hphp/facebook/update_version_header.h`. Feel free to skip unit test
+   runs etc.
