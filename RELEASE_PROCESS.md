@@ -2,6 +2,7 @@ Prerequisites:
 - AWS credentials
 - Write access to the HHVM staging repository
 - Write access to the hhvm.com repository
+- Write access to the hhvm-docker repository
 - ssh access to the MacOS build machines
 - access to HHVM FB page and Twitter accounts.
 
