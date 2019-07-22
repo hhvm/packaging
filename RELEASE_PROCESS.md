@@ -25,7 +25,8 @@ Releases are generally on Mondays, from Sunday's nightly builds.
    `bin/promote-nightly-to-release YYYY.MM.DD 4.x` - note that it's `4.x`, not
    `4.x.0`. For example, `bin/promote-nightly-to-release 2019.07.22 4.15`
 1. Open the AWS step functions dashboard, and wait for the source tarballs to
-   be created.
+   be created. `hhvm-build` is the most interesting step function at this stage;
+   `hhvm-build-and-publish` runs both `hhvm-build` and `hhvm-publish-release`.
 1. Start the MacOS builds
    1. in `screen` or similar, `sudo -i -u hhvmoss`
    1. `cd ~/code/homebrew-hhvm`; this is a clone of the `code/homebrew-hhvm`
