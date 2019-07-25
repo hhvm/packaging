@@ -30,7 +30,8 @@ mkdir /mnt/dl.hhvm.com
 mount /dev/xvdf /mnt/dl.hhvm.com
 
 aws s3 sync s3://hhvm-downloads/ /mnt/dl.hhvm.com/ --exclude '*nightly*' --exclude "source/nightlies/*" --exclude "homebrew-bottles/*"
-aws s3 sync s3://hhvm-scratch/ /var/hhvm-scratch/
+mkdir -p "/var/hhvm-scratch/${VERSION}"
+aws s3 sync "s3://hhvm-scratch/${VERSION}" "/var/hhvm-scratch/${VERSION}"
 
 export VERSION
 /opt/hhvm-packaging/bin/update-debianish-repo debian
