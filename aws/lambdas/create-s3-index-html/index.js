@@ -31,7 +31,7 @@ function handle_s3_response(err, data, event, callback, acc) {
     );
     return;
   }
-  
+
   publish_indices(event, acc, callback);
 }
 
@@ -74,7 +74,19 @@ function publish_indices(event, objs, callback) {
           }
         }
       },
-      (err, data) => callback(err, data)
+      (err, data) => {
+        try {
+          const paths = data.Invalidation.InvalidationBatch.Paths.Items;
+          if (paths.length > 17) {
+            data.Invalidation.InvalidationBatch.Paths.Items = [
+              ...paths.slice(0, 8),
+              '-- truncated --',
+              ...paths.slice(-8),
+            ];
+          }
+        } catch (e) {}
+        callback(err, data);
+      }
     );
   }).catch(err => callback(err));
 }
@@ -151,7 +163,7 @@ exports.handler = (event, context, callback) => {
     callback('bucket must be specified');
     return;
   }
-  
+
   const s3 = new AWS.S3();
   s3.listObjectsV2(
     { Bucket: event.bucket },
