@@ -6,7 +6,7 @@ Prerequisites:
 - ssh access to the MacOS build machines
 - access to HHVM FB page and Twitter accounts.
 
-Creating a .new .0 release
+Creating a new .0 release
 ==========================
 
 Releases are generally on Mondays, from Sunday's nightly builds.
@@ -54,7 +54,23 @@ Releases are generally on Mondays, from Sunday's nightly builds.
       the staging repository to avoid spamming the main one.
 1. Once all builds are complete, commit and push the blog post
 1. Announce on Facebook page, sharing to HHVM and Hack Users Group, and from
-   Twitter
+   Twitter. Include link to blog post.
 1. Update the `version.h` header in master; use
    `fbcode/hphp/facebook/update_version_header.h`. Feel free to skip unit test
    runs etc.
+
+Creating a new .z release
+=========================
+
+1. Check out the HHVM-x.y branch (e.g. `HHVM-4.16)
+   of the hhvm-staging repository
+1. cherry-pick or otherwise apply your changes
+1. make sure there are no uncommitted changes
+1. check out the HHVM-x.y branch of this packaging repository
+1. from your hhvm checkout, run
+  `/path/to/packaging/checkout/bin/hhvm-tag-and-push`; this will update
+  `version.h`, update the branch on github, and create the tag
+1. from this repository, run `bin/make-all-packages-on-aws 4.y.z`, e.g.
+  `bin/make-all-packages-on-aws 4.16.1`
+1. The AWS step functions are now running; proceed with release notes and MacOS
+   builds as for `.0` releases; do not update `version.h` in master.
