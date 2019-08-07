@@ -13,7 +13,7 @@ function get_userdata_uri(event) {
     + event.packagingBranch + '/aws/userdata/make-binary-package.sh';
 }
 
-function make_binary_package(distro, event, user_data) {
+async make_binary_package(distro, event, user_data) {
   if (distro === undefined) {
     throw "distro must be specified";
   }
@@ -56,7 +56,18 @@ function make_binary_package(distro, event, user_data) {
   };
 
   const ec2 = new AWS.EC2();
-  return ec2.runInstances(params).promise();
+  let tries = 0;
+  let interval = Math.random() * 5; // float 0-5
+  while (tries < 5) {
+    try {
+      return await ec2.runInstances(params).promise();
+    } catch (_err) {
+      tries++;
+      await new Promise(resolve => setTimeout(resolve, interval * 1000));
+      interval *= 2;
+    }
+  }
+  return await ec2.runInstances(params).promise();
 }
 
 function get_distros(event) {
