@@ -1,6 +1,5 @@
 'use strict';
 const AWS = require('aws-sdk');
-const promise = require('promise');
 const rp = require('request-promise');
 
 function get_distros_uri(event) {
@@ -13,7 +12,7 @@ function get_userdata_uri(event) {
     + event.packagingBranch + '/aws/userdata/make-binary-package.sh';
 }
 
-function make_binary_package(distro, event, user_data) {
+async function make_binary_package(distro, event, user_data) {
   if (distro === undefined) {
     throw "distro must be specified";
   }
@@ -55,51 +54,46 @@ function make_binary_package(distro, event, user_data) {
     UserData: (new Buffer(user_data)).toString('base64')
   };
 
+  let tries = 0;
+  let interval_s = (Math.random() * 4) + 1; // float 1.0-5.0
   const ec2 = new AWS.EC2();
-  return ec2.runInstances(params).promise();
-}
-
-function get_distros(event) {
-  return new promise((resolve, reject) => {
-    if (event.distros) {
-      resolve(event.distros);
-      return;
+  while (tries < 5) {
+    try {
+      return await ec2.runInstances(params).promise();
+    } catch (_err) {
+      tries++;
+      await new Promise(resolve => setTimeout(resolve, interval_s * 1000));
+      interval_s *= 2;
     }
-
-    rp(get_distros_uri(event)).then(response => {
-      resolve(response.trim().split("\n"));
-    });
-  });
+  }
+  await new Promise(resolve => setTimeout(resolve, interval_s * 1000));
+  return await ec2.runInstances(params).promise();
 }
 
-exports.handler = (event, context, callback) => {
-  (new promise(
-    // splay over 10 seconds for when doing multiple release builds at the same time
-    resolve => setTimeout(resolve, Math.random() * 10000)
-  ))
-  .then(
-    _ => promise.all([
-      get_distros(event),
-      rp(get_userdata_uri(event))
-    ])
-  )
-  .then(values => {
-    const distros = values[0];
-    const user_data = values[1];
+async function get_distros(event) {
+  if (event.distros) {
+    return event.distros;
+  }
+  const response = await rp(get_distros_uri(event));
+  return response.trim().split("\n");
+}
 
-    event.distros = distros;
-
-    return promise.all(
-      distros.map(distro => {
-        return make_binary_package(distro, event, user_data);
-      })
-    );
-  })
-  .then(values => {
-    event.instances = values.map(ec2_response => {
-      return ec2_response.Instances[0].InstanceId;
-    });
-    callback(null, event);
-  })
-  .done();
+exports.handler = async (event) => {
+  // Reduce chance of issues when there's many simultaneous builds
+  const splay_ms = Math.random() * 60 * 1000;
+  await new Promise(resolve => setTimeout(resolve, splay_ms));
+  const [distros, user_data] = await Promise.all([
+    get_distros(event),
+    rp(get_userdata_uri(event))
+  ]);
+  event.distros = distros;
+  const ec2_responses = await Promise.all(
+    distros.map(distro => {
+      return make_binary_package(distro, event, user_data);
+    })
+  );
+  event.instances = ec2_responses.map(ec2_response => {
+    return ec2_response.Instances[0].InstanceId;
+  });
+  return event;
 };
