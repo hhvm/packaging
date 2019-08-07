@@ -21,6 +21,11 @@ if ! which jq >/dev/null; then
   exit 1
 fi
 
+if ! which aws >/dev/null; then
+  echo "Install 'aws' (usually from the 'awscli' package) and try again."
+  exit 1
+fi
+
 PAYLOAD=$(echo "$@" | jq -Rn '(input | split(" ") | { "versions": . })')
 aws stepfunctions start-execution \
   --state-machine-arn \
