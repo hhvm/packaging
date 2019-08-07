@@ -16,6 +16,11 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
+if ! which jq >/dev/null; then
+  echo "Install 'jq' and try again."
+  exit 1
+fi
+
 PAYLOAD=$(echo "$@" | jq -Rn '(input | split(" ") | { "versions": . })')
 aws stepfunctions start-execution \
   --state-machine-arn \
