@@ -32,17 +32,9 @@ Releases are generally on Mondays, from Sunday's nightly builds.
    1. `cd ~/code/homebrew-hhvm`; this is a clone of the `code/homebrew-hhvm`
       repository
    1. `git fetch; git reset --hard origin/master`
-   1. Copy `Formula/hhvm-nightly.rb` to `Formula/hhvm-4.x.rb`, replacing `x`
-   1. Edit the class name in that file from `HhvmNightly` to `Hhvm4x`, e.g.
-      `Hhvm415`
-   1. Run `./build-release.sh 4.x.0 Formula/hhvm-4.x.rb`
-   1. Wait for both to complete; binaries are automatically uploaded.
-   1. One one host, add the bottle `sha256` lines from both builders - e.g.
-      one `sha256 "deadbeef" => :high_sierra` line, one
-      `sha256 "deadbeef' => :mojave` line
-   1. On the same host, make the `Aliases/hhvm` symlink (no `.rb` extension)
-      point to the new `Formular/hhvm-4.x.rb` file, commit, and push
-   1. on the other host, discard all changes (git reset --hard; git clean -ffdx)
+   1. Run `./build-release.sh 4.x.0`
+   1. Wait for both to complete; binaries are automatically uploaded, and recipe
+      changes are automatically pushed
 1. While waiting for the builds (linux and mac), write the blog post:
    1. Use existing posts as a template.
    1. Use `hhast` announcements from the previous week as guide for if codemods
