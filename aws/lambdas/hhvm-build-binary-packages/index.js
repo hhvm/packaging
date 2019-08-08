@@ -12,7 +12,7 @@ function get_userdata_uri(event) {
     + event.packagingBranch + '/aws/userdata/make-binary-package.sh';
 }
 
-async make_binary_package(distro, event, user_data) {
+async function make_binary_package(distro, event, user_data) {
   if (distro === undefined) {
     throw "distro must be specified";
   }
