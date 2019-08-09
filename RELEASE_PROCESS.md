@@ -124,3 +124,13 @@ ID    Number    Status      Result    Definition ID    Definition Name     Sourc
 
 Use the [Azure web interface](https://dev.azure.com/hhvm-oss/hhvm-oss-builds/_build?definitionId=1) to see detailed
 build status, including stdout/stderr.
+
+# Manual Fixups of Formula
+
+If a bottle is built, but the recipe update fails (e.g. git issues):
+
+- download with s3 or wget, e.g.
+  `aws s3 cp s3://hhvm-downloads/homebrew-bottles/hhvm@3.30-lts-3.30.8_1.high_sierra.bottle.tar.gz ./` , or 
+  `wget https://dl.hhvm.com/homebrew-bottles/hhvm@3.30-lts-3.30.8_1.high_sierra.bottle.tar.gz'
+- generate sha, e.g. `openssl dgst -sha256 hhvm@3.30*sierra*`
+- manually add the sha to the bottle section
