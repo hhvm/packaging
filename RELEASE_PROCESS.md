@@ -66,3 +66,56 @@ Creating a new .z release
   `bin/make-all-packages-on-aws 4.16.1`
 1. The AWS step functions are now running; proceed with release notes and MacOS
    builds as for `.0` releases; do not update `version.h` in master.
+
+Experimental: Building A MacOS Release On Azure
+===============================================
+
+This lets us build many in parallel, instead of restricting us to our
+permanent worker machines.
+
+Initial Setup
+-------------
+
+1. [Install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+2. `az login`
+3. Add the 'devops' extension to get CLI access to Azure pipelines:
+   `az extension add --name azure-devops`
+4. Configure the Azure Devops extension to use the correct organization and project:
+    `az devops configure --defaults organization=https://dev.azure.com/hhvm-oss/ project=hhvm-oss-builds` - alternatively, add `--organization` and
+    `--project` options to all following commands
+5. Optional: get readable output instead of json with `
+
+General Use
+-----------
+
+Listing jobs:
+
+```
+$ az pipelines build list --top 20 -o table
+ID    Number    Status      Result    Definition ID    Definition Name     Source Branch    Queued Time                 Reason
+----  --------  ----------  --------  ---------------  ------------------  ---------------  --------------------------  --------
+12    12        inProgress            1                hhvm-oss-builds-CI  master           2019-08-09 10:03:13.818939  manual
+11    11        completed   failed    1                hhvm-oss-builds-CI  master           2019-08-09 09:52:02.412387  manual
+10    10        completed   failed    1                hhvm-oss-builds-CI  master           2019-08-09 09:21:10.523309  manual
+9     9         completed   failed    1                hhvm-oss-builds-CI  master           2019-08-09 09:08:00.526379  manual
+5     5         completed   failed    1                hhvm-oss-builds-CI  master           2019-08-08 15:34:21.857854  manual
+8     8         completed   canceled  1                hhvm-oss-builds-CI  master           2019-08-08 15:43:00.310012  manual
+7     7         completed   canceled  1                hhvm-oss-builds-CI  master           2019-08-08 15:42:10.073800  manual
+6     6         completed   canceled  1                hhvm-oss-builds-CI  master           2019-08-08 15:41:19.357546  manual
+4     4         completed   failed    1                hhvm-oss-builds-CI  master           2019-08-08 15:31:09.347933  manual
+3     3         completed   failed    1                hhvm-oss-builds-CI  master           2019-08-08 15:19:30.592465  manual
+2     2         completed   failed    1                hhvm-oss-builds-CI  master           2019-08-08 15:10:51.677154  manual
+1     1         completed   failed    1                hhvm-oss-builds-CI  master           2019-08-08 15:07:30.406701  manual
+```
+
+For status of just one job:
+
+```
+$ az pipelines build show --id 12 -o table
+ID    Number    Status      Result    Definition ID    Definition Name     Source Branch    Queued Time                 Reason
+----  --------  ----------  --------  ---------------  ------------------  ---------------  --------------------------  --------
+12    12        inProgress            1                hhvm-oss-builds-CI  master           2019-08-09 10:03:13.818939  manual
+```
+
+Use the [Azure web interface](https://dev.azure.com/hhvm-oss/hhvm-oss-builds/_build?definitionId=1) to see detailed
+build status, including stdout/stderr.
