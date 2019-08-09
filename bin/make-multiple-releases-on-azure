@@ -1,0 +1,30 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+set -e
+
+ROOT="$(realpath "$(dirname $0)/..")"
+
+VERSION=$1
+if [ -z "$VERSION" ]; then
+  echo "Usage: $0 VERSION1 [VERSION2 [VERSION3 ...]]"
+  exit 1
+fi
+
+if ! which aws >/dev/null; then
+  echo "Install 'az' (usually from the 'azure-cli' package) and try again."
+  exit 1
+fi
+
+for VERSION in "$@"; do
+  echo ">>> Starting ${VERSION}... <<<"
+  az pipelines build queue \
+    --variables hhvm.version=$VERSION \
+    --definition-name hhvm-oss-builds-CI \
+    -o table
+done
