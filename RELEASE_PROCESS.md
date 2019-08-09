@@ -77,7 +77,7 @@ Initial Setup
 -------------
 
 1. [Install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-2. `az login`
+2. `az login --allow-no-subscriptions`
 3. Add the 'devops' extension to get CLI access to Azure pipelines:
    `az extension add --name azure-devops`
 4. Configure the Azure Devops extension to use the correct organization and project:
