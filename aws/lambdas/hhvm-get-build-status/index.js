@@ -1,8 +1,6 @@
 'use strict';
 const AWS = require('aws-sdk');
-const promise = require('promise');
 const rp = require('request-promise');
-
 
 function get_version_info(event) {
   let version = event.version;
@@ -31,7 +29,9 @@ async function get_distros(branch) {
 exports.handler = async (event) => {
   const {nightly, version, branch} = get_version_info(event);
 
-  const prefix = nightly ? 'hhvm-nightly-'+version : 'hhvm-'+version;
+  const prefix = nightly
+    ? 'hhvm-nightly-'+version
+    : 'hhvm-'+(version.split('.').slice(0, 2).join('.'))+'-'+version;
   const paths = {
     'macos-high_sierra':
       'homebrew-bottles/'+prefix+'.high_sierra.bottle.tar.gz',
@@ -63,7 +63,7 @@ exports.handler = async (event) => {
   let success = true;
   let results = {};
   const s3 = new AWS.S3();
-  await promise.all(
+  await Promise.all(
     Object.values(paths).map(async path => {
       try {
         await s3.headObject(
