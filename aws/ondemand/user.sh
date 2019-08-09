@@ -15,7 +15,6 @@ log "Configuring Git checkout..."
 touch /home/ubuntu/.ssh/known_hosts
 ssh-keyscan github.com >> /home/ubuntu/.ssh/known_hosts
 
-update-alternatives --config editor vim
 git config --global user.name "$GIT_NAME"
 git config --global user.email "$GIT_EMAIL"
 

@@ -29,10 +29,11 @@ touch /home/ubuntu/.sudo_as_admin_successful
 
 cat >> /home/ubuntu/.bashrc <<ANALBUMCOVER
   alias hh=hh_client
-  EDITOR=vim
   cd $REPO 2>/dev/null
   $DIR/motd.sh
 ANALBUMCOVER
+
+update-alternatives --set editor /usr/bin/vim.basic
 ok
 
 log "Cloning Git repository..."
