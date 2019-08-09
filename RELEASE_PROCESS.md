@@ -88,6 +88,12 @@ Initial Setup
 General Use
 -----------
 
+Starting a job:
+
+```
+$ az pipelines build queue --variables hhvm.version=4.15.1 --definition-name hhvm-oss-builds-CI -o table
+```
+
 Listing jobs:
 
 ```
