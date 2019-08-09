@@ -83,7 +83,6 @@ Initial Setup
 4. Configure the Azure Devops extension to use the correct organization and project:
     `az devops configure --defaults organization=https://dev.azure.com/hhvm-oss/ project=hhvm-oss-builds` - alternatively, add `--organization` and
     `--project` options to all following commands
-5. Optional: get readable output instead of json with `
 
 General Use
 -----------
