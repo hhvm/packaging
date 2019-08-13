@@ -16,7 +16,7 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-if ! which aws >/dev/null; then
+if ! which az >/dev/null; then
   echo "Install 'az' (usually from the 'azure-cli' package) and try again."
   exit 1
 fi
