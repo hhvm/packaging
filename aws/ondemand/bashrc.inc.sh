@@ -7,4 +7,4 @@
 alias hh=hh_client
 
 # push current branch, creating it on GitHub if it doesn't exist yet
-alias push="git push --set-upstream origin \$(git name-rev --name-only HEAD)"
+alias push="git push -f --set-upstream origin \$(git name-rev --name-only HEAD)"

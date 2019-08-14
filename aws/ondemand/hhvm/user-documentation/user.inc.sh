@@ -6,7 +6,7 @@
 
 cd /home/ubuntu/$REPO
 
-log "Building hhvm/user-documentation..."
+log "Building hhvm/user-documentation (this may take 2 to 3 minutes)..."
 hhvm bin/build.php
 ok
 
