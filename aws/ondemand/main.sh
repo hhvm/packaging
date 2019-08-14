@@ -27,8 +27,8 @@ mkdir -p /home/ubuntu/.cache
 touch /home/ubuntu/.cache/motd.legal-displayed
 touch /home/ubuntu/.sudo_as_admin_successful
 
+cat $DIR/bashrc.inc.sh >> /home/ubuntu/.bashrc
 cat >> /home/ubuntu/.bashrc <<ANALBUMCOVER
-  alias hh=hh_client
   cd $REPO 2>/dev/null
   $DIR/motd.sh
 ANALBUMCOVER
