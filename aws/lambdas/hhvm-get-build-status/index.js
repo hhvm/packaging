@@ -29,21 +29,22 @@ async function get_distros(branch) {
 exports.handler = async (event) => {
   const {nightly, version, branch} = get_version_info(event);
 
-  const prefix = nightly
+  const bin_prefix = nightly
     ? 'hhvm-nightly-'+version
     : 'hhvm-'+(version.split('.').slice(0, 2).join('.'))+'-'+version;
+  const src_prefix = nightly ? bin_prefix : ('hhvm-'+version);
   const paths = {
     'macos-high_sierra':
-      'homebrew-bottles/'+prefix+'.high_sierra.bottle.tar.gz',
+      'homebrew-bottles/'+bin_prefix+'.high_sierra.bottle.tar.gz',
     'macos-mojave':
-      'homebrew-bottles/'+prefix+'.mojave.bottle.tar.gz',
+      'homebrew-bottles/'+bin_prefix+'.mojave.bottle.tar.gz',
   };
   if (nightly) {
-    paths.source = 'source/nightlies/'+prefix+'.tar.gz';
-    paths.source_gpg = 'source/nightlies/'+prefix+'.tar.gz.sig';
+    paths.source = 'source/nightlies/'+src_prefix+'.tar.gz';
+    paths.source_gpg = 'source/nightlies/'+src_prefix+'.tar.gz.sig';
   } else {
-    paths.source = 'source/'+prefix+'.tar.gz';
-    paths.source_gpg = 'source/'+prefix+'.tar.gz.sig';
+    paths.source = 'source/'+src_prefix+'.tar.gz';
+    paths.source_gpg = 'source/'+src_prefix+'.tar.gz.sig';
   }
 
   const distros = await get_distros(branch);
