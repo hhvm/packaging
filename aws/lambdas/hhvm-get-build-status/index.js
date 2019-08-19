@@ -39,21 +39,27 @@ exports.handler = async (event) => {
     'macos-mojave':
       'homebrew-bottles/'+bin_prefix+'.mojave.bottle.tar.gz',
   };
+  const scratch_paths = {};
   if (nightly) {
     paths.source = 'source/nightlies/'+src_prefix+'.tar.gz';
     paths.source_gpg = 'source/nightlies/'+src_prefix+'.tar.gz.sig';
   } else {
     paths.source = 'source/'+src_prefix+'.tar.gz';
     paths.source_gpg = 'source/'+src_prefix+'.tar.gz.sig';
+    scratch_paths[paths.source] = src_prefix+'.tar.gz';
+    scratch_paths[paths.source_gpg] = src_prefix+'.tar.gz.sig';
   }
 
   const distros = await get_distros(branch);
   for (const distro of distros) {
     const debianish = distro.match(/^(ubuntu|debian)/);
     if (debianish !== null) {
-      paths[distro] = debianish[0] + '/pool/main/h/' +
-        (nightly ? 'hhvm-nightly/hhvm-nightly_' : 'hhvm/hhvm_') +
+      const file_name = (nightly ? 'hhvm-nightly_' : 'hhvm_') +
         version + '-1~' + (distro.match(/[a-z]+$/)) + '_amd64.deb';
+      const path = debianish[0] + '/pool/main/h/' +
+        (nightly ? 'hhvm-nightly/' : 'hhvm/') + file_name;
+      paths[distro] = path;
+      scratch_paths[path] = version + '/' + distro + '/' + file_name;
       continue;
     }
     // If we add a new distro kind without updating monitoring, make
@@ -70,23 +76,49 @@ exports.handler = async (event) => {
         await s3.headObject(
           { Bucket: 'hhvm-downloads', Key: path }
         ).promise();
-        results[path] = true;
+        results[path] = 'success';
       } catch (err) {
-        results[path] = false;
         success = false;
+        results[path] = 'failure';
+        if (scratch_paths[path]) {
+          try {
+            await s3.headObject(
+              { Bucket: 'hhvm-scratch', Key: scratch_paths[path] }
+            ).promise();
+            results[path] = 'unpublished';
+          } catch (err) {
+            // failure set already
+          }
+        }
       }
     })
   );
 
-  let response = { success, version, succeeded: [], failed: {} };
+  let response = {
+    success,
+    version,
+    succeeded: [],
+    failed: {},
+    built_not_published: [],
+    not_built: {},
+  };
   for (const key in paths) {
     const path = paths[key];
-    const success = results[path];
-    if (success) {
+    const result = results[path];
+    if (result === 'success') {
       response.succeeded.push(key);
+      continue;
     } else {
+      // Intentionally including 'unpublished' here: consider it failed if it's
+      // not available for download.
       response.failed[key] = 'https://dl.hhvm.com/'+path;
     };
+
+    if (result === 'unpublished') {
+      response.built_not_published.push(key);
+      continue;
+    } 
+    response.not_built[key] = 'https://dl.hhvm.com/'+path;
   }
   return response;
 }
