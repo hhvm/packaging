@@ -64,10 +64,10 @@ if ! bin/make-package-in-throwaway-container "$DISTRO"; then
   EC2_INSTANCE_ID="$(curl --silent http://169.254.169.254/latest/meta-data/instance-id)"
 
   # Create a Docker image from the container (instance)
+  DOCKER_REPOSITORY="223121549624.dkr.ecr.us-west-2.amazonaws.com"
 	IMAGE_NAME="${DOCKER_REPOSITORY}/hhvm-failed-builds:${VERSION}_${DISTRO}_${EC2_INSTANCE_ID}"
   docker commit "${FAILED_CONTAINER_ID}" "${IMAGE_NAME}"
   # Push to ECR so we can download to debug
-  DOCKER_REPOSITORY="223121549624.dkr.ecr.us-west-2.amazonaws.com"
 	docker push "${IMAGE_NAME}"
 
 	# Once we're confident with this, shutdown immediately instead of waiting for
