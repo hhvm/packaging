@@ -48,10 +48,20 @@ git clone ${REPO} ${PREFIX}-${VERSION}
 cd ${PREFIX}-$VERSION
 git checkout $HEAD
 if "${IS_AWS:-false}" && $IS_NIGHTLY; then
-  git tag "nightly-${VERSION}"
-  git push git@github.com:hhvm/hhvm-staging.git "nightly-$VERSION"
+  TAG="nightly-${VERSION}"
+  git tag "${TAG}"
+  git push git@github.com:hhvm/hhvm-staging.git "${TAG}"
   # might as well update master there too
   git push git@github.com:hhvm/hhvm-staging.git HEAD:master || true
+  # push to the main repo
+  ssh-add -D
+  aws kms decrypt \
+    --region us-west-2 \
+    --ciphertext-blob "fileb://${ROOT}/aws/main-repo-push-key.kms-ciphertext" \
+    --query Plaintext --output text \
+    | base64 --decode > "${KEYFILE}"
+  ssh-add "${KEYFILE}"
+  git push git@github.com:facebook/hhvm.git "${TAG}"
 fi
 git submodule update --init --recursive
 
