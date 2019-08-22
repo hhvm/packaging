@@ -2,7 +2,7 @@
 include /usr/share/dpkg/pkg-info.mk
 
 %:
-	dh $@ --buildsystem=cmake
+	dh $@ --buildsystem=cmake --parallel
 
 export PATH := /opt/hhvm-build-deps/bin:$(PATH)
 
