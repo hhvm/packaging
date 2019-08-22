@@ -58,6 +58,9 @@ Login Succeeded
 
 ## Starting a container (instance) from an image
 
+First, check the memory limits in your Docker configuration; the default is
+2GB, which will be insufficient.
+
 ```
 $ IMAGE_NAME=$(aws ecr describe-repositories --repository-name hhvm-failed-builds --query 'repositories[*].repositoryUri' --output text)
 $ IMAGE_TAG=2019.08.22_debian-8-jessie_i-08a53d39a3c2ae539 # from above
