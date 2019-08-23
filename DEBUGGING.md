@@ -44,8 +44,11 @@ Docker images allow you to quickly get a copy of the failed build.
 ## Listing available images
 
 ```
-$ aws ecr list-images --repository-name hhvm-failed-builds --query 'imageIds[*].[imageTag]' --output text
-2019.08.22_debian-8-jessie_i-08a53d39a3c2ae539
+$ bin/list-build-images
+Failed builds:
+- 2019.08.23_debian-8-jessie_i-0e79e0b5c07530107
+- 2019.08.22_debian-8-jessie_i-0441d0e0f080021fd
+- 2019.08.22_debian-8-jessie_i-08a53d39a3c2ae539
 ```
 
 ## Logging into Elastic Container Registry (ECR)
