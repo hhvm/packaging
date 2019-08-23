@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.  #
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+set -e
+
+STREAM="$1"
+
+if [ -z "${STREAM}" ]; then
+  echo "Usage: $0 LOG_NAME"
+  exit 1
+fi
+LIMIT="${2:-100}"
+
+aws logs get-log-events \
+  --log-group-name hhvm-binary-package-builds/cloud-init-output.log \
+  --log-stream-name "${STREAM}" \
+  --output text --query 'events[*].[message]'
