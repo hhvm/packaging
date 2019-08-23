@@ -8,13 +8,16 @@ CloudWatch log group, and are available via the CloudWatch web UI.
 Log stream names are `BUILD_DATE/hhvm-VERSION_DISTRO_EC2-INSTANCE-ID`;
 
 ```
-$ aws logs describe-log-streams \
->   --log-group-name hhvm-binary-package-builds/cloud-init-output.log \
->   --log-stream-name-prefix 2019/08/22/hhvm-2019.08.22 \
->   --query 'logStreams[*].[logStreamName]' --output text
+$ bin/list-build-logs
 2019/08/22/hhvm-2019.08.22_debian-8-jessie_i-0441d0e0f080021fd
 2019/08/22/hhvm-2019.08.22_debian-8-jessie_i-08a53d39a3c2ae539
 2019/08/22/hhvm-2019.08.22_debian-8-jessie_i-0ca36208f86e6a198
+2019/08/23/hhvm-2019.08.23_debian-8-jessie_i-0e79e0b5c07530107
+2019/08/23/hhvm-2019.08.23_debian-9-stretch_i-0fb0b6fded99c16da
+2019/08/23/hhvm-2019.08.23_ubuntu-16.04-xenial_i-097efd02691fbc546
+2019/08/23/hhvm-2019.08.23_ubuntu-18.04-bionic_i-090752a6c30ed87dd
+2019/08/23/hhvm-2019.08.23_ubuntu-18.10-cosmic_i-0464e77ca4066150f
+2019/08/23/hhvm-2019.08.23_ubuntu-19.04-disco_i-0332fc4967f5d763b
 ```
 
 ## Fetching a log via CLI
@@ -22,17 +25,16 @@ $ aws logs describe-log-streams \
 To fetch an entire log:
 
 ```
-$ aws logs get-log-events \
->   --log-group-name hhvm-binary-package-builds/cloud-init-output.log \
->   --log-stream-name 2019/08/22/hhvm-2019.08.22_debian-8-jessie_i-08a53d39a3c2ae539 \
->   --output text --query 'events[*].[message]'
+$ bin/fetch-build-log 2019/08/23/hhvm-2019.08.23_ubuntu-19.04-disco_i-0332fc4967f5d763b
 ```
 
-To fetch the last hundred entries, add:
+To fetch the last 20 entries:
 
 ```
->  --no-start-from-head --limit 100
+$ bin/tail-build-log 2019/08/23/hhvm-2019.08.23_debian-8-jessie_i-0e79e0b5c07530107 20
 ```
+
+If the number of entries is omitted, it defaults to 100.
 
 # Docker images for failed builds
 
