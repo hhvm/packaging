@@ -9,4 +9,8 @@ set -e
 
 aws logs describe-log-streams \
   --log-group-name hhvm-binary-package-builds/cloud-init-output.log \
-  --query 'logStreams[*].[logStreamName]' --output text
+  --query 'logStreams[*].[lastEventTimestamp,logStreamName]' \
+  --order-by LastEventTime \
+  --descending \
+  --output text \
+  | awk '{print strftime("%Y-%m-%d-%H:%M:%S", $1/1000)"\t"$2}'
