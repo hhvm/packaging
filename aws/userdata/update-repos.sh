@@ -20,6 +20,19 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
+CLOUDWATCH_CONFIG_FILE="$(mktemp)"
+cat > "${CLOUDWATCH_CONFIG_FILE}" <<EOF
+[general]
+state_file = /var/awslogs/state/agent-state  
+
+[/var/log/cloud-init-output.log]
+file = /var/log/cloud-init-output.log
+log_group_name = hhvm-binary-package-builds/cloud-init-output.log
+log_stream_name = $(date "+%Y/%m/%d")/hhvm-${VERSION}_update-repos_{instance_id}
+EOF
+curl -O https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
+python3 awslogs-agent-setup.py -n -r us-west-2 -c "${CLOUDWATCH_CONFIG_FILE}"
+
 git clone https://github.com/hhvm/packaging hhvm-packaging
 ln -s $(pwd)/hhvm-packaging /opt/hhvm-packaging
 (cd hhvm-packaging; git checkout $PACKAGING_BRANCH)
