@@ -47,7 +47,7 @@ async function make_binary_package(distro, event, user_data) {
       DeviceName: '/dev/sda1',
       Ebs: {
         DeleteOnTermination: true,
-        VolumeSize: 50 /*gb*/,
+        VolumeSize: 95 /*gb*/,
         VolumeType: 'gp2'
       }
     }],
