@@ -9,7 +9,11 @@ set -e
 
 echo "Failed builds:"
 
-aws ecr list-images \
+IMAGE_NAME=$(aws ecr describe-repositories --repository-name hhvm-failed-builds --query 'repositories[*].repositoryUri' --output text)
+TAGS=$(aws ecr list-images \
   --repository-name hhvm-failed-builds \
-  --query 'imageIds[*].[imageTag]' --output text \
-  | sed 's/^/- /'
+  --query 'imageIds[*].[imageTag]' --output text
+)
+for TAG in $TAGS; do
+  echo "- ${IMAGE_NAME}:${TAG}"
+done
