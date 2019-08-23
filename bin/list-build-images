@@ -14,15 +14,12 @@ function dump_builds() {
       --query 'repositories[*].repositoryUri' \
       --output text
   )
-  TAGS=$(
-    aws ecr list-images \
-      --repository-name "$1" \
-      --query 'imageIds[*].[imageTag]' \
-      --output text
-  )
-  for TAG in $TAGS; do
-    echo "- ${IMAGE_NAME}:${TAG}"
-  done
+  aws ecr describe-images \
+    --repository-name "$1" \
+    --query 'imageDetails[*].[imagePushedAt,imageTags[0]]' \
+    --output text \
+    | sort -r \
+    | awk '{ print "\t"strftime("%Y-%m-%d-%H:%M:%S", $1)"\t""'${IMAGE_NAME}':"$2 }'
 }
 
 echo "Failed builds:"
