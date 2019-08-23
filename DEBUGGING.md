@@ -61,6 +61,10 @@ WARNING! Using --password via the CLI is insecure. Use --password-stdin.
 Login Succeeded
 ```
 
+You can also run `aws ecr get-login` on a computer with AWS access tokens, then
+run the produced `docker login` command on another computer - for example, an
+EC2 instance you're using for debugging.
+
 ## Starting a container (instance) from an image
 
 First, check the memory limits in your Docker configuration; the default is
