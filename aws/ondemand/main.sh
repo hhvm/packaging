@@ -34,6 +34,10 @@ cat >> /home/ubuntu/.bashrc <<ANALBUMCOVER
 ANALBUMCOVER
 
 update-alternatives --set editor /usr/bin/vim.basic
+
+# required for remote IDE support
+echo "fs.inotify.max_user_watches=524288" >> /etc/sysctl.conf
+sysctl -p
 ok
 
 log "Cloning Git repository..."
