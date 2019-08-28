@@ -18,4 +18,4 @@ fi
 echo deb https://dl.hhvm.com/ubuntu $HHVM_REPO main > /etc/apt/sources.list.d/hhvm.list
 apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xB4112585D386EB94
 
-PACKAGES="hhvm php-cli unzip"
+PACKAGES="hhvm jq php-cli unzip"

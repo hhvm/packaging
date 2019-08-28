@@ -17,6 +17,7 @@ ssh-keyscan github.com >> /home/ubuntu/.ssh/known_hosts
 
 git config --global user.name "$GIT_NAME"
 git config --global user.email "$GIT_EMAIL"
+git config --global core.excludesfile /home/ubuntu/.gitignore_global
 
 cd /home/ubuntu/$REPO
 git checkout -b ondemand_$(date +%Y-%m-%d_%H%M) master
