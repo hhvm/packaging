@@ -18,9 +18,6 @@ mkdir -p .vscode
 if [ ! -e .vscode/settings.json ]; then
   echo "{}" > .vscode/settings.json
 fi
-SETTINGS_JSON=$(
-  cat .vscode/settings.json |
-  jq '."files.associations"."*.php" = "hack" | ."remote.SSH.defaultExtensions" += ["pranayagarwal.vscode-hack"]'
-)
+SETTINGS_JSON=$(cat .vscode/settings.json | jq '."files.associations"."*.php" = "hack"')
 echo "$SETTINGS_JSON" > .vscode/settings.json
 ok
