@@ -55,8 +55,10 @@ export IS_NIGHTLY
 aws s3 sync "s3://hhvm-nodist/${DISTRO}/" nodist/
 if bin/make-package-in-throwaway-container "$DISTRO"; then
   IMAGE_NAME=hhvm-succeeded-builds
+  FAILED=false
 else
   IMAGE_NAME=hhvm-failed-builds
+  FAILED=true
 fi
 # On modern systems, this should just be:
 #   $(aws ecr get-login --no-include-email --region us-west-2)
@@ -73,6 +75,13 @@ IMAGE_NAME="${DOCKER_REPOSITORY}/${IMAGE_NAME}:${VERSION}_${DISTRO}_${EC2_INSTAN
 docker commit "${CONTAINER_ID}" "${IMAGE_NAME}"
 # Push to ECR so we can download later
 docker push "${IMAGE_NAME}"
+
+if $FAILED; then
+  # Don't upload anything to S3 for this distro, or the repo update
+  # worker gets confused
+  shutdown -h now
+  exit 1
+fi
 
 rm "out/${SOURCE_BASENAME}"
 
