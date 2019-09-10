@@ -3,8 +3,9 @@ Prerequisites:
 - Write access to the HHVM staging repository
 - Write access to the hhvm.com repository
 - Write access to the hhvm-docker repository
-- ssh access to the MacOS build machines
-- access to HHVM FB page and Twitter accounts.
+- correctly configured Azure DevOps CLI client (see below)
+- ssh access to the MacOS build machines (optional)
+- access to HHVM FB page and Twitter accounts
 
 Creating a new .0 release
 ==========================
@@ -27,14 +28,8 @@ Releases are generally on Mondays, from Sunday's nightly builds.
 1. Open the AWS step functions dashboard, and wait for the source tarballs to
    be created. `hhvm-build` is the most interesting step function at this stage;
    `hhvm-build-and-publish` runs both `hhvm-build` and `hhvm-publish-release`.
-1. Start the MacOS builds
-   1. in `screen` or similar, `sudo -i -u hhvmoss`
-   1. `cd ~/code/homebrew-hhvm`; this is a clone of the `code/homebrew-hhvm`
-      repository
-   1. `git fetch; git reset --hard origin/master`
-   1. Run `./build-release.sh 4.x.0`
-   1. Wait for both to complete; binaries are automatically uploaded, and recipe
-      changes are automatically pushed
+1. Start the MacOS builds: `bin/make-multiple-releases-on-azure 4.x.0`
+   - in case of problems, use MacOS build machines to investigate (see below)
 1. While waiting for the builds (linux and mac), write the blog post:
    1. Use existing posts as a template.
    1. Use `hhast` announcements from the previous week as guide for if codemods
@@ -48,7 +43,7 @@ Releases are generally on Mondays, from Sunday's nightly builds.
 1. Announce on Facebook page, sharing to HHVM and Hack Users Group, and from
    Twitter. Include link to blog post.
 1. Update the `version.h` header in master; use
-   `fbcode/hphp/facebook/update_version_header.h`. Feel free to skip unit test
+   `fbcode/hphp/facebook/update_version_header.sh`. Feel free to skip unit test
    runs etc.
 
 Creating a new .z release
@@ -66,6 +61,19 @@ Creating a new .z release
   `bin/make-all-packages-on-aws 4.16.1`
 1. The AWS step functions are now running; proceed with release notes and MacOS
    builds as for `.0` releases; do not update `version.h` in master.
+
+Using MacOS build machines
+==========================
+
+1. ssh to the machine for the correct platform (mojave, high sierra)
+1. in `screen` or similar, `sudo -i -u hhvmoss`
+1. `cd ~/code/homebrew-hhvm`; this is a clone of the `code/homebrew-hhvm`
+  repository
+1. `git fetch; git reset --hard origin/master`
+1. Run `./build-release.sh 4.x.0`
+1. Wait for both to complete; binaries are automatically uploaded, and recipe
+  changes are automatically pushed
+
 
 Experimental: Building A MacOS Release On Azure
 ===============================================
@@ -130,7 +138,7 @@ build status, including stdout/stderr.
 If a bottle is built, but the recipe update fails (e.g. git issues):
 
 - download with s3 or wget, e.g.
-  `aws s3 cp s3://hhvm-downloads/homebrew-bottles/hhvm@3.30-lts-3.30.8_1.high_sierra.bottle.tar.gz ./` , or 
+  `aws s3 cp s3://hhvm-downloads/homebrew-bottles/hhvm@3.30-lts-3.30.8_1.high_sierra.bottle.tar.gz ./` , or
   `wget https://dl.hhvm.com/homebrew-bottles/hhvm@3.30-lts-3.30.8_1.high_sierra.bottle.tar.gz'
 - generate sha, e.g. `openssl dgst -sha256 hhvm@3.30*sierra*`
 - manually add the sha to the bottle section
