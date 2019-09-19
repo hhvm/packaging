@@ -33,7 +33,7 @@ maybe_crontab() {
   if [ -e "$1" ]
   then
     source "$1"
-    (crontab -l 2>/dev/null || true; echo $CRONTAB) | crontab -
+    (crontab -l 2>/dev/null || true; echo "$CRONTAB") | crontab -
   fi
 }
 
