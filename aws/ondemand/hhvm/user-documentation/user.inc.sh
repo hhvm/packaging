@@ -11,6 +11,5 @@ hhvm bin/build.php
 ok
 
 log "Starting web server (HHVM)..."
-cd public
-hhvm -m daemon -p 8080 -c ../hhvm.dev.ini -d hhvm.log.file=/home/ubuntu/hhvm.log
+$DIR/$TEAM/$REPO/hhvm-daemon.sh /home/ubuntu/$REPO
 ok
