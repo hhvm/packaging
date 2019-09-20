@@ -33,7 +33,10 @@ cd /opt/hhvm-packaging
 git checkout "$PACKAGING_BRANCH"
 RESYNC=false
 
-for DISTRO in $(<CURRENT_TARGETS); do
+for DISTRO in *; do
+  if [ ! -e ${DISTRO}/DISTRIBUTION ]; then
+    continue
+  fi
   ROOT_REPO="$(echo "$DISTRO" | cut -f1 -d-)" # eg 'debian' or 'ubuntu'
   DISTRO="$(<$DISTRO/DISTRIBUTION)"
   for REPO in $(<DEBIAN_REPOSITORIES); do
