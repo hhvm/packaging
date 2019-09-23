@@ -70,7 +70,7 @@ if ! bin/make-package-in-throwaway-container "$DISTRO"; then
   docker commit "${CONTAINER_ID}" "${IMAGE_NAME}"
   # Push to ECR so we can download later
   docker push "${IMAGE_NAME}"
-  shutdown -h now
+  shutdown -h +5m
   exit 1
 fi
 
@@ -79,4 +79,4 @@ rm "out/${SOURCE_BASENAME}"
 aws s3 cp --include '*' --recursive out/ s3://hhvm-scratch/${VERSION}/${DISTRO}/
 aws s3 sync nodist/ "s3://hhvm-nodist/${DISTRO}/"
 
-shutdown -h now
+shutdown -h +5m

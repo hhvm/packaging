@@ -42,4 +42,4 @@ export PACKAGING_BRANCH
 /opt/hhvm-packaging/aws/bin/update-repos
 /opt/hhvm-packaging/aws/bin/update-docker
 
-shutdown -h now
+shutdown -h +5m
