@@ -38,6 +38,12 @@ if [ ! -e "$PKGDIR/bin/$(basename $0)" ]; then
   exit 1
 fi
 
+GIT_ORIGIN="$(git remote get-url origin)"
+if [ "$GIT_ORIGIN" != "git@github.com:hhvm/packaging.git" ]; then
+  echo "Git origin must be set to hhvm/packaging (not a fork)."
+  exit 1
+fi
+
 function statusline() {
   # green background, back foreground
   tput setab 2
