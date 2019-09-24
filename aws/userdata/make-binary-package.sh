@@ -24,7 +24,7 @@ fi
 CLOUDWATCH_CONFIG_FILE="$(mktemp)"
 cat > "${CLOUDWATCH_CONFIG_FILE}" <<EOF
 [general]
-state_file = /var/awslogs/state/agent-state  
+state_file = /var/awslogs/state/agent-state
 
 [/var/log/cloud-init-output.log]
 file = /var/log/cloud-init-output.log
@@ -70,7 +70,7 @@ if ! bin/make-package-in-throwaway-container "$DISTRO"; then
   docker commit "${CONTAINER_ID}" "${IMAGE_NAME}"
   # Push to ECR so we can download later
   docker push "${IMAGE_NAME}"
-  shutdown -h +5m
+  shutdown -h +1
   exit 1
 fi
 
@@ -79,4 +79,4 @@ rm "out/${SOURCE_BASENAME}"
 aws s3 cp --include '*' --recursive out/ s3://hhvm-scratch/${VERSION}/${DISTRO}/
 aws s3 sync nodist/ "s3://hhvm-nodist/${DISTRO}/"
 
-shutdown -h +5m
+shutdown -h +1

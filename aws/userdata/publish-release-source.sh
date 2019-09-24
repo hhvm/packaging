@@ -26,4 +26,4 @@ ln -s $(pwd)/hhvm-packaging /opt/hhvm-packaging
 
 /opt/hhvm-packaging/aws/bin/publish-release-source
 
-shutdown -h +5m
+shutdown -h +1

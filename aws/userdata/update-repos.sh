@@ -23,7 +23,7 @@ fi
 CLOUDWATCH_CONFIG_FILE="$(mktemp)"
 cat > "${CLOUDWATCH_CONFIG_FILE}" <<EOF
 [general]
-state_file = /var/awslogs/state/agent-state  
+state_file = /var/awslogs/state/agent-state
 
 [/var/log/cloud-init-output.log]
 file = /var/log/cloud-init-output.log
@@ -42,4 +42,4 @@ export PACKAGING_BRANCH
 /opt/hhvm-packaging/aws/bin/update-repos
 /opt/hhvm-packaging/aws/bin/update-docker
 
-shutdown -h +5m
+shutdown -h +1
