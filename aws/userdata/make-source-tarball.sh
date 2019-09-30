@@ -43,4 +43,4 @@ gpg --sign --armor --detach --local-user 0xD386EB94 \
   -o "$FILE".sig "$FILE"
 aws s3 cp "${FILE}.sig" "s3://${S3_BUCKET}/${S3_PATH}.sig"
 
-shutdown -h +5m
+shutdown -h +1

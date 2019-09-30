@@ -29,15 +29,18 @@ async function get_distros(branch) {
 exports.handler = async (event) => {
   const {nightly, version, branch} = get_version_info(event);
 
-  const bin_prefix = nightly
+  const maj_min = version.split('.').slice(0, 2).join('.');
+  const macos_prefix = nightly
     ? 'hhvm-nightly-'+version
-    : 'hhvm-'+(version.split('.').slice(0, 2).join('.'))+'-'+version;
-  const src_prefix = nightly ? bin_prefix : ('hhvm-'+version);
+    : maj_min === '3.30'
+      ? 'hhvm@3.30-lts-'+version
+      : 'hhvm-'+maj_min+'-'+version;
+  const src_prefix = nightly ? macos_prefix : ('hhvm-'+version);
   const paths = {
     'macos-high_sierra':
-      'homebrew-bottles/'+bin_prefix+'.high_sierra.bottle.tar.gz',
+      'homebrew-bottles/'+macos_prefix+'.high_sierra.bottle.tar.gz',
     'macos-mojave':
-      'homebrew-bottles/'+bin_prefix+'.mojave.bottle.tar.gz',
+      'homebrew-bottles/'+macos_prefix+'.mojave.bottle.tar.gz',
   };
   const scratch_paths = {};
   if (nightly) {
@@ -117,7 +120,7 @@ exports.handler = async (event) => {
     if (result === 'unpublished') {
       response.built_not_published.push(key);
       continue;
-    } 
+    }
     response.not_built[key] = 'https://dl.hhvm.com/'+path;
   }
   return response;
