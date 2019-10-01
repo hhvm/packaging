@@ -121,6 +121,8 @@ These aren't usually directly invoked - instead, two wrappers are used:
 
 For more details, look at the definitions either in AWS console, or `aws/step-functions/`
 
+Nightly builds are triggered by a CloudWatch scheduled event rule.
+
 S3 Buckets
 ----------
 
