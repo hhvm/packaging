@@ -61,7 +61,7 @@ git commit DEBIAN_REPOSITORIES -m "Adding DISTRO-${MAJOR}.${MINOR} apt repositor
 statusline "Pushing packaging branch..."
 git push -u origin "HEAD:HHVM-${VERSION}"
 
-SCRATCHDIR="$(mktemp -d)"
+SCRATCHDIR="$(mktemp -dt hhvm.XXXXXXXX)"
 statusline "Working in ${SCRATCHDIR}..."
 
 cd "$SCRATCHDIR"
