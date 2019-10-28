@@ -14,7 +14,7 @@ if [ "$ROOT" == "/opt/hhvm-packaging" ]; then
 else
   OUT="$ROOT/out/"
 fi
-TEMPDIR="$(mktemp -d)"
+TEMPDIR="$(mktemp -dt hhvm.XXXXXXXX)"
 VERSION=${VERSION:-"$(date +%Y.%m.%d)"}
 IS_NIGHTLY=${IS_NIGHTLY:-true}
 TAR=${TAR:-tar}
