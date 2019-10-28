@@ -9,11 +9,11 @@
 VERSION=5.5.0
 BUILD_VER=1
 
-set -ex 
+set -ex
 
 PKG_NAME=gcc
 CACHE_TARBALL="/var/nodist/${PKG_NAME}-${VERSION}-$(</opt/hhvm-distro-packaging/DISTRIBUTION)${BUILD_VER}.tar.bz2"
-PKG_DIR=$(mktemp -d)
+PKG_DIR=$(mktemp -dt hhvm.XXXXXXXX)
 
 cd /tmp
 if [ -e "$CACHE_TARBALL" ]; then
