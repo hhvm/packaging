@@ -21,10 +21,12 @@ consumed by "workers". A worker is an EC2 instance specifically initialized to
 process tasks for one of the activities.
 
 The standard Amazon flow seems to assume that workers are constantly available,
-which doesn't quite work for us (we don't want ~70 beefy EC2 instances running constantly). We therefore start workers "on demand", by a state in the state
+which doesn't quite work for us (we don't want ~70 beefy EC2 instances running
+constantly). We therefore start workers "on demand", by a state in the state
 machine that directly preceeds the state that publishes each task.
 
-However, the system is intentionally design to **not** rely on this being 100% accurate. Any worker can process any task belonging to the same activity, so
+However, the system is intentionally designed to **not** rely on this being 100%
+accurate. Any worker can process any task belonging to the same activity, so
 if some worker EC2 instance fails to initialize, or shuts down because of a
 failure, or any other unpredictable thing happens, we don't care. Another worker
 will pick up the task later.
@@ -168,7 +170,8 @@ After any changes:
 These debug options can be passed to the state machine:
 
 - `--fake-ec2` is the closest thing to an end-to-end test without actually
-  building a release; it will do almost everything as in a normal run but pass `dummy-task.sh` as the `SCRIPT_URL` to each worker (note that it still uses
+  building a release; it will do almost everything as in a normal run but pass
+  `dummy-task.sh` as the `SCRIPT_URL` to each worker (note that it still uses
   non-fake code for some operations, like checking which steps should be
   skipped, so it may fail e.g. if you try to run it with a version number that
   was never tagged or some other invalid set of parameters)

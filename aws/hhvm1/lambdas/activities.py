@@ -45,7 +45,7 @@ class Activity:
       raise Exception('missing config in ' + type(self).__name__)
 
     script_url = common.url(
-      'aws/hhvm1/dummy-task.sh' if self.fake_ec2
+      'aws/hhvm1/worker/dummy-task.sh' if self.fake_ec2
       else 'aws/userdata/' + self.script_name
     )
     init_url = common.url(self.init_script) if self.init_script else ''
@@ -75,7 +75,7 @@ class Activity:
         ACTIVITY_ARN="{self.activity_arn}"
         SCRIPT_URL="{script_url}"
         INIT_URL="{init_url}"
-        {common.fetch('aws/hhvm1/worker.sh')}
+        {common.fetch('aws/hhvm1/worker/worker.sh')}
       ''',
     }
 
@@ -146,7 +146,7 @@ class PublishBinaryPackages(Activity):
   ec2_iam_arn = 'arn:aws:iam::223121549624:instance-profile/hhvm-repo-builders'
   activity_arn = 'arn:aws:states:us-west-2:223121549624:activity:hhvm-publish-binary-packages'
   script_name = 'update-repos.sh'
-  init_script = 'aws/hhvm1/init-update-repos.sh'
+  init_script = 'aws/hhvm1/worker/init/update-repos.sh'
   env = {'REPOS_ONLY': '1'}
 
   def should_run(self):

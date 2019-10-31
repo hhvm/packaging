@@ -35,11 +35,11 @@ def lambda_handler(event, context=None):
       return False
 
   # The actual health check: Find any activities that are scheduled but not
-  # started and make sure there's at least one worker ready for each.
+  # started and make sure there's a worker ready for each.
   ec2 = boto3.client('ec2')
   for activity_class in get_pending_activities(events):
     activity = activity_class(event)
-    if not activity.has_ec2_workers():
+    if activity.needs_ec2_worker():
       ec2.run_instances(**activity.ec2_params())
 
   # Wait and repeat.

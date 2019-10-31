@@ -5,8 +5,8 @@ import re
 from urllib import request
 
 class Config:
-  override_org = 'jjergus'
-  override_branch = 'hhvm1'
+  override_org = None
+  override_branch = None
 
 def is_nightly(version):
   return re.fullmatch(r'[0-9]{4}\.[0-9]{2}\.[0-9]{2}', version)

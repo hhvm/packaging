@@ -1,2 +1,2 @@
 #!/bin/bash
-$(dirname $0)/generate.hack | jq -C . | less -R
+"$(dirname "$0")/generate.hack" | jq -C . | less -R

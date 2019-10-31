@@ -15,7 +15,7 @@ if [ -z "$1" -o "$1" == "--help" ]; then
   echo " --fake-ec2  launched EC2 instances will succeed without doing anything"
   echo
   echo "Available steps:"
-  find "$(dirname $0)/../" -name activities.py \
+  find "$(dirname "$0")/../" -name activities.py \
     | xargs grep '^class [a-zA-Z]*.Activity.:$' \
     | grep -o ' [a-zA-Z]*'
   exit 1
