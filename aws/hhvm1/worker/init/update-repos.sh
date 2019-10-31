@@ -6,8 +6,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-set -ex
-
 # This is source'd (not executed) from worker.sh so we can declare this function
 # here for worker.sh to use when it shuts down itself.
 cleanup() {

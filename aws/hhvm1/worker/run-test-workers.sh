@@ -1,4 +1,10 @@
 #!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
 
 if [ -t 1 ]; then
   echo "Pro-tip: You can run: pushd \$($0); and then later: popd" 1>&2
