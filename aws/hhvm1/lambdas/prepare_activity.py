@@ -9,7 +9,7 @@ import random
 from time import sleep
 
 import activities
-from common import env_for_version, skip_ec2
+from common import env_for_version, fake_ec2, skip_ec2
 
 def lambda_handler(event, context=None):
   activity_name = event['activity']
@@ -24,7 +24,7 @@ def lambda_handler(event, context=None):
   # spread these out, in case several run at once
   sleep(random.uniform(1, 10))
 
-  if not activity.should_run():
+  if not skip_ec2(event) and not fake_ec2(event) and not activity.should_run():
     return {'skip': True}
 
   if not skip_ec2(event) and activity.needs_ec2_worker():

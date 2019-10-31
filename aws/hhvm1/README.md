@@ -171,10 +171,9 @@ These debug options can be passed to the state machine:
 
 - `--fake-ec2` is the closest thing to an end-to-end test without actually
   building a release; it will do almost everything as in a normal run but pass
-  `dummy-task.sh` as the `SCRIPT_URL` to each worker (note that it still uses
-  non-fake code for some operations, like checking which steps should be
-  skipped, so it may fail e.g. if you try to run it with a version number that
-  was never tagged or some other invalid set of parameters)
+  `dummy-task.sh` as the `SCRIPT_URL` to each worker (this also skips all the
+  `activity.should_run()` checks -- to test those, use
+  `python3 test.py Test.test_should_run`)
 - `--skip-ec2` is a cheaper/faster option but less end-to-end: it will not start
   any EC2 instances at all; you will need to process any triggered tasks
   manually, for which you can use `run-test-workers.sh` and
