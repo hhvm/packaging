@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+echo "ONE STATE MACHINE TO RULE THEM ALL"
+echo
+
+if [ -z "$1" -o "$1" == "--help" ]; then
+  echo "Usage: $0 [--skip-ec2|--fake-ec2] <versions> <distros> <steps>"
+  echo
+  echo "Each version will be built for each specified distro that it supports."
+  echo "Omit <distros> to build each version for all supported distros."
+  echo "Omit <steps> to perform all build steps."
+  echo "Note: Arguments are accepted in any order."
+  echo
+  echo " --skip-ec2  won't launch any EC2 instances (useful for testing)"
+  echo " --fake-ec2  launched EC2 instances will succeed without doing anything"
+  echo
+  echo "Available steps:"
+  find "$(dirname "$0")/../" -name activities.py \
+    | xargs grep '^class [a-zA-Z]*.Activity.:$' \
+    | grep -o ' [a-zA-Z]*'
+  exit 1
+fi
+
+aws stepfunctions start-execution \
+  --state-machine-arn \
+    arn:aws:states:us-west-2:223121549624:stateMachine:one-state-machine-to-rule-them-all \
+  --input "\"$*\"" \
+  --name="$(echo "$*" | tr ' ' '_' | head -c 20)-$(whoami)-$(date +%Y-%m-%d-%H-%M)"
+
