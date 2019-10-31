@@ -91,6 +91,7 @@ while true; do
     TASK_TOKEN=$(echo "$TASK_JSON" | jq -r '.taskToken // ""')
 
     if [ -n "$TASK_TOKEN" ]; then
+      SECONDS=0  # magic bash variable
       PROCESSED_COUNT=$((PROCESSED_COUNT + 1))
 
       # We got a task, run it!
@@ -122,11 +123,11 @@ while true; do
       if $WRAPPER_SCRIPT; then
         try_really_hard aws stepfunctions send-task-success \
           --task-token "$TASK_TOKEN" \
-          --task-output "{\"ec2\":\"$EC2_INSTANCE_ID\"}"
+          --task-output "{\"ec2\":\"$EC2_INSTANCE_ID\",\"time_sec\":\"$SECONDS\"}"
       else
         try_really_hard aws stepfunctions send-task-failure \
           --task-token "$TASK_TOKEN" \
-          --cause "{\"ec2\":\"$EC2_INSTANCE_ID\"}"
+          --cause "{\"ec2\":\"$EC2_INSTANCE_ID\",\"time_sec\":\"$SECONDS\"}"
         # We don't know if the problem was with the task or with this worker,
         # so it's safer not to reuse the worker. Shut down and let any retries
         # be picked by different workers.

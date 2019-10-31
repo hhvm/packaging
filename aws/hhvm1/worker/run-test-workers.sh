@@ -10,7 +10,7 @@ if [ -t 1 ]; then
   echo "Pro-tip: You can run: pushd \$($0); and then later: popd" 1>&2
 fi
 
-SRC_DIR="$(realpath $(dirname $0))"
+SRC_DIR="$(realpath "$(dirname "$0")")"
 TMP_DIR="$(mktemp -dt hhvm1-test-XXX)"
 mkdir -p "$TMP_DIR/logs"
 

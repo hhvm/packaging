@@ -102,8 +102,8 @@ what's currently going on.
   above).
 - The output of the state machine is a JSON that lists all steps, and for each
   it indicates whether it was skipped, succeeded or failed + any related
-  information (EC2 instance ID for worker successes/failures; exception data for
-  AWS lambdas that throw an exception).
+  information (EC2 instance ID + elapsed time for worker successes/failures;
+  exception data for AWS lambdas that throw an exception).
 
 
 ## Making changes and testing
