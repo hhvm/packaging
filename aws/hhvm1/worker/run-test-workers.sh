@@ -23,6 +23,10 @@ shutdown() {
   echo skipping shutdown $@
 }
 
+rm() {
+  echo skipping rm $@
+}
+
 ACTIVITIES=(
   "arn:aws:states:us-west-2:223121549624:activity:hhvm-make-source-tarball"
   "arn:aws:states:us-west-2:223121549624:activity:hhvm-make-binary-package"

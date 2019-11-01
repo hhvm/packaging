@@ -13,6 +13,11 @@ from urllib import request
 class Config:
   override_org = None
   override_branch = None
+  map_states = {
+    # state name: map key
+    'ForEachVersion': 'version',
+    'ForEachPlatform': 'platform',
+  }
 
 def is_nightly(version):
   return re.fullmatch(r'[0-9]{4}\.[0-9]{2}\.[0-9]{2}', version)
@@ -77,3 +82,39 @@ def skip_ec2(event):
 
 def fake_ec2(event):
   return event.get('buildInput', {}).get('debug') == 'fake_ec2'
+
+def normalize_results(results):
+  """
+  The state machine output has some unnecessary nesting due to how the state
+  machine is structured -- this cleans it up:
+
+  - unnecessary nesting due to "parallel states" is flattened
+  - lists of version/platform outputs are normalized into a map of results keyed
+    by the version/platform
+  - this makes the state machine output robust against changes like adding a new
+    state that runs in parallel with some existing states, which is important
+    because the logic in check_if_repos_changed and check_for_failures depends
+    on the structure of the results
+  """
+
+  normalized = {}
+
+  for state_name, result in results.items():
+    if state_name in Config.map_states:
+      # convert from list to map
+      key = Config.map_states[state_name]
+      normalized[state_name] = {
+        item[key]: normalize_results(item['results']) for item in result
+      }
+    elif type(result) == list:
+      # flatten
+      for item in result:
+        normalized.update(normalize_results(item['results']))
+    else:
+      # just remove some redundant stuff
+      result.pop('taskInput', None)
+      if result.get('skip') == False:
+        del result['skip']
+      normalized[state_name] = result
+
+  return normalized

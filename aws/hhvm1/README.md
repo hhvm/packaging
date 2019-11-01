@@ -103,7 +103,9 @@ what's currently going on.
 - The output of the state machine is a JSON that lists all steps, and for each
   it indicates whether it was skipped, succeeded or failed + any related
   information (EC2 instance ID + elapsed time for worker successes/failures;
-  exception data for AWS lambdas that throw an exception).
+  exception data for AWS lambdas that throw an exception). On failures, this
+  output can be found as the output of the `NormalizeResults` step (the final
+  step has no output because it throws an exception).
 
 
 ## Making changes and testing
@@ -179,5 +181,7 @@ These debug options can be passed to the state machine:
   manually, for which you can use `run-test-workers.sh` and
   `kill-test-workers.sh` (looking at the log files produced by these test
   workers can be very useful for debugging)
+- note: steps are never skipped in debug runs (they all "succeed" without doing
+  anything)
 - the ability to specify specific activities to run is particularly useful for
   testing (e.g. you can run a real build, just not publish anything)

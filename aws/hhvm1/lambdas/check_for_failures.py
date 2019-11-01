@@ -4,8 +4,10 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
+from common import Config
+
 def lambda_handler(event, context=None):
-  failures = get_failures(event.get('results', {}))
+  failures = get_failures(event)
 
   if failures:
     raise Exception('The following steps have failed:\n' + '\n'.join(failures))
@@ -13,19 +15,14 @@ def lambda_handler(event, context=None):
   return event
 
 def get_failures(results, context=[]):
-  context_str = ' ({0})'.format(', '.join(context)) if context else ''
   failures = []
 
-  for step_name, result in results.items():
-    if type(result) == list:
-      for item in result:
-        failures += get_failures(
-          item.get('results', {}),
-          context + [item[k] for k in ['version', 'platform'] if k in item]
-        )
+  for state_name, result in results.items():
+    if state_name in Config.map_states:
+      for key, inner_results in result.items():
+        failures += get_failures(inner_results, context + [key])
     elif 'failure' in result:
-      failures += [
-        step_name + context_str + ' ' + result['failure'].get('Cause', '')
-      ]
+      words = [state_name] + context + [result['failure'].get('Cause', '')]
+      failures += [' '.join(words)]
 
   return failures

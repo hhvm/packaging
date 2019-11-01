@@ -16,6 +16,7 @@ import check_for_failures
 from common import Config
 import get_platforms_for_version
 import health_check
+import normalize_results
 import parse_input
 import prepare_activity
 
@@ -299,14 +300,27 @@ class Test(unittest.TestCase):
       }
     )
 
-  def get_check_if_repos_changed_event(self, success, debug=''):
-    key = 'success' if success else 'failure'
+  def get_check_if_repos_changed_event(self, successes, debug=''):
+    keys = ['success' if success else 'failure' for success in successes]
     return {
       'buildInput': {'debug': debug},
       'results': {
         'ForEachVersion': [
-          {'results': {'PublishBinaryPackages': {'failure': {}}}},
-          {'results': {'PublishBinaryPackages': {key: {}}}},
+          {
+            'version': '3.30.12',
+            'results': {
+              'MakeSourceTarball': {'success': {}},
+              'PublishBinaryPackages': {'failure': {}},
+              'PublishSourceTarballAndPublishDockerImages': [
+                {'results': {'PublishSourceTarball': {keys[0]: {}}}},
+                {'results': {'PublishDockerImages': {'success': {}}}},
+              ],
+            },
+          },
+          {
+            'version': '4.42.0',
+            'results': {'PublishBinaryPackages': {keys[1]: {}}},
+          },
         ],
       },
     }
@@ -314,57 +328,168 @@ class Test(unittest.TestCase):
   def test_check_if_repos_changed(self):
     self.assertEqual(
       check_if_repos_changed.lambda_handler(
-        self.get_check_if_repos_changed_event(False)
+        self.get_check_if_repos_changed_event([False, False])
       ),
       False
     )
     self.assertEqual(
       check_if_repos_changed.lambda_handler(
-        self.get_check_if_repos_changed_event(True)
+        self.get_check_if_repos_changed_event([False, True])
       ),
       True
     )
     self.assertEqual(
       check_if_repos_changed.lambda_handler(
-        self.get_check_if_repos_changed_event(False, 'skip_ec2')
+        self.get_check_if_repos_changed_event([True, False])
+      ),
+      True
+    )
+    self.assertEqual(
+      check_if_repos_changed.lambda_handler(
+        self.get_check_if_repos_changed_event([True, True])
+      ),
+      True
+    )
+    self.assertEqual(
+      check_if_repos_changed.lambda_handler(
+        self.get_check_if_repos_changed_event([False, False], 'skip_ec2')
       ),
       False
     )
     self.assertEqual(
       check_if_repos_changed.lambda_handler(
-        self.get_check_if_repos_changed_event(True, 'fake_ec2')
+        self.get_check_if_repos_changed_event([False, True], 'fake_ec2')
       ),
       False
     )
     self.assertEqual(
       check_if_repos_changed.lambda_handler(
-        self.get_check_if_repos_changed_event(True, 'skip_ec2')
+        self.get_check_if_repos_changed_event([True, True], 'skip_ec2')
       ),
       False
+    )
+    # test nightly special case
+    self.assertEqual(
+      check_if_repos_changed.lambda_handler({
+        'results': {
+          'ForEachVersion': [
+            {
+              'version': '2019.11.01',
+              'results': {'MakeSourceTarball': {'success': {}}},
+            },
+          ],
+        },
+      }),
+      True
     )
 
-  def test_check_for_failures(self):
-    event = {'results': {'foo': {'success': {}}}}
-    self.assertEqual(check_for_failures.lambda_handler(event), event)
+  def test_normalize_results_and_check_for_failures(self):
+    self.assertEqual(
+      check_for_failures.lambda_handler(normalize_results.lambda_handler({
+        'buildInput': {},
+        'results': {
+          'ForEachVersion': [
+            {
+              'version': '3.30.12',
+              'results': {
+                'MakeSourceTarball': {'skip': True},
+                'ForEachPlatform': [
+                  {
+                    'platform': 'debian-8-jessie',
+                    'results': {
+                      'MakeBinaryPackage': {'success': {'ec2': 'i-faceb001'}},
+                    },
+                  },
+                  {
+                    'results': {
+                      'MakeBinaryPackage': {'skip': True},
+                    },
+                    'platform': 'ubuntu-14.04-trusty',
+                  },
+                ],
+                'PublishSourceTarballAndPublishDockerImages': [
+                  {
+                    'results': {
+                      'PublishSourceTarball': {
+                        'skip': False,
+                        'taskInput': {
+                          'name': 'PublishSourceTarball-3.30.12',
+                          'env': 'VERSION="3.30.12"\nIS_NIGHTLY="false"',
+                        },
+                        'success': {'ec2': 'i-faceb002'},
+                      },
+                    },
+                  },
+                  {
+                    'results': {
+                      'PublishDockerImages': {'success': {'ec2': 'i-faceb003'}},
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              'version': '4.42.0',
+              'results': {'foo': {'skip': True}},
+            },
+          ],
+          'UpdateIndicesAndInvalidateCloudFront': [
+            {
+              'results': {
+                'UpdateIndices': {'success': {'ec2': 'i-faceb004'}},
+              },
+            },
+            {
+              'results': {
+                'InvalidateCloudFront': {'success': {'ec2': 'i-faceb005'}},
+              },
+            },
+          ],
+        },
+      })),
+      {
+        'ForEachVersion': {
+          '3.30.12': {
+            'MakeSourceTarball': {'skip': True},
+            'ForEachPlatform': {
+              'debian-8-jessie': {
+                'MakeBinaryPackage': {'success': {'ec2': 'i-faceb001'}},
+              },
+              'ubuntu-14.04-trusty': {
+                'MakeBinaryPackage': {'skip': True},
+              },
+            },
+            'PublishSourceTarball': {'success': {'ec2': 'i-faceb002'}},
+            'PublishDockerImages': {'success': {'ec2': 'i-faceb003'}},
+          },
+          '4.42.0': {
+            'foo': {'skip': True},
+          },
+        },
+        'UpdateIndices': {'success': {'ec2': 'i-faceb004'}},
+        'InvalidateCloudFront': {'success': {'ec2': 'i-faceb005'}},
+      }
+    )
+
     with self.assertRaisesRegex(
       Exception,
       '^The following steps have failed:\nfoo bar$'
     ):
-      check_for_failures.lambda_handler(
+      check_for_failures.lambda_handler(normalize_results.lambda_handler(
         {'results': {'foo': {'failure': {'Cause': 'bar'}}}}
-      )
+      ))
 
     with self.assertRaisesRegex(
       Exception,
-      r'^The following steps have failed:\n'
-      r'MakeSourceTarball \(4\.2\.0\) \n'
-      r'PublishBinaryPackage \(4\.2\.0, debian\) \n'
-      r'MakeBinaryPackage \(4\.2\.1, ubuntu\) \n'
-      r'PublishBinaryPackage \(4\.2\.1, ubuntu\) \n'
-      r'PublishBinaryPackage \(4\.2\.1, debian\) \n'
-      r'bar $'
+      '^The following steps have failed:\n'
+      'MakeSourceTarball 4.2.0 \n'
+      'PublishBinaryPackage 4.2.0 debian \n'
+      'MakeBinaryPackage 4.2.1 ubuntu \n'
+      'PublishBinaryPackage 4.2.1 ubuntu \n'
+      'PublishBinaryPackage 4.2.1 debian \n'
+      'bar $'
     ):
-      check_for_failures.lambda_handler({
+      check_for_failures.lambda_handler(normalize_results.lambda_handler({
         'results': {
           'foo': {'success': {}},
           'ForEachVersion': [
@@ -409,7 +534,7 @@ class Test(unittest.TestCase):
           ],
           'bar': {'failure': {}},
         },
-      })
+      }))
 
   def test_health_check(self):
     execution_arn = (

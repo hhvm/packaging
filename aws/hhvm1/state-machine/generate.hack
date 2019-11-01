@@ -42,6 +42,7 @@ enum S: string as string {
   UpdateIndices = 'UpdateIndices';
   InvalidateCloudFront = 'InvalidateCloudFront';
   CheckIfReposChanged = 'CheckIfReposChanged';
+  NormalizeResults = 'NormalizeResults';
   CheckForFailures = 'CheckForFailures';
   HealthCheck = 'HealthCheck';
   // Activity states' name prefixes
@@ -122,6 +123,9 @@ abstract final class Config {
     S::CheckIfReposChanged =>
       'arn:aws:lambda:us-west-2:223121549624:function:'.
       'hhvm1-check-if-repos-changed',
+    S::NormalizeResults =>
+      'arn:aws:lambda:us-west-2:223121549624:function:'.
+      'hhvm1-normalize-results',
     S::CheckForFailures =>
       'arn:aws:lambda:us-west-2:223121549624:function:'.
       'hhvm1-check-for-failures',
@@ -439,7 +443,7 @@ function main_branch(): StateMachine {
           dict[
             'Variable' => path('reposChanged'),
             'BooleanEquals' => false,
-            'Next' => S::CheckForFailures,
+            'Next' => S::NormalizeResults,
           ],
         ],
         F::Default => S::UpdateIndices.S::And.S::InvalidateCloudFront,
@@ -472,6 +476,11 @@ function main_branch(): StateMachine {
             ],
           ),
         ],
+      ],
+
+      S::NormalizeResults => dict[
+        F::Type => T::Task,
+        F::ResultPath => '$',
       ],
 
       S::CheckForFailures => dict[

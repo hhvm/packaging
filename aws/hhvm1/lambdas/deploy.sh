@@ -10,6 +10,7 @@ set -e
 
 cd "$(dirname $0)"
 
+echo -n "Testing"
 if ! ./test.py; then
   echo
   read -p "Tests failed. Deploy anyway? " -n 1 -r
@@ -30,6 +31,7 @@ NAMES=(
   hhvm1-parse-input
   hhvm1-get-platforms-for-version
   hhvm1-prepare-activity
+  hhvm1-normalize-results
   hhvm1-check-for-failures
   hhvm1-check-if-repos-changed
   hhvm1-health-check
