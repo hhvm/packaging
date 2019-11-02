@@ -116,15 +116,22 @@ while true; do
           echo skipping shutdown \$@
         }
         SKIP_CLOUDWATCH=1
+        TASK_TOKEN=$(printf %q "$TASK_TOKEN")
         $TASK_ENV
         source process-task.sh" > $WRAPPER_SCRIPT
       chmod a+x $WRAPPER_SCRIPT
 
       if $WRAPPER_SCRIPT; then
-        try_really_hard aws stepfunctions send-task-success \
-          --task-token "$TASK_TOKEN" \
-          --task-output "{\"ec2\":\"$EC2_INSTANCE_ID\",\"time_sec\":\"$SECONDS\"}"
+        if [ -n "$SKIP_SEND_TASK_SUCCESS" ]; then
+          echo "Task script succeeded but not reporting success from here."
+        else
+          try_really_hard aws stepfunctions send-task-success \
+            --task-token "$TASK_TOKEN" \
+            --task-output "{\"ec2\":\"$EC2_INSTANCE_ID\",\"time_sec\":\"$SECONDS\"}"
+        fi
       else
+        # Note: Even if we can't succeed (SKIP_SEND_TASK_SUCCESS=1), we can
+        # always fail. Such is life.
         try_really_hard aws stepfunctions send-task-failure \
           --task-token "$TASK_TOKEN" \
           --cause "{\"ec2\":\"$EC2_INSTANCE_ID\",\"time_sec\":\"$SECONDS\"}"

@@ -145,11 +145,47 @@ class Test(unittest.TestCase):
       f'        SCRIPT_URL="https://raw.githubusercontent.com/{org}/packaging/'
         f'{branch}/aws/userdata/make-binary-package.sh"\n'
       '        INIT_URL=""\n'
+      '        \n'
       '        #!/bin/bash\n'
     )
     self.assertEqual(
       ec2_params['UserData'][:len(expected_prefix)],
       expected_prefix,
+    )
+
+    # has INIT_URL
+    ec2_params = activities.PublishBinaryPackages({}).ec2_params()
+    expected_prefix = (
+      '#!/bin/bash\n'
+      '        ACTIVITY_ARN="arn:aws:states:us-west-2:223121549624:activity:'
+        'hhvm-publish-binary-packages"\n'
+      f'        SCRIPT_URL="https://raw.githubusercontent.com/{org}/packaging/'
+        f'{branch}/aws/userdata/update-repos.sh"\n'
+      f'        INIT_URL="https://raw.githubusercontent.com/{org}/packaging/'
+        f'{branch}/aws/hhvm1/worker/init/update-repos.sh"\n'
+      '        \n'
+      '        #!/bin/bash\n'
+    )
+    self.assertEqual(
+      ec2_params['UserData'][:len(expected_prefix)],
+      expected_prefix
+    )
+
+    # overrides worker_env()
+    ec2_params = activities.BuildAndPublishMacOS({}).ec2_params()
+    expected_prefix = (
+      '#!/bin/bash\n'
+      '        ACTIVITY_ARN="arn:aws:states:us-west-2:223121549624:activity:'
+        'hhvm-build-and-publish-macos"\n'
+      f'        SCRIPT_URL="https://raw.githubusercontent.com/{org}/packaging/'
+        f'{branch}/aws/userdata/trigger-macos-builds.sh"\n'
+      '        INIT_URL=""\n'
+      '        SKIP_SEND_TASK_SUCCESS="1"\n'
+      '        #!/bin/bash\n'
+    )
+    self.assertEqual(
+      ec2_params['UserData'][:len(expected_prefix)],
+      expected_prefix
     )
 
   def test_should_run(self):
@@ -589,6 +625,48 @@ class Test(unittest.TestCase):
     )
     events += [{'type': 'ActivityStarted', 'previousEventId': 31}]
     self.assertEqual(health_check.get_pending_activities(events), [])
+
+  def test_build_and_publish_macos(self):
+    future = (date.today() + timedelta(days=2)).strftime('%Y.%m.%d')
+    macos = next(iter(Config.macos_versions.keys()))
+
+    activity = activities.BuildAndPublishMacOS(
+      {'version': future, 'buildInput': {'platforms': []}}
+    )
+    self.assertEqual(
+      activity.platforms_to_build(),
+      Config.macos_versions.keys()
+    )
+    self.assertEqual(activity.should_run(), True)
+    self.assertEqual(activity.task_env(), {})
+
+    activity = activities.BuildAndPublishMacOS(
+      {'version': future, 'buildInput': {'platforms': [macos, 'ubuntu']}}
+    )
+    self.assertEqual(activity.platforms_to_build(), {macos})
+    self.assertEqual(activity.should_run(), True)
+    self.assertEqual(
+      activity.task_env(),
+      {'PLATFORM': Config.macos_versions[macos]}
+    )
+
+    activity = activities.BuildAndPublishMacOS(
+      {'version': future, 'buildInput': {'platforms': ['ubuntu']}}
+    )
+    self.assertEqual(activity.should_run(), False)
+    self.assertEqual(activity.platforms_to_build(), set())
+
+    activity = activities.BuildAndPublishMacOS(
+      {'version': '4.29.0', 'buildInput': {'platforms': []}}
+    )
+    self.assertEqual(activity.platforms_to_build(), set())
+    self.assertEqual(activity.should_run(), False)
+
+    activity = activities.BuildAndPublishMacOS(
+      {'version': '4.29.0', 'buildInput': {'platforms': [macos]}}
+    )
+    self.assertEqual(activity.platforms_to_build(), set())
+    self.assertEqual(activity.should_run(), False)
 
 
 if __name__ == '__main__':

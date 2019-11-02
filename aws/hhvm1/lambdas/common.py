@@ -11,12 +11,19 @@ import re
 from urllib import request
 
 class Config:
-  override_org = None
-  override_branch = None
+  override_org = 'jjergus'
+  override_branch = 'macos'
   map_states = {
     # state name: map key
     'ForEachVersion': 'version',
     'ForEachPlatform': 'platform',
+  }
+  macos_versions = {
+    # key: name as reported by build_statuses()
+    # value: version as reported by sw_vers -productVersion | cut -d . -f 1,2
+    # note: activity.BuildAndPublishMacOS depends on this having at most 2 items
+    'macos-high_sierra': '10.13',
+    'macos-mojave': '10.14',
   }
 
 def is_nightly(version):
@@ -58,6 +65,9 @@ def env_for_version(version):
   env['S3_SOURCE'] = 's3://{S3_BUCKET}/{S3_PATH}'.format(**env)
   env['PACKAGING_BRANCH'] = branch(version)
   return env
+
+def format_env(env):
+  return '\n'.join([f'{var}="{value}"' for var, value in env.items()])
 
 @functools.lru_cache()
 def build_statuses(version):

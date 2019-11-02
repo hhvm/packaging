@@ -32,6 +32,7 @@ enum A: string as string {
   PublishBinaryPackages = 'PublishBinaryPackages';
   PublishSourceTarball = 'PublishSourceTarball';
   PublishDockerImages = 'PublishDockerImages';
+  BuildAndPublishMacOS = 'BuildAndPublishMacOS';
 }
 
 // State names/name parts
@@ -54,6 +55,7 @@ enum S: string as string {
   Platform = 'Platform';
   // "Parallel" state name part
   And = 'And';
+  BuildAndPublishLinux = 'BuildAndPublishLinux';
   // Suffix for an explicit "end" state, which we need to add to all nested
   // state machines because not all state types support {"End": true}
   End = 'End';
@@ -152,6 +154,9 @@ abstract final class Config {
     A::PublishDockerImages =>
       'arn:aws:states:us-west-2:223121549624:activity:'.
       'hhvm-publish-docker-images',
+    A::BuildAndPublishMacOS =>
+      'arn:aws:states:us-west-2:223121549624:activity:'.
+      'hhvm-build-and-publish-macos',
   ];
 
   const dict<A, int> TIMEOUT_SEC = dict[
@@ -160,6 +165,7 @@ abstract final class Config {
     A::PublishBinaryPackages => 180 * 60,
     A::PublishDockerImages => 180 * 60,
     A::PublishSourceTarball => 30 * 60,
+    A::BuildAndPublishMacOS => 180 * 60,
   ];
 
   /**
@@ -201,12 +207,15 @@ function path(string ...$keys): string {
 
 /**
  * Returns the value to use for F::Parameters that preserves the specified
- * parameters' values. BuildInput is always preserved.
+ * parameters' values...
  */
 function params(P ...$keys): dict<string, string> {
   return Dict\pull($keys, $key ==> path($key), $key ==> "$key.$");
 }
 
+/**
+ * ...and adds the specified parameter with the specified value.
+ */
 function params_with(
   keyset<P> $params_to_preserve,
   string $new_name,
@@ -217,6 +226,10 @@ function params_with(
   return $params;
 }
 
+/**
+ * ...and adds the specified parameter with value automatically produced by a
+ * map state.
+ */
 function map_params(
   keyset<P> $params_to_preserve,
   P $map_param,
@@ -327,23 +340,106 @@ function linear_state_machine(
  * Adds in the Succes/Failure states that we need in every nested state machine.
  */
 function nested_state_machine(
-  string $prefix,
-  ?P $add_param,
+  string $end_state_prefix,
+  ?P $add_param_to_results,
   dict<string, State> $states,
 ): StateMachine {
   return linear_state_machine(
-    $prefix.S::End,
+    $end_state_prefix.S::End,
     Dict\merge(
       $states,
       dict[
-        $prefix.S::End => dict[
+        $end_state_prefix.S::End => dict[
           F::Type => T::Pass,
-          F::Parameters => $add_param is nonnull
-            ? params($add_param, P::Results)
+          F::Parameters => $add_param_to_results is nonnull
+            ? params($add_param_to_results, P::Results)
             : params(P::Results),
           F::End => true,
         ],
       ],
+    ),
+  );
+}
+
+/**
+ * The two main parallel build branches.
+ */
+function linux_branch(): StateMachine {
+  return nested_state_machine(
+    S::BuildAndPublishLinux,
+    null,
+    Dict\merge(
+      dict[
+        S::GetPlatformsForVersion => dict[
+          F::Type => T::Task,
+          F::ResultPath => path('platforms'),
+        ],
+        S::ForEach.S::Platform => dict[
+          F::Type => T::Map,
+          F::ItemsPath => path('platforms'),
+          F::Parameters =>
+            map_params(keyset[P::BuildInput, P::Version], P::Platform),
+          F::Iterator => nested_state_machine(
+            S::Platform,
+            P::Platform,
+            Dict\merge(
+              states_for_activity(
+                keyset[P::Version, P::Platform],
+                A::MakeBinaryPackage,
+                S::Platform.S::End,
+                S::Platform.S::End,
+              ),
+            ),
+          ),
+        ],
+      ],
+      states_for_activity(
+        keyset[P::BuildInput, P::Version, P::Results],
+        A::PublishBinaryPackages,
+        A::PublishSourceTarball.S::And.A::PublishDockerImages,
+        S::BuildAndPublishLinux.S::End,
+      ),
+      dict[
+        A::PublishSourceTarball.S::And.A::PublishDockerImages => dict[
+          F::Type => T::Parallel,
+          F::Parameters => params(P::BuildInput, P::Version),
+          F::Branches => vec[
+            nested_state_machine(
+              A::PublishSourceTarball,
+              null,
+              states_for_activity(
+                keyset[P::Version],
+                A::PublishSourceTarball,
+                A::PublishSourceTarball.S::End,
+                A::PublishSourceTarball.S::End,
+              ),
+            ),
+            nested_state_machine(
+              A::PublishDockerImages,
+              null,
+              states_for_activity(
+                keyset[P::Version],
+                A::PublishDockerImages,
+                A::PublishDockerImages.S::End,
+                A::PublishDockerImages.S::End,
+              ),
+            ),
+          ],
+        ],
+      ],
+    ),
+  );
+}
+
+function macos_branch(): StateMachine {
+  return nested_state_machine(
+    A::BuildAndPublishMacOS,
+    null,
+    states_for_activity(
+      keyset[P::Version],
+      A::BuildAndPublishMacOS,
+      A::BuildAndPublishMacOS.S::End,
+      A::BuildAndPublishMacOS.S::End,
     ),
   );
 }
@@ -367,65 +463,14 @@ function main_branch(): StateMachine {
             states_for_activity(
               keyset[P::Version],
               A::MakeSourceTarball,
-              S::GetPlatformsForVersion,
+              S::BuildAndPublishLinux.S::And.A::BuildAndPublishMacOS,
               S::Version.S::End,
             ),
             dict[
-              S::GetPlatformsForVersion => dict[
-                F::Type => T::Task,
-                F::ResultPath => path('platforms'),
-              ],
-              S::ForEach.S::Platform => dict[
-                F::Type => T::Map,
-                F::ItemsPath => path('platforms'),
-                F::Parameters =>
-                  map_params(keyset[P::BuildInput, P::Version], P::Platform),
-                F::Iterator => nested_state_machine(
-                  S::Platform,
-                  P::Platform,
-                  Dict\merge(
-                    states_for_activity(
-                      keyset[P::Version, P::Platform],
-                      A::MakeBinaryPackage,
-                      S::Platform.S::End,
-                      S::Platform.S::End,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-            states_for_activity(
-              keyset[P::BuildInput, P::Version, P::Results],
-              A::PublishBinaryPackages,
-              A::PublishSourceTarball.S::And.A::PublishDockerImages,
-              S::Version.S::End,
-            ),
-            dict[
-              A::PublishSourceTarball.S::And.A::PublishDockerImages => dict[
+              S::BuildAndPublishLinux.S::And.A::BuildAndPublishMacOS => dict[
                 F::Type => T::Parallel,
                 F::Parameters => params(P::BuildInput, P::Version),
-                F::Branches => vec[
-                  nested_state_machine(
-                    A::PublishSourceTarball,
-                    null,
-                    states_for_activity(
-                      keyset[P::Version],
-                      A::PublishSourceTarball,
-                      A::PublishSourceTarball.S::End,
-                      A::PublishSourceTarball.S::End,
-                    ),
-                  ),
-                  nested_state_machine(
-                    A::PublishDockerImages,
-                    null,
-                    states_for_activity(
-                      keyset[P::Version],
-                      A::PublishDockerImages,
-                      A::PublishDockerImages.S::End,
-                      A::PublishDockerImages.S::End,
-                    ),
-                  ),
-                ],
+                F::Branches => vec[linux_branch(), macos_branch()],
               ],
             ],
           ),
