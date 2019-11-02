@@ -16,6 +16,7 @@ def lambda_handler(event, context=None):
     if (
       'success' in vr.get('PublishBinaryPackages', {}) or
       'success' in vr.get('PublishSourceTarball', {}) or
+      'success' in vr.get('BuildAndPublishMacOS', {}) or
       # nightlies are published directly from MakeSourceTarball
       is_nightly(version) and 'success' in vr.get('MakeSourceTarball', {})
     ):
