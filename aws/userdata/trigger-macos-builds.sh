@@ -36,6 +36,11 @@ git config user.name "HHVM Homebrew Bot (AWS)"
 git config user.email opensource+hhvm-homebrew-bot@fb.com
 git checkout build-triggers
 
+# Clean up old build metadata files.
+MONTH_BEFORE_LAST=$(date +%Y-%m --date '40 days ago')
+find builds/ -name "${MONTH_BEFORE_LAST}-*.sh" | xargs git rm -f || true
+
+# Then add the new metadata file.
 TRIGGER_FILE="builds/$(date +%Y-%m-%d_%H-%M-%S)_$RANDOM.sh"
 
 echo "
