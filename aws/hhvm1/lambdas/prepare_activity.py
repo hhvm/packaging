@@ -9,7 +9,7 @@ import random
 from time import sleep
 
 import activities
-from common import env_for_version, fake_ec2, skip_ec2
+from common import env_for_version, fake_ec2, format_env, skip_ec2
 
 def lambda_handler(event, context=None):
   activity_name = event['activity']
@@ -39,12 +39,12 @@ def lambda_handler(event, context=None):
     env['DISTRO'] = event['platform']
 
   env.update(env_for_version(version))
-  env.update(activity.env)
+  env.update(activity.task_env())
 
   return {
     'skip': False,
     'taskInput': {
       'name': task_name,
-      'env': '\n'.join([f'{var}="{value}"' for var, value in env.items()]),
+      'env': format_env(env),
     },
   }

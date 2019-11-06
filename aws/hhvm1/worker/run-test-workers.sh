@@ -33,6 +33,7 @@ ACTIVITIES=(
   "arn:aws:states:us-west-2:223121549624:activity:hhvm-publish-binary-packages"
   "arn:aws:states:us-west-2:223121549624:activity:hhvm-publish-source-tarball"
   "arn:aws:states:us-west-2:223121549624:activity:hhvm-publish-docker-images"
+  "arn:aws:states:us-west-2:223121549624:activity:hhvm-build-and-publish-macos"
 )
 
 for ARN in "${ACTIVITIES[@]}"; do

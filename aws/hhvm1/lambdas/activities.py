@@ -18,7 +18,6 @@ class Activity:
   script_name = None
   # Optional.
   init_script = None
-  env = {}
 
   def __init__(self, event):
     self.event = event
@@ -29,6 +28,16 @@ class Activity:
 
   def platform(self):
     return self.event['platform']
+
+  def worker_env(self):
+    # Subclasses can provide extra environment variables for worker.sh (will
+    # also be available from self.init_script)
+    return {}
+
+  def task_env(self):
+    # Subclasses can provide extra environment variables for the individual
+    # task's script (self.script_name)
+    return {}
 
   def needs_ec2_worker(self):
     # Subclasses may override.
@@ -81,6 +90,7 @@ class Activity:
         ACTIVITY_ARN="{self.activity_arn}"
         SCRIPT_URL="{script_url}"
         INIT_URL="{init_url}"
+        {common.format_env(self.worker_env())}
         {common.fetch('aws/hhvm1/worker/worker.sh')}
       ''',
     }
@@ -153,7 +163,9 @@ class PublishBinaryPackages(Activity):
   activity_arn = 'arn:aws:states:us-west-2:223121549624:activity:hhvm-publish-binary-packages'
   script_name = 'update-repos.sh'
   init_script = 'aws/hhvm1/worker/init/update-repos.sh'
-  env = {'REPOS_ONLY': '1'}
+
+  def task_env(self):
+    return {'REPOS_ONLY': '1'}
 
   def should_run(self):
     return any_unpublished({
@@ -202,7 +214,9 @@ class PublishDockerImages(Activity):
   ec2_iam_arn = 'arn:aws:iam::223121549624:instance-profile/hhvm-repo-builders'
   activity_arn = 'arn:aws:states:us-west-2:223121549624:activity:hhvm-publish-docker-images'
   script_name = 'update-repos.sh'
-  env = {'DOCKER_ONLY': '1'}
+
+  def task_env(self):
+    return {'DOCKER_ONLY': '1'}
 
   def docker_tags(self, repo):
     return {
@@ -219,3 +233,42 @@ class PublishDockerImages(Activity):
       self.version() not in self.docker_tags('hhvm') or
       self.version() not in self.docker_tags('hhvm-proxygen')
     )
+
+
+class BuildAndPublishMacOS(Activity):
+  ec2_iam_arn = 'arn:aws:iam::223121549624:instance-profile/hhvm-macos-builds-triggerer'
+  activity_arn = 'arn:aws:states:us-west-2:223121549624:activity:hhvm-build-and-publish-macos'
+  script_name = 'trigger-macos-builds.sh'
+
+  def platforms_to_build(self):
+    requested = common.Config.macos_versions.keys()
+    if self.event['buildInput']['platforms']:
+      requested = {
+        p for p in requested if p in self.event['buildInput']['platforms']
+      }
+
+    return set() if not requested else {
+      platform
+        for platform, status in common.build_statuses(self.version()).items()
+        if status != 'succeeded' and platform in requested
+    }
+
+  def worker_env(self):
+    return {'SKIP_SEND_TASK_SUCCESS': '1'}
+
+  def task_env(self):
+    platforms = self.platforms_to_build()
+    if len(platforms) == len(common.Config.macos_versions):
+      return {}  # build all platforms
+    elif len(platforms) == 1:
+      return {'PLATFORM': common.Config.macos_versions[next(iter(platforms))]}
+    else:
+      # can't happen if Config.macos_versions has <= 2 elements and should_run()
+      # returned True
+      raise Exception(
+        'we can only build all platforms or a single platform, but got: ' +
+        ', '.join(platforms)
+      )
+
+  def should_run(self):
+    return bool(self.platforms_to_build())
