@@ -29,8 +29,11 @@ class Config:
 def is_nightly(version):
   return re.fullmatch(r'[0-9]{4}\.[0-9]{2}\.[0-9]{2}', version)
 
-def is_binary_platform(platform):
+def is_linux(platform):
   return re.fullmatch(r'(debian|ubuntu)-[0-9\.]+-[a-z]+', platform)
+
+def is_binary_platform(platform):
+  return is_linux(platform) or platform in Config.macos_versions
 
 def branch(version):
   if not version or is_nightly(version):

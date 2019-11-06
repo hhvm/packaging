@@ -27,6 +27,7 @@ class Test(unittest.TestCase):
   def test_parse_input(self):
     debian = 'debian-9-stretch'
     ubuntu = 'ubuntu-19.04-disco'
+    macos = next(iter(Config.macos_versions))
     self.assertEqual(
       parse_input.lambda_handler({}),
       {
@@ -65,11 +66,13 @@ class Test(unittest.TestCase):
       },
     )
     self.assertEqual(
-      parse_input.lambda_handler(f'4.26.1 foo {ubuntu} --skip-ec2 {debian}'),
+      parse_input.lambda_handler(
+        f'4.26.1 {macos} foo {ubuntu} --skip-ec2 {debian}'
+      ),
       {
         'buildInput': {
           'versions': ['4.26.1'],
-          'platforms': [ubuntu, debian],
+          'platforms': [macos, ubuntu, debian],
           'activities': [],
           'debug': 'skip_ec2',
         },
@@ -628,7 +631,7 @@ class Test(unittest.TestCase):
 
   def test_build_and_publish_macos(self):
     future = (date.today() + timedelta(days=2)).strftime('%Y.%m.%d')
-    macos = next(iter(Config.macos_versions.keys()))
+    macos = next(iter(Config.macos_versions))
 
     activity = activities.BuildAndPublishMacOS(
       {'version': future, 'buildInput': {'platforms': []}}

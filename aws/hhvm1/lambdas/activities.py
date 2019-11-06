@@ -171,7 +171,7 @@ class PublishBinaryPackages(Activity):
     return any_unpublished({
       platform: status
         for platform, status in common.build_statuses(self.version()).items()
-        if common.is_binary_platform(platform)
+        if common.is_linux(platform)
     })
 
   def ec2_params(self):
