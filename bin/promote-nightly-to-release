@@ -18,6 +18,21 @@ if ! echo "$VERSION" | grep -q -e '^[0-9]\+\.[0-9]\+$'; then
   echo "Only specify MAJOR.MINOR version, not MAJOR.MINOR.RELEASE"
   exit 1
 fi
+if [ "$(<.git/HEAD)" != "ref: refs/heads/master" ]; then
+  echo "Run from master branch."
+  exit 1
+fi
+if ! git diff --exit-code >/dev/null; then
+  echo "Uncommitted changes, bailing out."
+  exit 1
+fi
+
+echo "Fetching any updates to packaging repo..."
+git fetch >/dev/null
+if ! git diff --exit-code origin/master..HEAD >/dev/null; then
+  echo "Current branch is out of sync with origin/master, bailing out."
+  exit 1
+fi
 
 MAJOR=$(echo "$VERSION" | cut -f1 -d.)
 MINOR=$(echo "$VERSION" | cut -f2 -d.)
