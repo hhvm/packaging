@@ -29,3 +29,9 @@ dump_builds hhvm-failed-builds
 echo "Succeeded builds:"
 
 dump_builds hhvm-succeeded-builds
+
+echo "To use an image:"
+
+echo '  $(aws ecr get-login --no-include-email)'
+echo '  docker pull IMAGE_NAME'
+echo '  docker run -it IMAGE_NAME /bin/bash -l'
