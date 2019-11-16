@@ -8,3 +8,4 @@
 
 mkdir debian/build-deps/
 cp /opt/hhvm-packaging/build-deps/build-gcc debian/build-deps/
+cp /opt/hhvm-packaging/build-deps/build-cmake debian/build-deps/

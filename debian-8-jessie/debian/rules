@@ -7,6 +7,7 @@ include /usr/share/dpkg/pkg-info.mk
 export PATH := /opt/hhvm-build-deps/bin:$(PATH)
 
 override_dh_auto_configure:
+	debian/build-deps/build-cmake
 	debian/build-deps/build-gcc
 	dh_auto_configure -- \
  	-DCMAKE_INSTALL_PREFIX=/opt/hhvm/$(DEB_VERSION_UPSTREAM) \
