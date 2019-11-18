@@ -1,0 +1,85 @@
+#!/bin/bash
+
+PREFIX="arn:aws:states:us-west-2:223121549624"
+SM="$PREFIX:stateMachine:one-state-machine-to-rule-them-all"
+EXEC="$PREFIX:execution:one-state-machine-to-rule-them-all"
+
+case "$1" in
+  "")
+    # no args: show everything (list + latest output)
+    SHOW_LIST=true
+    SHOW_OUTPUT=true
+    ;;
+  l|list|-l|--list)
+    # show list only
+    SHOW_LIST=true
+    SHOW_OUTPUT=false
+    ;;
+  *)
+    # execution name was specified, show only the relevant output
+    SHOW_LIST=false
+    SHOW_OUTPUT=true
+    ;;
+esac
+
+if $SHOW_LIST; then
+  aws stepfunctions list-executions \
+    --max-items 10 \
+    --output table \
+    --query "executions[*].{name:name,status:status}" \
+    --state-machine-arn "$SM"
+
+  echo
+  echo "Use '$0 <name>' to get output of a specific execution."
+fi
+
+if ! $SHOW_OUTPUT; then
+  exit 0
+fi
+
+NAME="$1"
+if [ -z "$NAME" ]; then
+  # missing name: use latest
+  NAME=$(
+    aws stepfunctions list-executions \
+      --max-items 1 \
+      --output text \
+      --query "executions[*].name" \
+      --state-machine-arn "$SM" \
+      | head -n 1
+  )
+fi
+
+JSON=$(aws stepfunctions describe-execution --execution-arn "$EXEC:$NAME")
+STATUS=$(echo "$JSON" | jq -r .status)
+
+echo
+echo "Execution '$NAME' $STATUS."
+echo
+
+if [ "$STATUS" == "SUCCEEDED" ]; then
+  echo "$JSON" | jq -r .output | jq .
+
+elif [ "$STATUS" == "FAILED" ]; then
+  EVENTS=$(
+    aws stepfunctions get-execution-history \
+      --reverse-order \
+      --max-items 30 \
+      --execution-arn "$EXEC:$NAME"
+  )
+
+  # dig out the error message
+  echo "$EVENTS" | jq -r '
+    .events[] |
+    select(.type == "ExecutionFailed") |
+    .executionFailedEventDetails.cause
+  ' | jq -r .errorMessage | sed 's/$/\n/'
+
+  # dig out the output (input to the final step)
+  FINAL_STEP="arn:aws:lambda:us-west-2:223121549624:function:hhvm1-check-for-failures"
+  echo "$EVENTS" | jq -r "
+    .events[].lambdaFunctionScheduledEventDetails |
+    select(.resource == \"$FINAL_STEP\") |
+    .input
+  " | jq .
+fi
