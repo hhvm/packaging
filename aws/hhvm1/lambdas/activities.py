@@ -149,15 +149,6 @@ class MakeBinaryPackage(Activity):
     return params
 
 
-def any_unpublished(statuses):
-  if any(s == 'not_built' for s in statuses.values()):
-    raise Exception(
-      'cannot publish because there are unbuilt packages: ' +
-      ', '.join(p for p in statuses if statuses[p] == 'not_built')
-    )
-  return any(s == 'built_not_published' for s in statuses.values())
-
-
 class PublishBinaryPackages(Activity):
   ec2_iam_arn = 'arn:aws:iam::223121549624:instance-profile/hhvm-repo-builders'
   activity_arn = 'arn:aws:states:us-west-2:223121549624:activity:hhvm-publish-binary-packages'
@@ -168,11 +159,11 @@ class PublishBinaryPackages(Activity):
     return {'REPOS_ONLY': '1'}
 
   def should_run(self):
-    return any_unpublished({
-      platform: status
+    return any(
+      status == 'built_not_published'
         for platform, status in common.build_statuses(self.version()).items()
         if common.is_linux(platform)
-    })
+    )
 
   def ec2_params(self):
     params = super().ec2_params()
@@ -203,11 +194,13 @@ class PublishSourceTarball(Activity):
   script_name = 'publish-release-source.sh'
 
   def should_run(self):
-    return not common.is_nightly(self.version()) and any_unpublished({
-      platform: status
-        for platform, status in common.build_statuses(self.version()).items()
-        if platform in {'source', 'source_gpg'}
-    })
+    if common.is_nightly(self.version()):
+      return False
+    statuses = common.build_statuses(self.version())
+    return (
+      statuses.get('source') == 'built_not_published' or
+      statuses.get('source_gpg') == 'built_not_published'
+    )
 
 
 class PublishDockerImages(Activity):

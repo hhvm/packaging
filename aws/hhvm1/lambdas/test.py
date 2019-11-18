@@ -230,20 +230,35 @@ class Test(unittest.TestCase):
       False
     )
 
+    # we don't publish if nothing is "built_not_published"
     with patch('common.build_statuses', return_value={
       'ubuntu-18.04-bionic': 'not_built',
       'source_gpg': 'not_built',
     }):
-      with self.assertRaisesRegex(
-        Exception,
-        'cannot publish because there are unbuilt packages: ubuntu-18.04-bionic'
-      ):
-        activities.PublishBinaryPackages({'version': '4.27.0'}).should_run()
-      with self.assertRaisesRegex(
-        Exception,
-        'cannot publish because there are unbuilt packages: source_gpg'
-      ):
-        activities.PublishSourceTarball({'version': '4.27.0'}).should_run()
+      self.assertEqual(
+        activities.PublishBinaryPackages({'version': '4.27.0'}).should_run(),
+        False
+      )
+      self.assertEqual(
+        activities.PublishSourceTarball({'version': '4.27.0'}).should_run(),
+        False
+      )
+
+    # we publish even if not everything is built
+    with patch('common.build_statuses', return_value={
+      'debian-8-jessie': 'not_built',
+      'ubuntu-18.04-bionic': 'built_not_published',
+      'source': 'not_built',
+      'source_gpg': 'built_not_published',
+    }):
+      self.assertEqual(
+        activities.PublishBinaryPackages({'version': '4.27.0'}).should_run(),
+        True
+      )
+      self.assertEqual(
+        activities.PublishSourceTarball({'version': '4.27.0'}).should_run(),
+        True
+      )
 
     with patch('common.build_statuses', return_value={
       'ubuntu-18.04-bionic': 'built_not_published',
@@ -274,6 +289,14 @@ class Test(unittest.TestCase):
         activities.PublishSourceTarball({'version': '4.27.0'}).should_run(),
         True
       )
+
+    # we shouldn't do a useless build_statuses() API call for nightlies
+    with patch('common.build_statuses') as mock_function:
+      self.assertEqual(
+        activities.PublishSourceTarball({'version': future}).should_run(),
+        False
+      )
+      self.assertEqual(mock_function.called, False)
 
     self.assertEqual(
       activities.PublishDockerImages({'version': '4.27.0'}).should_run(),
