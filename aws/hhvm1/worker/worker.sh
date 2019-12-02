@@ -112,10 +112,6 @@ while true; do
 
       WRAPPER_SCRIPT="./task_${TASK_NAME}_$(date +%Y-%m-%d_%H-%M-%S).sh"
       echo "#!/bin/bash
-        shutdown() {
-          echo skipping shutdown \$@
-        }
-        SKIP_CLOUDWATCH=1
         TASK_TOKEN=$(printf %q "$TASK_TOKEN")
         $TASK_ENV
         source process-task.sh" > $WRAPPER_SCRIPT

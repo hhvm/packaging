@@ -17,24 +17,6 @@ if ! gpg --list-secret-key opensource+hhvm@fb.com >/dev/null 2>/dev/null; then
   aws kms decrypt --ciphertext-blob "fileb:///opt/hhvm-packaging/aws/gpg-key.kms-ciphertext" --query Plaintext --output text | base64 --decode | gpg --import
 fi
 
-MOUNTED=""
-if [ ! -e /mnt/dl.hhvm.com ]; then
-  # See http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html#instancedata-data-retrieval
-  INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
-  # We keep a shared XFS volume as the source of truth to avoid having to
-  # redownload from S3 every day, which can take a *really* long time.
-  VOLUME_ID="vol-096d2c45d13d3a865"
-  aws ec2 attach-volume \
-    --device /dev/sdf \
-    --instance-id "$INSTANCE_ID" \
-    --volume-id "$VOLUME_ID"
-  sleep 10 # wait for EC2 to attach
-
-  mkdir /mnt/dl.hhvm.com
-  mount /dev/xvdf /mnt/dl.hhvm.com
-  MOUNTED="1"
-fi
-
 aws s3 sync s3://hhvm-downloads/ /mnt/dl.hhvm.com/ --exclude '*nightly*' --exclude "source/nightlies/*" --exclude "homebrew-bottles/*"
 mkdir -p "/var/hhvm-scratch/${VERSION}"
 aws s3 sync "s3://hhvm-scratch/${VERSION}" "/var/hhvm-scratch/${VERSION}"
@@ -52,8 +34,3 @@ export VERSION
   MONTH_BEFORE_LAST=$(date +%Y.%m --date '40 days ago')
   find source/nightlies/ debian/ ubuntu/ -name "*${MONTH_BEFORE_LAST}*" | xargs rm -f
 )
-
-if [ -n "$MOUNTED" ]; then
-  # only umount here if this script mounted it
-  umount /mnt/dl.hhvm.com
-fi
