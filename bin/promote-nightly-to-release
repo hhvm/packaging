@@ -111,7 +111,7 @@ git clone git@github.com:hhvm/hhvm-docker.git
 )
 
 statusline "Triggering Linux builds..."
-"$PKGDIR/bin/qaz" "${VERSION}.0"
+"$PKGDIR/bin/build-on-aws" "${VERSION}.0"
 
 statusline "Cleaning up..."
 rm -rf "${SCRATCHDIR}"

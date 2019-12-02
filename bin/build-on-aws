@@ -7,6 +7,7 @@
 # LICENSE file in the root directory of this source tree.
 
 echo "ONE STATE MACHINE TO RULE THEM ALL"
+echo "Runs any subset of build steps for any combination of versions + distros."
 echo
 
 if [ -z "$1" -o "$1" == "--help" ]; then

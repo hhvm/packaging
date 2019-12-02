@@ -8,7 +8,7 @@ other steps, either automatically (it will check and not do anything that's
 already done) or manually (it accepts any combination of versions, distros and
 step names as input).
 
-See `bin/qaz` for usage instructions.
+See `bin/build-on-aws` for usage instructions.
 
 
 ## Architecture overview
