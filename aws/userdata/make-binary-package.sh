@@ -7,7 +7,6 @@
 # LICENSE file in the root directory of this source tree.
 
 set -ex
-shutdown -h 180 # auto-shutdown after 3 hours
 
 export TZ=UTC
 
@@ -19,21 +18,6 @@ if [ \
 ]; then
   echo "DISTRO, VERSION, S3_SOURCE, and IS_NIGHTLY must all be set"
   exit 1
-fi
-
-if [ -z "$SKIP_CLOUDWATCH" ]; then
-  CLOUDWATCH_CONFIG_FILE="$(mktemp)"
-  cat > "${CLOUDWATCH_CONFIG_FILE}" <<EOF
-[general]
-state_file = /var/awslogs/state/agent-state
-
-[/var/log/cloud-init-output.log]
-file = /var/log/cloud-init-output.log
-log_group_name = hhvm-binary-package-builds/cloud-init-output.log
-log_stream_name = $(date "+%Y/%m/%d")/hhvm-${VERSION}_${DISTRO}_{instance_id}
-EOF
-  curl -O https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
-  python3 awslogs-agent-setup.py -n -r us-west-2 -c "${CLOUDWATCH_CONFIG_FILE}"
 fi
 
 SOURCE_BASENAME="$(basename "$S3_SOURCE")"
@@ -71,7 +55,6 @@ if ! bin/make-package-in-throwaway-container "$DISTRO"; then
   docker commit "${CONTAINER_ID}" "${IMAGE_NAME}"
   # Push to ECR so we can download later
   docker push "${IMAGE_NAME}"
-  shutdown -h +1
   exit 1
 fi
 
@@ -79,5 +62,3 @@ rm "out/${SOURCE_BASENAME}"
 
 aws s3 cp --include '*' --recursive out/ s3://hhvm-scratch/${VERSION}/${DISTRO}/
 aws s3 sync nodist/ "s3://hhvm-nodist/${DISTRO}/"
-
-shutdown -h +1
