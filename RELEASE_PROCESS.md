@@ -3,8 +3,8 @@ Prerequisites:
 - Write access to the HHVM staging repository
 - Write access to the hhvm.com repository
 - Write access to the hhvm-docker repository
-- correctly configured Azure DevOps CLI client (see below)
-- ssh access to the MacOS build machines (optional)
+- correctly configured Azure DevOps CLI client (optional, to track progress or
+  deal with issues)
 - access to HHVM FB page and Twitter accounts
 
 Creating a new .0 release
@@ -22,14 +22,13 @@ Releases are generally on Mondays, from Sunday's nightly builds.
      supported platforms (e.g. see https://hhvm.com/api/build-status/2019.07.22)
    - Tools and libraries should be passing on the nightlies (see
      https://travis-ci.org/hhvm)
-1. Create the tags and start the linux builds:
+1. Create the tags and start the builds:
    `bin/promote-nightly-to-release YYYY.MM.DD 4.x` - note that it's `4.x`, not
    `4.x.0`. For example, `bin/promote-nightly-to-release 2019.07.22 4.15`
-1. Open the AWS step functions dashboard, and wait for the source tarballs to
-   be created. `hhvm-build` is the most interesting step function at this stage;
-   `hhvm-build-and-publish` runs both `hhvm-build` and `hhvm-publish-release`.
-1. Start the MacOS builds: `bin/make-multiple-releases-on-azure 4.x.0`
-   - in case of problems, use MacOS build machines to investigate (see below)
+1. You can track progress in the AWS step functions dashboard. MacOS build
+   output is available in the Azure web interface (see below). Output of
+   finished (successful or failed) builds can also be fetched using
+   `bin/aws-build-status`.
 1. While waiting for the builds (linux and mac), write the blog post:
    1. Use existing posts as a template.
    1. Use `hhast` announcements from the previous week as guide for if codemods
@@ -62,21 +61,8 @@ Creating a new .z release
 1. The AWS step functions are now running; proceed with release notes and MacOS
    builds as for `.0` releases; do not update `version.h` in master.
 
-Using MacOS build machines
-==========================
-
-1. ssh to the machine for the correct platform (mojave, high sierra)
-1. in `screen` or similar, `sudo -i -u hhvmoss`
-1. `cd ~/code/homebrew-hhvm`; this is a clone of the `code/homebrew-hhvm`
-  repository
-1. `git fetch; git reset --hard origin/master`
-1. Run `./build-release.sh 4.x.0`
-1. Wait for both to complete; binaries are automatically uploaded, and recipe
-  changes are automatically pushed
-
-
-Experimental: Building A MacOS Release On Azure
-===============================================
+Building A MacOS Release On Azure
+=================================
 
 This lets us build many in parallel, instead of restricting us to our
 permanent worker machines.
@@ -94,6 +80,9 @@ Initial Setup
 
 General Use
 -----------
+
+Builds are triggered automatically from the AWS step function, so the commands
+below should only be needed in case of issues.
 
 Starting a job:
 
