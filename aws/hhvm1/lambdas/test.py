@@ -148,6 +148,8 @@ class Test(unittest.TestCase):
       f'        SCRIPT_URL="https://raw.githubusercontent.com/{org}/packaging/'
         f'{branch}/aws/userdata/make-binary-package.sh"\n'
       '        INIT_URL=""\n'
+      f'        AFTER_TASK_URL="https://raw.githubusercontent.com/{org}/packaging/'
+        f'{branch}/aws/hhvm1/worker/after-task/make-binary-package.sh"\n'
       '        \n'
       '        #!/bin/bash\n'
     )
@@ -166,6 +168,7 @@ class Test(unittest.TestCase):
         f'{branch}/aws/userdata/update-repos.sh"\n'
       f'        INIT_URL="https://raw.githubusercontent.com/{org}/packaging/'
         f'{branch}/aws/hhvm1/worker/init/update-repos.sh"\n'
+      '        AFTER_TASK_URL=""\n'
       '        \n'
       '        #!/bin/bash\n'
     )
@@ -183,7 +186,28 @@ class Test(unittest.TestCase):
       f'        SCRIPT_URL="https://raw.githubusercontent.com/{org}/packaging/'
         f'{branch}/aws/userdata/trigger-macos-builds.sh"\n'
       '        INIT_URL=""\n'
+      '        AFTER_TASK_URL=""\n'
       '        SKIP_SEND_TASK_SUCCESS="1"\n'
+      '        #!/bin/bash\n'
+    )
+    self.assertEqual(
+      ec2_params['UserData'][:len(expected_prefix)],
+      expected_prefix
+    )
+
+    # fake_ec2
+    ec2_params = activities.PublishBinaryPackages(
+      {'buildInput': {'debug': 'fake_ec2'}}
+    ).ec2_params()
+    expected_prefix = (
+      '#!/bin/bash\n'
+      '        ACTIVITY_ARN="arn:aws:states:us-west-2:223121549624:activity:'
+        'hhvm-publish-binary-packages"\n'
+      f'        SCRIPT_URL="https://raw.githubusercontent.com/{org}/packaging/'
+        f'{branch}/aws/hhvm1/worker/dummy-task.sh"\n'
+      '        INIT_URL=""\n'
+      '        AFTER_TASK_URL=""\n'
+      '        \n'
       '        #!/bin/bash\n'
     )
     self.assertEqual(

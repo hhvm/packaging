@@ -18,6 +18,7 @@ class Activity:
   script_name = None
   # Optional.
   init_script = None
+  after_task_script = None
 
   def __init__(self, event):
     self.event = event
@@ -36,7 +37,7 @@ class Activity:
 
   def task_env(self):
     # Subclasses can provide extra environment variables for the individual
-    # task's script (self.script_name)
+    # task's script (self.script_name and self.after_task_script)
     return {}
 
   def needs_ec2_worker(self):
@@ -63,7 +64,16 @@ class Activity:
       'aws/hhvm1/worker/dummy-task.sh' if self.fake_ec2
       else 'aws/userdata/' + self.script_name
     )
-    init_url = common.url(self.init_script) if self.init_script else ''
+    init_url = (
+      common.url(self.init_script)
+        if self.init_script and not self.fake_ec2
+        else ''
+    )
+    after_task_url = (
+      common.url(self.after_task_script)
+        if self.after_task_script and not self.fake_ec2
+        else ''
+    )
     return {
       'ImageId': 'ami-6e1a0117',  # ubuntu 16.04
       'MaxCount': 1,
@@ -90,6 +100,7 @@ class Activity:
         ACTIVITY_ARN="{self.activity_arn}"
         SCRIPT_URL="{script_url}"
         INIT_URL="{init_url}"
+        AFTER_TASK_URL="{after_task_url}"
         {common.format_env(self.worker_env())}
         {common.fetch('aws/hhvm1/worker/worker.sh')}
       ''',
@@ -129,6 +140,7 @@ class MakeBinaryPackage(Activity):
   ec2_iam_arn = 'arn:aws:iam::223121549624:instance-profile/hhvm-binary-package-builder'
   activity_arn = 'arn:aws:states:us-west-2:223121549624:activity:hhvm-make-binary-package'
   script_name = 'make-binary-package.sh'
+  after_task_script = 'aws/hhvm1/worker/after-task/make-binary-package.sh'
 
   def should_run(self):
     return common.build_status(self.version(), self.platform()) == 'not_built'

@@ -67,6 +67,10 @@ if [ -n "$INIT_URL" ]; then
   source init.sh
 fi
 
+if [ -n "$AFTER_TASK_URL" ]; then
+  curl --retry 5 "$AFTER_TASK_URL" > after-task.sh || fail
+fi
+
 PROCESSED_COUNT=0
 
 # Each poll is ~1 minute, so this is the approximate number of minutes we'll
@@ -118,6 +122,7 @@ while true; do
       chmod a+x $WRAPPER_SCRIPT
 
       if $WRAPPER_SCRIPT; then
+        TASK_SUCCESS="true"
         if [ -n "$SKIP_SEND_TASK_SUCCESS" ]; then
           echo "Task script succeeded but not reporting success from here."
         else
@@ -128,12 +133,26 @@ while true; do
       else
         # Note: Even if we can't succeed (SKIP_SEND_TASK_SUCCESS=1), we can
         # always fail. Such is life.
+        TASK_SUCCESS="false"
         try_really_hard aws stepfunctions send-task-failure \
           --task-token "$TASK_TOKEN" \
           --cause "{\"ec2\":\"$EC2_INSTANCE_ID\",\"time_sec\":\"$SECONDS\"}"
+      fi
+
+      if [ -e after-task.sh ]; then
+        WRAPPER_SCRIPT="./after_task_${TASK_NAME}_$(date +%Y-%m-%d_%H-%M-%S).sh"
+        echo "#!/bin/bash
+          SUCCESS='$TASK_SUCCESS'
+          $TASK_ENV
+          source after-task.sh" > $WRAPPER_SCRIPT
+        chmod a+x $WRAPPER_SCRIPT
+        $WRAPPER_SCRIPT
+      fi
+
+      if ! $TASK_SUCCESS; then
         # We don't know if the problem was with the task or with this worker,
         # so it's safer not to reuse the worker. Shut down and let any retries
-        # be picked by different workers.
+        # be picked up by different workers.
         fail
       fi
 
@@ -144,6 +163,7 @@ while true; do
 
       # Clean up anything that the task script may have created. TODO: Reusing
       # some of these may actually save time if we can do it safely.
+      docker rm -f $(docker ps -aq)
       rm -rf hhvm* ~/hhvm* /hhvm* /opt/hhvm* /tmp/hhvm* ~/.gnupg /var/out
 
       # Go wait for the next task (outer while loop).
