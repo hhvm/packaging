@@ -71,9 +71,11 @@ git submodule update --init --recursive
 # Delete stuff we dont' need
 find . -name '.git' | xargs rm -rf
 # ~ 500mb here
-rm -rf third-party/webscalesqlclient/src/{rocksdb,xtrabackup,rqg,mysql-test}
+rm -rf third-party/fb-mysql/mysql-5.6/{rocksdb,xtrabackup,rqg,mysql-test}
 # ~ 250mb here
 rm -rf hphp/test/{slow,quick,zend,zend7}
+# ~ 200mb here
+rm -rf third-party/boost/boost/libs/*/{doc,test}
 
 cd ..
 $TAR zcf "${OUT}/${PREFIX}-${VERSION}.tar.gz" "${PREFIX}-${VERSION}"
