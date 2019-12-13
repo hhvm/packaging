@@ -23,3 +23,9 @@ maybe_source() {
     source "$1"
   fi
 }
+
+# default config options, may be overriden by TEAM/REPO-specific config
+CLONE_TO_HOME=true
+
+maybe_source $DIR/$TEAM/config.inc.sh
+maybe_source $DIR/$TEAM/$REPO/config.inc.sh

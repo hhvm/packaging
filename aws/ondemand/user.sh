@@ -19,9 +19,11 @@ git config --global user.name "$GIT_NAME"
 git config --global user.email "$GIT_EMAIL"
 git config --global core.excludesfile /home/ubuntu/.gitignore_global
 
-cd /home/ubuntu/$REPO
-git checkout -b ondemand_$(date +%Y-%m-%d_%H%M) master
-git remote set-url origin git@github.com:$GITHUB_USER/$REPO.git
+if $CLONE_TO_HOME; then
+  cd "/home/ubuntu/$REPO"
+  git checkout -b "ondemand_$(date +%Y-%m-%d_%H%M)" master
+  git remote set-url origin "git@github.com:$GITHUB_USER/$REPO.git"
+fi
 ok
 
 # team and repo-specific init code
