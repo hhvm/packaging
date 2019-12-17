@@ -28,7 +28,7 @@ dump_builds hhvm-failed-builds
 
 echo "Succeeded builds:"
 
-dump_builds hhvm-succeeded-builds
+dump_builds hhvm-successful-builds
 
 echo "To use an image:"
 

@@ -9,7 +9,7 @@
 set -ex
 
 if $SUCCESS; then
-  IMAGE_NAME=hhvm-succeeded-builds
+  IMAGE_NAME=hhvm-successful-builds
 else
   IMAGE_NAME=hhvm-failed-builds
 fi
