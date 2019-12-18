@@ -40,9 +40,11 @@ echo "fs.inotify.max_user_watches=524288" >> /etc/sysctl.conf
 sysctl -p
 ok
 
-log "Cloning Git repository..."
-sudo -i -u ubuntu git clone git://github.com/$TEAM/$REPO.git
-ok
+if $CLONE_TO_HOME; then
+  log "Cloning Git repository..."
+  sudo -i -u ubuntu git clone git://github.com/$TEAM/$REPO.git
+  ok
+fi
 
 log "Installing required .deb packages..."
 ALL_PACKAGES="lolcat"
