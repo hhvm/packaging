@@ -117,6 +117,7 @@ if [ -z "$CONTAINER" ]; then
     docker run -dt \
       -v "$SRC_DIR:/opt/ondemand:ro" \
       -v "$SSH_AUTH_SOCK:/ssh-agent" \
+      --security-opt "seccomp=$SRC_DIR/facebook/hhvm/seccomp.json" \
       "$IMAGE" /bin/bash -l
   )"
   echo -e '\e[22m' # reset text color

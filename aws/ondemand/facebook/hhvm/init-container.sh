@@ -85,3 +85,6 @@ if [ ! -e "$BUILD_DIR/.git" ]; then
   popd
   rm -rf "$TMP_DIR"
 fi
+
+ln -s "$BUILD_DIR/obj-x86_64-linux-gnu/hphp/hhvm/hhvm" "$BUILD_DIR/hphp/hhvm/hhvm" \
+  || true
