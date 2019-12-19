@@ -52,6 +52,9 @@ cat >> /root/.bash_logout <<ANALBUMCOVER
   echo
 ANALBUMCOVER
 
+touch /root/.vimrc
+echo "syntax on" >> /root/.vimrc
+
 cat > /root/.gitignore_global <<ANALBUMCOVER
 debian
 obj-x86_64-linux-gnu
