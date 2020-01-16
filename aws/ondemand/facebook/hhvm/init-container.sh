@@ -42,6 +42,13 @@ cat >> /root/.bashrc <<ANALBUMCOVER
   echo
   echo -e "\e[92mYou are now inside the chosen Docker container.\e[39m Enjoy!"
   echo
+  echo -e "HHVM sources are in: \e[1m$BUILD_DIR\e[21m (\e[1m\$HHVM_DIR\e[21m)"
+  echo -e "Build output is in: \e[1m\$HHVM_DIR/obj-x86_64-linux-gnu\e[21m"
+  echo "Run \`make -j 8\` from the output directory after any changes."
+  echo
+  echo -e "Host machine's home directory is mouted at: \e[1m/home/ubuntu\e[21m"
+  echo "You can transfer files into/out of the container by copying them there."
+  echo
 ANALBUMCOVER
 
 touch /root/.bash_logout
