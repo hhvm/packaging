@@ -7,7 +7,7 @@
 import boto3
 
 from activities import Activity
-from common import skip_ec2
+from common import all_execution_events, skip_ec2
 
 def lambda_handler(event, context=None):
   if skip_ec2(event):
@@ -15,29 +15,11 @@ def lambda_handler(event, context=None):
     # repeat).
     return False
 
-  execution_arn = event['execution']
-  end_state = event['endState']
-
-  # Get all execution history events.
-  client = boto3.client('stepfunctions')
-
-  response = client.get_execution_history(
-    executionArn=execution_arn,
-    maxResults=1000,
-  )
-  events = response['events']
-
-  while 'nextToken' in response:
-    response = client.get_execution_history(
-      executionArn=execution_arn,
-      maxResults=1000,
-      nextToken=response['nextToken'],
-    )
-    events += response['events']
+  events = all_execution_events(event['execution'])
 
   # Quit (and don't repeat) if we've reached the end state.
   for e in events:
-    if e.get('stateEnteredEventDetails', {}).get('name') == end_state:
+    if e.get('stateEnteredEventDetails', {}).get('name') == event['endState']:
       return False
 
   # The actual health check: Find any activities that are scheduled but not

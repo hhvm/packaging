@@ -21,9 +21,9 @@ class Config:
   macos_versions = {
     # key: name as reported by build_statuses()
     # value: version as reported by sw_vers -productVersion | cut -d . -f 1,2
-    # note: activity.BuildAndPublishMacOS depends on this having at most 2 items
     'macos-high_sierra': '10.13',
     'macos-mojave': '10.14',
+    'macos-catalina': '10.15',
   }
 
 def is_nightly(version):
@@ -70,7 +70,7 @@ def env_for_version(version):
   return env
 
 def format_env(env):
-  return '\n'.join([f'{var}="{value}"' for var, value in env.items()])
+  return '\n'.join([f'{var}={value}' for var, value in env.items()])
 
 @functools.lru_cache()
 def build_statuses(version):
@@ -131,3 +131,19 @@ def normalize_results(results):
       normalized[state_name] = result
 
   return normalized
+
+def all_execution_events(execution_arn):
+  client = boto3.client('stepfunctions')
+  response = client.get_execution_history(
+    executionArn=execution_arn,
+    maxResults=1000,
+  )
+  events = response['events']
+  while 'nextToken' in response:
+    response = client.get_execution_history(
+      executionArn=execution_arn,
+      maxResults=1000,
+      nextToken=response['nextToken'],
+    )
+    events += response['events']
+  return events

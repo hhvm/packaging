@@ -264,16 +264,12 @@ class BuildAndPublishMacOS(Activity):
   def task_env(self):
     platforms = self.platforms_to_build()
     if len(platforms) == len(common.Config.macos_versions):
-      return {}  # build all platforms
-    elif len(platforms) == 1:
-      return {'PLATFORM': common.Config.macos_versions[next(iter(platforms))]}
+      return {'PLATFORMS': '("")'}  # build all platforms
     else:
-      # can't happen if Config.macos_versions has <= 2 elements and should_run()
-      # returned True
-      raise Exception(
-        'we can only build all platforms or a single platform, but got: ' +
-        ', '.join(platforms)
-      )
+      return {
+        'PLATFORMS': '("%s")' %
+          '" "'.join(sorted(common.Config.macos_versions[p] for p in platforms))
+      }
 
   def should_run(self):
     return bool(self.platforms_to_build())

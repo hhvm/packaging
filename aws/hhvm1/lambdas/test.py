@@ -187,7 +187,7 @@ class Test(unittest.TestCase):
         f'{branch}/aws/userdata/trigger-macos-builds.sh"\n'
       '        INIT_URL=""\n'
       '        AFTER_TASK_URL=""\n'
-      '        SKIP_SEND_TASK_SUCCESS="1"\n'
+      '        SKIP_SEND_TASK_SUCCESS=1\n'
       '        #!/bin/bash\n'
     )
     self.assertEqual(
@@ -380,7 +380,7 @@ class Test(unittest.TestCase):
             'S3_SOURCE="s3://hhvm-downloads/source/nightlies/'
               f'hhvm-nightly-{future}.tar.gz"\n'
             'PACKAGING_BRANCH="master"\n'
-            'DOCKER_ONLY="1"'
+            'DOCKER_ONLY=1'
           ),
         },
       }
@@ -626,7 +626,7 @@ class Test(unittest.TestCase):
     execution_arn = (
       'arn:aws:states:us-west-2:223121549624:execution:'
       'one-state-machine-to-rule-them-all:'
-      '--fake-ec2_4.27.1_4.-jjergus-2019-10-15-18-33'
+      '4.43.0-jjergus-2020-02-03-09-33'
     )
     self.assertEqual(
       health_check.lambda_handler({
@@ -678,7 +678,7 @@ class Test(unittest.TestCase):
 
   def test_build_and_publish_macos(self):
     future = (date.today() + timedelta(days=2)).strftime('%Y.%m.%d')
-    macos = next(iter(Config.macos_versions))
+    macos1, macos2 = list(Config.macos_versions.keys())[:2]
 
     activity = activities.BuildAndPublishMacOS(
       {'version': future, 'buildInput': {'platforms': []}}
@@ -688,17 +688,30 @@ class Test(unittest.TestCase):
       Config.macos_versions.keys()
     )
     self.assertEqual(activity.should_run(), True)
-    self.assertEqual(activity.task_env(), {})
+    self.assertEqual(activity.task_env(), {'PLATFORMS': '("")'})
 
     activity = activities.BuildAndPublishMacOS(
-      {'version': future, 'buildInput': {'platforms': [macos, 'ubuntu']}}
+      {'version': future, 'buildInput': {'platforms': [macos1, 'ubuntu']}}
     )
-    self.assertEqual(activity.platforms_to_build(), {macos})
+    self.assertEqual(activity.platforms_to_build(), {macos1})
     self.assertEqual(activity.should_run(), True)
     self.assertEqual(
       activity.task_env(),
-      {'PLATFORM': Config.macos_versions[macos]}
+      {'PLATFORMS': '("%s")' % Config.macos_versions[macos1]}
     )
+
+    if (len(Config.macos_versions) > 2):
+      activity = activities.BuildAndPublishMacOS(
+        {'version': future, 'buildInput': {'platforms': [macos1, macos2]}}
+      )
+      self.assertEqual(activity.platforms_to_build(), {macos1, macos2})
+      self.assertEqual(activity.should_run(), True)
+      self.assertEqual(
+        activity.task_env(),
+        {'PLATFORMS': '("{0}" "{1}")'.format(*sorted(
+          [Config.macos_versions[macos1], Config.macos_versions[macos2]]
+        ))}
+      )
 
     activity = activities.BuildAndPublishMacOS(
       {'version': future, 'buildInput': {'platforms': ['ubuntu']}}
@@ -713,7 +726,7 @@ class Test(unittest.TestCase):
     self.assertEqual(activity.should_run(), False)
 
     activity = activities.BuildAndPublishMacOS(
-      {'version': '4.29.0', 'buildInput': {'platforms': [macos]}}
+      {'version': '4.29.0', 'buildInput': {'platforms': [macos1]}}
     )
     self.assertEqual(activity.platforms_to_build(), set())
     self.assertEqual(activity.should_run(), False)
