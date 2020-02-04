@@ -4,23 +4,28 @@ PREFIX="arn:aws:states:us-west-2:223121549624"
 SM="$PREFIX:stateMachine:one-state-machine-to-rule-them-all"
 EXEC="$PREFIX:execution:one-state-machine-to-rule-them-all"
 
-case "$1" in
-  "")
-    # no args: show everything (list + latest output)
-    SHOW_LIST=true
-    SHOW_OUTPUT=true
-    ;;
-  l|list|-l|--list)
-    # show list only
-    SHOW_LIST=true
-    SHOW_OUTPUT=false
-    ;;
-  *)
-    # execution name was specified, show only the relevant output
-    SHOW_LIST=false
-    SHOW_OUTPUT=true
-    ;;
-esac
+SHOW_LIST=true
+SHOW_OUTPUT=true
+VERBOSE=false
+NAME=""
+
+while (( "$#" )); do
+  case "$1" in
+    l|list|-l|--list)
+      # show list only
+      SHOW_OUTPUT=false
+      ;;
+    v|verbose|-v|--verbose)
+      VERBOSE=true
+      ;;
+    *)
+      # execution name was specified, show only the relevant output
+      SHOW_LIST=false
+      NAME="$1"
+      ;;
+  esac
+  shift
+done
 
 if $SHOW_LIST; then
   aws stepfunctions list-executions \
@@ -37,7 +42,6 @@ if ! $SHOW_OUTPUT; then
   exit 0
 fi
 
-NAME="$1"
 if [ -z "$NAME" ]; then
   # missing name: use latest
   NAME=$(
@@ -57,8 +61,11 @@ echo
 echo "Execution '$NAME' $STATUS."
 echo
 
+# This Python script prints out the list of finished and unfinished tasks.
+"$(dirname "$0")/../aws/hhvm1/execution_status.py" "$EXEC:$NAME"
+
 if [ "$STATUS" == "SUCCEEDED" ]; then
-  echo "$JSON" | jq -r .output | jq .
+  FULL_OUTPUT=$(echo "$JSON" | jq -r .output | jq .)
 
 elif [ "$STATUS" == "FAILED" ]; then
   EVENTS=$(
@@ -77,9 +84,17 @@ elif [ "$STATUS" == "FAILED" ]; then
 
   # dig out the output (input to the final step)
   FINAL_STEP="arn:aws:lambda:us-west-2:223121549624:function:hhvm1-check-for-failures"
-  echo "$EVENTS" | jq -r "
-    .events[].lambdaFunctionScheduledEventDetails |
-    select(.resource == \"$FINAL_STEP\") |
-    .input
-  " | jq .
+  FULL_OUTPUT=$(
+    echo "$EVENTS" | jq -r "
+      .events[].lambdaFunctionScheduledEventDetails |
+      select(.resource == \"$FINAL_STEP\") |
+      .input
+    " | jq .
+  )
+fi
+
+if $VERBOSE; then
+  echo "$FULL_OUTPUT"
+else
+  echo "Use -v (--verbose) to see full build output."
 fi
