@@ -40,25 +40,23 @@ git checkout build-triggers
 MONTH_BEFORE_LAST=$(date +%Y-%m --date '40 days ago')
 find builds/ -name "${MONTH_BEFORE_LAST}-*.sh" | xargs git rm -f || true
 
-# Then add the new metadata file(s).
-for PLATFORM in "${PLATFORMS[@]}"; do
-  TRIGGER_FILE="builds/$(date +%Y-%m-%d_%H-%M-%S)_$RANDOM.sh"
+# Then add the new metadata file.
+TRIGGER_FILE="builds/$(date +%Y-%m-%d_%H-%M-%S)_$RANDOM.sh"
 
-  echo "
-    VERSION='$VERSION'
-    PLATFORM='$PLATFORM'
-    SKIP_IF_DONE=1
-    TASK_TOKEN=$(printf %q "$TASK_TOKEN")
-  " > "$TRIGGER_FILE"
+echo "
+  VERSION='$VERSION'
+  PLATFORM='$PLATFORM'
+  SKIP_IF_DONE=1
+  TASK_TOKEN=$(printf %q "$TASK_TOKEN")
+" > "$TRIGGER_FILE"
 
-  COMMIT_MESSAGE="[aws] build $VERSION"
-  if [ -n "$PLATFORM" ]; then
-    COMMIT_MESSAGE="$COMMIT_MESSAGE on $PLATFORM"
-  fi
+COMMIT_MESSAGE="[aws] build $VERSION"
+if [ -n "$PLATFORM" ]; then
+  COMMIT_MESSAGE="$COMMIT_MESSAGE on $PLATFORM"
+fi
 
-  git add "$TRIGGER_FILE"
-  git commit -m "$COMMIT_MESSAGE"
-done
+git add "$TRIGGER_FILE"
+git commit -m "$COMMIT_MESSAGE"
 
 git pull --rebase  # make race conditions less likely
 git push

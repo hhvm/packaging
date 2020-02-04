@@ -263,13 +263,15 @@ class BuildAndPublishMacOS(Activity):
 
   def task_env(self):
     platforms = self.platforms_to_build()
-    if len(platforms) == len(common.Config.macos_versions):
-      return {'PLATFORMS': '("")'}  # build all platforms
+    # right now we can only correctly trigger a build for a single platform or
+    # for all platforms
+    if len(platforms) == 1:
+      return {'PLATFORM': common.Config.macos_versions[next(iter(platforms))]}
     else:
-      return {
-        'PLATFORMS': '("%s")' %
-          '" "'.join(sorted(common.Config.macos_versions[p] for p in platforms))
-      }
+      # build all platforms (but the Azure pipeline will skip any that are
+      # already built)
+      return {}
+
 
   def should_run(self):
     return bool(self.platforms_to_build())

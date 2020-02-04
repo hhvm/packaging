@@ -187,7 +187,7 @@ class Test(unittest.TestCase):
         f'{branch}/aws/userdata/trigger-macos-builds.sh"\n'
       '        INIT_URL=""\n'
       '        AFTER_TASK_URL=""\n'
-      '        SKIP_SEND_TASK_SUCCESS=1\n'
+      '        SKIP_SEND_TASK_SUCCESS="1"\n'
       '        #!/bin/bash\n'
     )
     self.assertEqual(
@@ -380,7 +380,7 @@ class Test(unittest.TestCase):
             'S3_SOURCE="s3://hhvm-downloads/source/nightlies/'
               f'hhvm-nightly-{future}.tar.gz"\n'
             'PACKAGING_BRANCH="master"\n'
-            'DOCKER_ONLY=1'
+            'DOCKER_ONLY="1"'
           ),
         },
       }
@@ -688,7 +688,7 @@ class Test(unittest.TestCase):
       Config.macos_versions.keys()
     )
     self.assertEqual(activity.should_run(), True)
-    self.assertEqual(activity.task_env(), {'PLATFORMS': '("")'})
+    self.assertEqual(activity.task_env(), {})
 
     activity = activities.BuildAndPublishMacOS(
       {'version': future, 'buildInput': {'platforms': [macos1, 'ubuntu']}}
@@ -697,21 +697,15 @@ class Test(unittest.TestCase):
     self.assertEqual(activity.should_run(), True)
     self.assertEqual(
       activity.task_env(),
-      {'PLATFORMS': '("%s")' % Config.macos_versions[macos1]}
+      {'PLATFORM': Config.macos_versions[macos1]}
     )
 
-    if (len(Config.macos_versions) > 2):
-      activity = activities.BuildAndPublishMacOS(
-        {'version': future, 'buildInput': {'platforms': [macos1, macos2]}}
-      )
-      self.assertEqual(activity.platforms_to_build(), {macos1, macos2})
-      self.assertEqual(activity.should_run(), True)
-      self.assertEqual(
-        activity.task_env(),
-        {'PLATFORMS': '("{0}" "{1}")'.format(*sorted(
-          [Config.macos_versions[macos1], Config.macos_versions[macos2]]
-        ))}
-      )
+    activity = activities.BuildAndPublishMacOS(
+      {'version': future, 'buildInput': {'platforms': [macos1, macos2]}}
+    )
+    self.assertEqual(activity.platforms_to_build(), {macos1, macos2})
+    self.assertEqual(activity.should_run(), True)
+    self.assertEqual(activity.task_env(), {})
 
     activity = activities.BuildAndPublishMacOS(
       {'version': future, 'buildInput': {'platforms': ['ubuntu']}}

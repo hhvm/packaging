@@ -70,7 +70,7 @@ def env_for_version(version):
   return env
 
 def format_env(env):
-  return '\n'.join([f'{var}={value}' for var, value in env.items()])
+  return '\n'.join([f'{var}="{value}"' for var, value in env.items()])
 
 @functools.lru_cache()
 def build_statuses(version):

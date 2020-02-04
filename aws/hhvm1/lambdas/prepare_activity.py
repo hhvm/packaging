@@ -39,9 +39,6 @@ def lambda_handler(event, context=None):
     env['DISTRO'] = event['platform']
 
   env.update(env_for_version(version))
-  env = {name: f'"{value}"' for name, value in env.items()}
-
-  # Don't quote, as this may contain arrays etc.
   env.update(activity.task_env())
 
   return {
