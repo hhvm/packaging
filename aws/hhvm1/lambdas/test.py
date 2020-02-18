@@ -339,7 +339,6 @@ class Test(unittest.TestCase):
   def test_prepare_activity(self):
     self.assertEqual(
       prepare_activity.lambda_handler({
-        'buildInput': {'debug': 'skip_ec2'},
         'activity': 'MakeBinaryPackage',
         'version': '4.26.12345',
         'platform': 'ubuntu-18.04-bionic',
@@ -369,7 +368,9 @@ class Test(unittest.TestCase):
         'version': future,
       }),
       {
-        'skip': False,
+        # skip_ec2 causes this to be True, but the taskInput is still included
+        # since it's useful for debugging
+        'skip': True,
         'taskInput': {
           'name': f'PublishDockerImages-{future}',
           'env': (

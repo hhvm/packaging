@@ -24,6 +24,8 @@ def lambda_handler(event, context=None):
   # spread these out, in case several run at once
   sleep(random.uniform(1, 10))
 
+  # activity.should_run() often throws if previous steps didn't run, so we can't
+  # call it in any of the debug modes
   if not skip_ec2(event) and not fake_ec2(event) and not activity.should_run():
     return {'skip': True}
 
@@ -42,7 +44,7 @@ def lambda_handler(event, context=None):
   env.update(activity.task_env())
 
   return {
-    'skip': False,
+    'skip': skip_ec2(event),
     'taskInput': {
       'name': task_name,
       'env': format_env(env),
