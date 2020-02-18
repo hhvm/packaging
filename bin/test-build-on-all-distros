@@ -1,0 +1,69 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+set -e
+
+if [ -z "$1" ] || [ ! -d "$1" ]; then
+  echo "Usage: $0 <hhvm dir>"
+  exit 1
+fi
+
+pushd "$(dirname "$0")" >/dev/null
+MINOR=$(git branch -r | grep -Po '(?<=origin/HHVM-4.)[0-9]+' | sort -rn | head -1)
+popd >/dev/null
+if [ -z "$MINOR" ]; then
+  echo "Failed to get the latest packaging branch name."
+  exit 1
+fi
+
+for _ in $(seq 1 10); do
+  VERSION="4.$MINOR.$((RANDOM + 1000))"
+  if ! aws s3 ls "s3://hhvm-scratch/hhvm-$VERSION.tar.gz"; then
+    break
+  fi
+  VERSION=""
+done
+
+if [ -z "$VERSION" ]; then
+  echo "Failed to generate a unique test version number."
+  exit 1
+fi
+
+WORK_DIR="$(mktemp -dt hhvm.XXXXXXXX)"
+
+(
+  set -x
+  cp -r "$1" "$WORK_DIR/hhvm-$VERSION"
+)
+
+pushd "$WORK_DIR/hhvm-$VERSION" >/dev/null
+find . -name .git -print0 | xargs -0 rm -rf
+rm -rf third-party/fb-mysql/mysql-5.6/{rocksdb,xtrabackup,rqg,mysql-test}
+rm -rf hphp/test/{slow,quick,zend,zend7}
+rm -rf third-party/boost/boost/libs/*/{doc,test}
+popd >/dev/null
+
+pushd "$WORK_DIR" >/dev/null
+(
+  set -x
+  tar czf "hhvm-$VERSION.tar.gz" "hhvm-$VERSION"
+  aws s3 cp "hhvm-$VERSION.tar.gz" s3://hhvm-scratch/
+)
+popd >/dev/null
+rm -rf "$WORK_DIR"
+
+"$(dirname "$0")/build-on-aws" MakeBinaryPackage "$VERSION"
+
+echo
+echo "Use $(dirname "$0")/aws-build-status to see build progress."
+echo "Docker images of all successful and failed builds should become available"
+echo "on OnDemand servers within 1 hour after the build finishes."
+echo
+echo "Clean up after build:"
+echo "  aws s3 rm s3://hhvm-scratch/hhvm-$VERSION.tar.gz"
+echo "  aws s3 rm --recursive s3://hhvm-scratch/hhvm-$VERSION"
