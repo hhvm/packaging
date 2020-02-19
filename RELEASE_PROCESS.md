@@ -33,11 +33,12 @@ Releases are generally on Mondays, from Sunday's nightly builds.
    1. Use existing posts as a template.
    1. Use `hhast` announcements from the previous week as guide for if codemods
       are available.
-   1. Fetch the staging repository with `git fetch --tags`; use
+   1. Use
+      [GitHub UI](https://github.com/facebook/hhvm/compare/HHVM-4.44.0...nightly-2020.02.18)
+      (replace version numbers in the URL) or
       `git log --oneline HHVM-4.x.0..HHVM-4.y.0` or
       `HHVM-4.x.0..nightly-YYYY.MM.DD` to find a list of commits for highlights
-      and breaking changes. The `nightly-YYYY.MM.DD` tags are only pushed to
-      the staging repository to avoid spamming the main one.
+      and breaking changes.
 1. Once all builds are complete, commit and push the blog post
 1. Announce on Facebook page, sharing to HHVM and Hack Users Group, and from
    Twitter. Include link to blog post.
