@@ -311,6 +311,9 @@ function linear_state_machine(
           ],
         ];
       }
+      if (idx($states[$name], F::Catch) === vec[]) {
+        unset($states[$name][F::Catch]);
+      }
     }
 
     if ($type === T::Map || $type === T::Parallel) {
@@ -456,21 +459,28 @@ function main_branch(): StateMachine {
         F::Type => T::Map,
         F::ItemsPath => path(P::BuildInput, 'versions'),
         F::Parameters => map_params(keyset[P::BuildInput], P::Version),
-        F::Iterator => nested_state_machine(
-          S::Version,
-          P::Version,
+        F::Iterator => linear_state_machine(
+          S::Version.S::NormalizeResults,
           Dict\merge(
             states_for_activity(
               keyset[P::Version],
               A::MakeSourceTarball,
               S::BuildAndPublishLinux.S::And.A::BuildAndPublishMacOS,
-              S::Version.S::End,
+              S::Version.S::NormalizeResults,
             ),
             dict[
               S::BuildAndPublishLinux.S::And.A::BuildAndPublishMacOS => dict[
                 F::Type => T::Parallel,
                 F::Parameters => params(P::BuildInput, P::Version),
                 F::Branches => vec[linux_branch(), macos_branch()],
+              ],
+              S::Version.S::NormalizeResults => dict[
+                F::Type => T::Task,
+                F::Resource => Config::ARN[S::NormalizeResults],
+                F::Parameters => params(P::Version, P::Results),
+                F::ResultPath => path('results'),
+                F::Catch => vec[],
+                F::End => true,
               ],
             ],
           ),

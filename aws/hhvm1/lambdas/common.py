@@ -113,16 +113,17 @@ def normalize_results(results):
   normalized = {}
 
   for state_name, result in results.items():
-    if state_name in Config.map_states:
-      # convert from list to map
-      key = Config.map_states[state_name]
-      normalized[state_name] = {
-        item[key]: normalize_results(item['results']) for item in result
-      }
-    elif type(result) == list:
-      # flatten
-      for item in result:
-        normalized.update(normalize_results(item['results']))
+    if type(result) == list:
+      if state_name in Config.map_states:
+        # convert from list to map
+        key = Config.map_states[state_name]
+        normalized[state_name] = {
+          item[key]: normalize_results(item['results']) for item in result
+        }
+      else:
+        # flatten
+        for item in result:
+          normalized.update(normalize_results(item['results']))
     else:
       # just remove some redundant stuff
       result.pop('taskInput', None)

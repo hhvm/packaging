@@ -195,7 +195,29 @@ class Test(unittest.TestCase):
       expected_prefix
     )
 
-    # fake_ec2
+    # fake_ec2 (should change SCRIPT_URL and remove AFTER_TASK_URL)
+    ec2_params = activities.MakeBinaryPackage({
+      'buildInput': {'debug': 'fake_ec2'},
+      'version': '4.26.1',
+      'platform': 'ubuntu-18.04-bionic',
+    }).ec2_params()
+    expected_prefix = (
+      '#!/bin/bash\n'
+      '        ACTIVITY_ARN="arn:aws:states:us-west-2:223121549624:activity:'
+        'hhvm-make-binary-package"\n'
+      f'        SCRIPT_URL="https://raw.githubusercontent.com/{org}/packaging/'
+        f'{branch}/aws/hhvm1/worker/dummy-task.sh"\n'
+      '        INIT_URL=""\n'
+      f'        AFTER_TASK_URL=""\n'
+      '        \n'
+      '        #!/bin/bash\n'
+    )
+    self.assertEqual(
+      ec2_params['UserData'][:len(expected_prefix)],
+      expected_prefix,
+    )
+
+    # fake_ec2 (should change SCRIPT_URL and remove INIT_URL)
     ec2_params = activities.PublishBinaryPackages(
       {'buildInput': {'debug': 'fake_ec2'}}
     ).ec2_params()
@@ -203,6 +225,26 @@ class Test(unittest.TestCase):
       '#!/bin/bash\n'
       '        ACTIVITY_ARN="arn:aws:states:us-west-2:223121549624:activity:'
         'hhvm-publish-binary-packages"\n'
+      f'        SCRIPT_URL="https://raw.githubusercontent.com/{org}/packaging/'
+        f'{branch}/aws/hhvm1/worker/dummy-task.sh"\n'
+      '        INIT_URL=""\n'
+      '        AFTER_TASK_URL=""\n'
+      '        \n'
+      '        #!/bin/bash\n'
+    )
+    self.assertEqual(
+      ec2_params['UserData'][:len(expected_prefix)],
+      expected_prefix
+    )
+
+    # fake_ec2 (should change SCRIPT_URL and remove SKIP_SEND_TASK_SUCCESS)
+    ec2_params = activities.BuildAndPublishMacOS(
+      {'buildInput': {'debug': 'fake_ec2'}}
+    ).ec2_params()
+    expected_prefix = (
+      '#!/bin/bash\n'
+      '        ACTIVITY_ARN="arn:aws:states:us-west-2:223121549624:activity:'
+        'hhvm-build-and-publish-macos"\n'
       f'        SCRIPT_URL="https://raw.githubusercontent.com/{org}/packaging/'
         f'{branch}/aws/hhvm1/worker/dummy-task.sh"\n'
       '        INIT_URL=""\n'
@@ -471,91 +513,124 @@ class Test(unittest.TestCase):
     )
 
   def test_normalize_results_and_check_for_failures(self):
+    v1 = '3.30.12'
+    v1_before = {
+      'version': v1,
+      'results': {
+        'MakeSourceTarball': {'skip': True},
+        'ForEachPlatform': [
+          {
+            'platform': 'debian-8-jessie',
+            'results': {
+              'MakeBinaryPackage': {'success': {'ec2': 'i-faceb001'}},
+            },
+          },
+          {
+            'results': {
+              'MakeBinaryPackage': {'skip': True},
+            },
+            'platform': 'ubuntu-14.04-trusty',
+          },
+        ],
+        'PublishSourceTarballAndPublishDockerImages': [
+          {
+            'results': {
+              'PublishSourceTarball': {
+                'skip': False,
+                'taskInput': {
+                  'name': 'PublishSourceTarball-3.30.12',
+                  'env': 'VERSION="3.30.12"\nIS_NIGHTLY="false"',
+                },
+                'success': {'ec2': 'i-faceb002'},
+              },
+            },
+          },
+          {
+            'results': {
+              'PublishDockerImages': {'success': {'ec2': 'i-faceb003'}},
+            },
+          },
+        ],
+      },
+    }
+    v1_after = {
+      'MakeSourceTarball': {'skip': True},
+      'ForEachPlatform': {
+        'debian-8-jessie': {
+          'MakeBinaryPackage': {'success': {'ec2': 'i-faceb001'}},
+        },
+        'ubuntu-14.04-trusty': {
+          'MakeBinaryPackage': {'skip': True},
+        },
+      },
+      'PublishSourceTarball': {'success': {'ec2': 'i-faceb002'}},
+      'PublishDockerImages': {'success': {'ec2': 'i-faceb003'}},
+    }
+    v2 = '4.42.0'
+    v2_before = {
+      'version': v2,
+      'results': {'foo': {'skip': True}},
+    }
+    v2_after = {
+      'foo': {'skip': True},
+    }
+    parallel_steps_before = [
+      {
+        'results': {
+          'UpdateIndices': {'success': {'ec2': 'i-faceb004'}},
+        },
+      },
+      {
+        'results': {
+          'InvalidateCloudFront': {'success': {'ec2': 'i-faceb005'}},
+        },
+      },
+    ]
+    everything_after = {
+      'ForEachVersion': {
+        v1: v1_after,
+        v2: v2_after,
+      },
+      'UpdateIndices': {'success': {'ec2': 'i-faceb004'}},
+      'InvalidateCloudFront': {'success': {'ec2': 'i-faceb005'}},
+    }
+    # normalization inside ForEachVersion
+    self.assertEqual(normalize_results.lambda_handler(v1_before), v1_after)
+    self.assertEqual(normalize_results.lambda_handler(v2_before), v2_after)
+    # final normalization after ForEachVersion
     self.assertEqual(
       check_for_failures.lambda_handler(normalize_results.lambda_handler({
         'buildInput': {},
         'results': {
           'ForEachVersion': [
             {
-              'version': '3.30.12',
-              'results': {
-                'MakeSourceTarball': {'skip': True},
-                'ForEachPlatform': [
-                  {
-                    'platform': 'debian-8-jessie',
-                    'results': {
-                      'MakeBinaryPackage': {'success': {'ec2': 'i-faceb001'}},
-                    },
-                  },
-                  {
-                    'results': {
-                      'MakeBinaryPackage': {'skip': True},
-                    },
-                    'platform': 'ubuntu-14.04-trusty',
-                  },
-                ],
-                'PublishSourceTarballAndPublishDockerImages': [
-                  {
-                    'results': {
-                      'PublishSourceTarball': {
-                        'skip': False,
-                        'taskInput': {
-                          'name': 'PublishSourceTarball-3.30.12',
-                          'env': 'VERSION="3.30.12"\nIS_NIGHTLY="false"',
-                        },
-                        'success': {'ec2': 'i-faceb002'},
-                      },
-                    },
-                  },
-                  {
-                    'results': {
-                      'PublishDockerImages': {'success': {'ec2': 'i-faceb003'}},
-                    },
-                  },
-                ],
-              },
+              'version': v1,
+              'results': v1_after,
             },
             {
-              'version': '4.42.0',
-              'results': {'foo': {'skip': True}},
+              'version': v2,
+              'results': v2_after,
             },
           ],
-          'UpdateIndicesAndInvalidateCloudFront': [
-            {
-              'results': {
-                'UpdateIndices': {'success': {'ec2': 'i-faceb004'}},
-              },
-            },
-            {
-              'results': {
-                'InvalidateCloudFront': {'success': {'ec2': 'i-faceb005'}},
-              },
-            },
-          ],
+          'UpdateIndicesAndInvalidateCloudFront': parallel_steps_before,
         },
       })),
-      {
-        'ForEachVersion': {
-          '3.30.12': {
-            'MakeSourceTarball': {'skip': True},
-            'ForEachPlatform': {
-              'debian-8-jessie': {
-                'MakeBinaryPackage': {'success': {'ec2': 'i-faceb001'}},
-              },
-              'ubuntu-14.04-trusty': {
-                'MakeBinaryPackage': {'skip': True},
-              },
-            },
-            'PublishSourceTarball': {'success': {'ec2': 'i-faceb002'}},
-            'PublishDockerImages': {'success': {'ec2': 'i-faceb003'}},
-          },
-          '4.42.0': {
-            'foo': {'skip': True},
-          },
+      everything_after
+    )
+    # normalization of everything at once (not used right now but was used in
+    # the past and we may need it again at some point)
+    self.assertEqual(
+      check_for_failures.lambda_handler(normalize_results.lambda_handler({
+        'buildInput': {},
+        'results': {
+          'ForEachVersion': [
+            v1_before,
+            v2_before,
+          ],
+          'UpdateIndicesAndInvalidateCloudFront': parallel_steps_before,
         },
-        'UpdateIndices': {'success': {'ec2': 'i-faceb004'}},
-        'InvalidateCloudFront': {'success': {'ec2': 'i-faceb005'}},
-      }
+      })),
+      everything_after
     )
 
     with self.assertRaisesRegex(

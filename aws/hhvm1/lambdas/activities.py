@@ -259,6 +259,8 @@ class BuildAndPublishMacOS(Activity):
     }
 
   def worker_env(self):
+    if self.fake_ec2:
+      return {}
     return {'SKIP_SEND_TASK_SUCCESS': '1'}
 
   def task_env(self):
