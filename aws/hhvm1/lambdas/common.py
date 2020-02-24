@@ -96,6 +96,9 @@ def skip_ec2(event):
 def fake_ec2(event):
   return event.get('buildInput', {}).get('debug') == 'fake_ec2'
 
+def is_test_build(event):
+  return event.get('buildInput', {}).get('debug') == 'test_build'
+
 def normalize_results(results):
   """
   The state machine output has some unnecessary nesting due to how the state

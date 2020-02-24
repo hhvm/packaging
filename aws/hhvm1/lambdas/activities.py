@@ -23,6 +23,7 @@ class Activity:
   def __init__(self, event):
     self.event = event
     self.fake_ec2 = common.fake_ec2(event)
+    self.is_test_build = common.is_test_build(event)
 
   def version(self):
     return self.event['version']
@@ -264,16 +265,19 @@ class BuildAndPublishMacOS(Activity):
     return {'SKIP_SEND_TASK_SUCCESS': '1'}
 
   def task_env(self):
-    platforms = self.platforms_to_build()
-    # right now we can only correctly trigger a build for a single platform or
-    # for all platforms
-    if len(platforms) == 1:
-      return {'PLATFORM': common.Config.macos_versions[next(iter(platforms))]}
-    else:
-      # build all platforms (but the Azure pipeline will skip any that are
-      # already built)
-      return {}
+    task_env = {}
 
+    if self.is_test_build:
+      task_env['SKIP_PUBLISH'] = '1'
+
+    # Right now we can only correctly trigger a build for a single platform or
+    # for all platforms, but the Azure pipeline will skip any platforms that are
+    # already built, so at worst this wastes a few CPU cycles.
+    platforms = self.platforms_to_build()
+    if len(platforms) == 1:
+      task_env['PLATFORM'] = common.Config.macos_versions[next(iter(platforms))]
+
+    return task_env
 
   def should_run(self):
     return bool(self.platforms_to_build())

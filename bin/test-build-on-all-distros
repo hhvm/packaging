@@ -57,7 +57,7 @@ pushd "$WORK_DIR" >/dev/null
 popd >/dev/null
 rm -rf "$WORK_DIR"
 
-"$(dirname "$0")/build-on-aws" MakeBinaryPackage "$VERSION"
+"$(dirname "$0")/build-on-aws" --test "$VERSION"
 
 echo
 echo "Use $(dirname "$0")/aws-build-status to see build progress."

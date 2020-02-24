@@ -78,6 +78,18 @@ class Test(unittest.TestCase):
         },
       },
     )
+    # --test also forces the correct step names
+    self.assertEqual(
+      parse_input.lambda_handler('4.42.4242 --test PublishSourceTarball'),
+      {
+        'buildInput': {
+          'versions': ['4.42.4242'],
+          'platforms': [],
+          'activities': ['MakeBinaryPackage', 'BuildAndPublishMacOS'],
+          'debug': 'test_build',
+        },
+      },
+    )
 
   def test_get_platforms_for_version(self):
     self.assertEqual(
@@ -800,6 +812,29 @@ class Test(unittest.TestCase):
     )
     self.assertEqual(activity.platforms_to_build(), set())
     self.assertEqual(activity.should_run(), False)
+
+    # test build
+    activity = activities.BuildAndPublishMacOS({
+      'version': future,
+      'buildInput': {'debug': 'test_build', 'platforms': []}
+    })
+    self.assertEqual(
+      activity.platforms_to_build(),
+      Config.macos_versions.keys()
+    )
+    self.assertEqual(activity.should_run(), True)
+    self.assertEqual(activity.task_env(), {'SKIP_PUBLISH': '1'})
+
+    activity = activities.BuildAndPublishMacOS({
+      'version': future,
+      'buildInput': {'debug': 'test_build', 'platforms': [macos2]}
+    })
+    self.assertEqual(activity.platforms_to_build(), {macos2})
+    self.assertEqual(activity.should_run(), True)
+    self.assertEqual(
+      activity.task_env(),
+      {'SKIP_PUBLISH': '1', 'PLATFORM': Config.macos_versions[macos2]}
+    )
 
 
 if __name__ == '__main__':
