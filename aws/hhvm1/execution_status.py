@@ -29,7 +29,7 @@ unfinished = {
     if id not in finished and e['type'] == 'TaskStateEntered'
 }
 
-def output(s, f):
+def output(s, f, prev):
   details = s['stateEnteredEventDetails']
   name = details['name']
   if name == 'HealthCheck' or name.startswith('PrepareTo'):
@@ -42,16 +42,22 @@ def output(s, f):
   if f:
     timedelta = f['timestamp'] - s['timestamp']
     out.append('(' + str(timedelta).rstrip('0') + ')')
-  print('  ' + ' '.join(o for o in out if o))
+  prefix = ''
+  if prev:
+    if prev['type'].endswith('Succeeded'):
+      prefix = '\033[32m'
+    elif prev['type'].endswith('Failed'):
+      prefix = '\033[31mFAILED: '
+  print('  ' + prefix + ' '.join(o for o in out if o) + '\033[0m')
 
 if finished:
   print('Finished tasks:')
   for s, f in finished.values():
-    output(s, f)
+    output(s, f, events[f['previousEventId']])
   print()
 
 if unfinished:
   print('Unfinished tasks:')
   for s in unfinished.values():
-    output(s, None)
+    output(s, None, None)
   print()
