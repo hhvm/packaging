@@ -33,7 +33,15 @@ def lambda_handler(event, context=None):
       platforms += [part]
 
   if debug == 'test_build':
-    activities = [MakeBinaryPackage.__name__, BuildAndPublishMacOS.__name__]
+    available_activities = [
+      MakeBinaryPackage.__name__,
+      BuildAndPublishMacOS.__name__,
+    ]
+    for a in activities:
+      if a not in available_activities:
+        raise Exception(a + ' is not a valid test build step')
+    if not activities:
+      activities = available_activities
 
   if not versions:
     versions = [date.today().strftime('%Y.%m.%d')]

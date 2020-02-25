@@ -80,7 +80,7 @@ class Test(unittest.TestCase):
     )
     # --test also forces the correct step names
     self.assertEqual(
-      parse_input.lambda_handler('4.42.4242 --test PublishSourceTarball'),
+      parse_input.lambda_handler('4.42.4242 --test-build'),
       {
         'buildInput': {
           'versions': ['4.42.4242'],
@@ -90,6 +90,22 @@ class Test(unittest.TestCase):
         },
       },
     )
+    self.assertEqual(
+      parse_input.lambda_handler('4.42.4242 test MakeBinaryPackage'),
+      {
+        'buildInput': {
+          'versions': ['4.42.4242'],
+          'platforms': [],
+          'activities': ['MakeBinaryPackage'],
+          'debug': 'test_build',
+        },
+      },
+    )
+    with self.assertRaisesRegex(
+      Exception,
+      '^PublishSourceTarball is not a valid test build step$'
+    ):
+      parse_input.lambda_handler('4.42.4242 --test PublishSourceTarball')
 
   def test_get_platforms_for_version(self):
     self.assertEqual(
@@ -506,6 +522,12 @@ class Test(unittest.TestCase):
     self.assertEqual(
       check_if_repos_changed.lambda_handler(
         self.get_check_if_repos_changed_event([True, True], 'skip_ec2')
+      ),
+      False
+    )
+    self.assertEqual(
+      check_if_repos_changed.lambda_handler(
+        self.get_check_if_repos_changed_event([True, True], 'test_build')
       ),
       False
     )
