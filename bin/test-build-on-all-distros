@@ -9,9 +9,14 @@
 set -e
 
 if [ -z "$1" ] || [ ! -d "$1" ]; then
-  echo "Usage: $0 <hhvm dir>"
+  echo "Usage: $0 <hhvm dir> [<extra args>]"
+  echo "  <extra args> are passed to bin/build-on-aws"
+  echo "  (can be names of build steps, distros)"
   exit 1
 fi
+
+SOURCE_DIR="$1"
+shift
 
 pushd "$(dirname "$0")" >/dev/null
 MINOR=$(git branch -r | grep -Po '(?<=origin/HHVM-4.)[0-9]+' | sort -rn | head -1)
@@ -38,7 +43,7 @@ WORK_DIR="$(mktemp -dt hhvm.XXXXXXXX)"
 
 (
   set -x
-  cp -r "$1" "$WORK_DIR/hhvm-$VERSION"
+  cp -r "$SOURCE_DIR" "$WORK_DIR/hhvm-$VERSION"
 )
 
 pushd "$WORK_DIR/hhvm-$VERSION" >/dev/null
@@ -57,7 +62,7 @@ pushd "$WORK_DIR" >/dev/null
 popd >/dev/null
 rm -rf "$WORK_DIR"
 
-"$(dirname "$0")/build-on-aws" --test "$VERSION"
+"$(dirname "$0")/build-on-aws" --test "$VERSION" "$@"
 
 echo
 echo "Use $(dirname "$0")/aws-build-status to see build progress."
