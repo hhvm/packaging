@@ -85,7 +85,10 @@ if [ ! -e "$BUILD_DIR/.git" ]; then
   git clone git://github.com/facebook/hhvm.git "$TMP_DIR"
   pushd "$TMP_DIR"
   git fetch --all --tags
-  git checkout "tags/$TAG" -b "ondemand_$(date +%Y-%m-%d_%H%M)"
+  # This may fail if running a test build with a fake version number, in which
+  # case using master is probably fine (git status won't be clean though).
+  git checkout "tags/$TAG" -b "ondemand_$(date +%Y-%m-%d_%H%M)" \
+    || git checkout -b "ondemand_$(date +%Y-%m-%d_%H%M)"
   source /opt/ondemand/config.inc.sh
   git config user.name "$GIT_NAME"
   git config user.email "$GIT_EMAIL"
