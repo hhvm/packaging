@@ -59,8 +59,15 @@ cat >> /root/.bash_logout <<ANALBUMCOVER
   echo
 ANALBUMCOVER
 
-touch /root/.vimrc
-echo "syntax on" >> /root/.vimrc
+cat >> /root/.vimrc <<ANALBUMCOVER
+syntax on
+set background=dark
+set tabstop=2
+set softtabstop=2
+set expandtab
+set backspace=indent,eol,start
+set mouse=a
+ANALBUMCOVER
 
 cat > /root/.gitignore_global <<ANALBUMCOVER
 debian
