@@ -426,6 +426,32 @@ class Test(unittest.TestCase):
             'S3_SOURCE="s3://hhvm-scratch/hhvm-4.26.12345.tar.gz"\n'
             'PACKAGING_BRANCH="HHVM-4.26"'
           ),
+          'fail_args': '',
+        },
+      }
+    )
+
+    self.assertEqual(
+      prepare_activity.lambda_handler({
+        'buildInput': {'debug': 'test_build'},
+        'activity': 'MakeBinaryPackage',
+        'version': '4.26.12345',
+        'platform': 'ubuntu-18.04-bionic',
+      }),
+      {
+        'skip': False,
+        'taskInput': {
+          'name': 'MakeBinaryPackage-4.26.12345-ubuntu-18.04-bionic',
+          'env': (
+            'VERSION="4.26.12345"\n'
+            'DISTRO="ubuntu-18.04-bionic"\n'
+            'IS_NIGHTLY="false"\n'
+            'S3_BUCKET="hhvm-scratch"\n'
+            'S3_PATH="hhvm-4.26.12345.tar.gz"\n'
+            'S3_SOURCE="s3://hhvm-scratch/hhvm-4.26.12345.tar.gz"\n'
+            'PACKAGING_BRANCH="HHVM-4.26"'
+          ),
+          'fail_args': '--error TestBuildNoRetry',
         },
       }
     )
@@ -453,6 +479,7 @@ class Test(unittest.TestCase):
             'PACKAGING_BRANCH="master"\n'
             'DOCKER_ONLY="1"'
           ),
+          'fail_args': '',
         },
       }
     )

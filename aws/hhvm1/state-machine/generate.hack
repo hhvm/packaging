@@ -189,6 +189,10 @@ abstract final class Config {
    */
   const vec<dict<string, mixed>> ACTIVITY_RETRY_POLICY = vec[
     dict[
+      'ErrorEquals' => vec['TestBuildNoRetry'],
+      'MaxAttempts' => 0,
+    ],
+    dict[
       'ErrorEquals' => vec['States.ALL'],
       // retry after 1 minute, then 5 minutes, then fail
       'IntervalSeconds' => 60,

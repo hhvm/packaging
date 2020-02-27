@@ -102,6 +102,7 @@ while true; do
       INPUT_JSON=$(echo "$TASK_JSON" | jq -r '.input // {}')
       TASK_NAME=$(echo "$INPUT_JSON" | jq -r '.name // ""')
       TASK_ENV=$(echo "$INPUT_JSON" | jq -r '.env // ""')
+      TASK_FAIL_ARGS=$(echo "$INPUT_JSON" | jq -r '.fail_args // ""')
 
       # Update EC2 instance name to reflect the name of the current task (for
       # nicer view in the AWS console).
@@ -117,6 +118,7 @@ while true; do
       WRAPPER_SCRIPT="./task_${TASK_NAME}_$(date +%Y-%m-%d_%H-%M-%S).sh"
       echo "#!/bin/bash
         TASK_TOKEN=$(printf %q "$TASK_TOKEN")
+        FAIL_ARGS=$(printf %q "$TASK_FAIL_ARGS")
         $TASK_ENV
         source process-task.sh" > $WRAPPER_SCRIPT
       chmod a+x $WRAPPER_SCRIPT
@@ -136,7 +138,8 @@ while true; do
         TASK_SUCCESS="false"
         try_really_hard aws stepfunctions send-task-failure \
           --task-token "$TASK_TOKEN" \
-          --cause "{\"ec2\":\"$EC2_INSTANCE_ID\",\"time_sec\":\"$SECONDS\"}"
+          --cause "{\"ec2\":\"$EC2_INSTANCE_ID\",\"time_sec\":\"$SECONDS\"}" \
+          $TASK_FAIL_ARGS
       fi
 
       if [ -e after-task.sh ]; then

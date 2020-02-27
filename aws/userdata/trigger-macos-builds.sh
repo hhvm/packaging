@@ -49,6 +49,7 @@ echo "
   SKIP_IF_DONE=1
   SKIP_PUBLISH='$SKIP_PUBLISH'
   TASK_TOKEN=$(printf %q "$TASK_TOKEN")
+  FAIL_ARGS=$(printf %q "$FAIL_ARGS")
 " > "$TRIGGER_FILE"
 
 COMMIT_MESSAGE="[aws] build $VERSION"

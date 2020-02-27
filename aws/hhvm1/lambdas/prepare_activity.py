@@ -9,7 +9,7 @@ import random
 from time import sleep
 
 import activities
-from common import env_for_version, fake_ec2, format_env, skip_ec2
+from common import env_for_version, fake_ec2, format_env, is_test_build, skip_ec2
 
 def lambda_handler(event, context=None):
   activity_name = event['activity']
@@ -48,5 +48,6 @@ def lambda_handler(event, context=None):
     'taskInput': {
       'name': task_name,
       'env': format_env(env),
+      'fail_args': '--error TestBuildNoRetry' if is_test_build(event) else ''
     },
   }
