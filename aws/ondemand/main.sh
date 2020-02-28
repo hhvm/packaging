@@ -24,6 +24,7 @@ ok
 log "Initial system configuration..."
 chmod a-x /etc/update-motd.d/*
 mkdir -p /home/ubuntu/.cache
+chown ubuntu:ubuntu /home/ubuntu/.cache
 touch /home/ubuntu/.cache/motd.legal-displayed
 touch /home/ubuntu/.sudo_as_admin_successful
 

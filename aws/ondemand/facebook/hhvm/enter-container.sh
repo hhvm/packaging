@@ -116,7 +116,7 @@ if [ -z "$CONTAINER" ]; then
   CONTAINER="$(
     docker run -dt \
       -v "$SRC_DIR:/opt/ondemand:ro" \
-      -v "$SSH_AUTH_SOCK:/ssh-agent" \
+      -v "/:/mnt/parent" \
       -v "/home/ubuntu:/home/ubuntu" \
       --security-opt "seccomp=$SRC_DIR/facebook/hhvm/seccomp.json" \
       "$IMAGE" /bin/bash -l
@@ -124,7 +124,9 @@ if [ -z "$CONTAINER" ]; then
   echo -e '\e[22m' # reset text color
 
   echo -e "Running initialization script inside the container:\e[2m"
-  if docker exec -it "$CONTAINER" \
+  if docker exec -it \
+      -e "SSH_AUTH_SOCK=/mnt/parent$SSH_AUTH_SOCK" \
+      "$CONTAINER" \
       /opt/ondemand/facebook/hhvm/init-container.sh "$VERSION"; then
     # only persist the container ID if init-container.sh succeeds
     echo "CONTAINER=$CONTAINER" >> $DOCKER_CONFIG
@@ -148,4 +150,6 @@ fi
 # Restart the container if it died somehow.
 docker start "$CONTAINER" >/dev/null
 
-docker exec -it "$CONTAINER" /bin/bash -l
+docker exec -it \
+  -e "SSH_AUTH_SOCK=/mnt/parent$SSH_AUTH_SOCK" \
+  "$CONTAINER" /bin/bash -l
