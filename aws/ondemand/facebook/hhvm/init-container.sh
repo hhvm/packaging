@@ -36,7 +36,6 @@ touch /root/.bashrc
 cat >> /root/.bashrc <<ANALBUMCOVER
   PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]# '
   alias push="git push -f --set-upstream origin \\\$(git name-rev --name-only HEAD)"
-  export SSH_AUTH_SOCK=/ssh-agent
   export HHVM_DIR='$BUILD_DIR'
   cd \$HHVM_DIR
   echo
