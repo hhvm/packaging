@@ -151,6 +151,8 @@ After any changes:
   on 100% test coverage here, and feel free to add more test cases -- it's
   probably easier than anything else you could do to manually test your changes,
   and will prevent regressions on top of that)
+  - requires `boto3` (the Python AWS library), install using standard OS package
+    manager (`sudo apt-get install python3-boto3`) or `pip install boto3`
 - run `deploy.sh` to deploy the Python code to all the AWS lambdas without
   having to click on things
 
