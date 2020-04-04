@@ -50,7 +50,7 @@ git checkout $HEAD
 if "${IS_AWS:-false}" && $IS_NIGHTLY; then
   TAG="nightly-${VERSION}"
   # Tag may already exist from previous failed runs.
-  if ! (git ls-remote origin "refs/tags/$TAG" | grep "$TAG"); then
+  if ! (git ls-remote git@github.com:hhvm/hhvm-staging.git "refs/tags/$TAG" | grep "$TAG"); then
     git tag "${TAG}"
     git push git@github.com:hhvm/hhvm-staging.git "${TAG}"
     # might as well update master there too
