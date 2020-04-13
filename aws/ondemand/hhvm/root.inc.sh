@@ -5,6 +5,6 @@
 # LICENSE file in the root directory of this source tree.
 
 log "Installing Composer..."
-curl https://getcomposer.org/composer.phar > /usr/local/bin/composer
+curl https://getcomposer.org/composer-stable.phar > /usr/local/bin/composer
 chmod a+x /usr/local/bin/composer
 ok
