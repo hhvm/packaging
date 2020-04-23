@@ -41,6 +41,8 @@ aws s3 sync "s3://hhvm-nodist/${DISTRO}/" nodist/
 
 bin/make-package-in-throwaway-container "$DISTRO"
 
-aws s3 cp --include '*' --exclude "${SOURCE_BASENAME}" --recursive \
-  out/ s3://hhvm-scratch/${VERSION}/${DISTRO}/
-aws s3 sync nodist/ "s3://hhvm-nodist/${DISTRO}/"
+if [ -z "$SKIP_PUBLISH" ]; then
+  aws s3 cp --include '*' --exclude "${SOURCE_BASENAME}" --recursive \
+    out/ s3://hhvm-scratch/${VERSION}/${DISTRO}/
+  aws s3 sync nodist/ "s3://hhvm-nodist/${DISTRO}/"
+fi

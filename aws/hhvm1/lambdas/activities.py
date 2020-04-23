@@ -143,6 +143,11 @@ class MakeBinaryPackage(Activity):
   script_name = 'make-binary-package.sh'
   after_task_script = 'aws/hhvm1/worker/after-task/make-binary-package.sh'
 
+  def task_env(self):
+    if self.is_test_build:
+      return {'SKIP_PUBLISH': '1'}
+    return {}
+
   def should_run(self):
     return common.build_status(self.version(), self.platform()) == 'not_built'
 

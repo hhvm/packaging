@@ -143,12 +143,12 @@ class Test(unittest.TestCase):
       ['debian-10-buster', 'ubuntu-19.04-disco'],
     )
     # incompatible platforms are excluded
-    input = {'platforms': ['ubuntu-19.04-disco', 'ubuntu-14.04-trusty']}
+    input = {'platforms': ['ubuntu-19.10-eoan', 'ubuntu-14.04-trusty']}
     self.assertEqual(
       get_platforms_for_version.lambda_handler(
         {'version': '2019.10.10', 'buildInput': input}
       ),
-      ['ubuntu-19.04-disco'],
+      ['ubuntu-19.10-eoan'],
     )
     self.assertEqual(
       get_platforms_for_version.lambda_handler(
@@ -449,7 +449,8 @@ class Test(unittest.TestCase):
             'S3_BUCKET="hhvm-scratch"\n'
             'S3_PATH="hhvm-4.26.12345.tar.gz"\n'
             'S3_SOURCE="s3://hhvm-scratch/hhvm-4.26.12345.tar.gz"\n'
-            'PACKAGING_BRANCH="HHVM-4.26"'
+            'PACKAGING_BRANCH="HHVM-4.26"\n'
+            'SKIP_PUBLISH="1"'
           ),
           'fail_args': '--error TestBuildNoRetry',
         },
