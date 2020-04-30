@@ -40,10 +40,10 @@ exports.handler = async (event) => {
     'macos-mojave':
       'homebrew-bottles/'+macos_prefix+'.mojave.bottle.tar.gz',
   };
-  if (nightly && version >= '2020.02.04' || !nightly && maj_min >= '4.43') {
+  //if (nightly && version >= '2020.02.04' || !nightly && maj_min >= '4.43') {
     paths['macos-catalina'] =
       'homebrew-bottles/'+macos_prefix+'.catalina.bottle.tar.gz';
-  }
+  //}
 
   const scratch_paths = {};
   if (nightly) {
