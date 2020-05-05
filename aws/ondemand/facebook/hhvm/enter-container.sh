@@ -123,17 +123,22 @@ if [ -z "$CONTAINER" ]; then
   )"
   echo -e '\e[22m' # reset text color
 
-  echo -e "Running initialization script inside the container:\e[2m"
-  if docker exec -it \
-      -e "SSH_AUTH_SOCK=/mnt/parent$SSH_AUTH_SOCK" \
-      "$CONTAINER" \
-      /opt/ondemand/facebook/hhvm/init-container.sh "$VERSION"; then
-    # only persist the container ID if init-container.sh succeeds
+  if echo "$IMAGE" | grep backup > /dev/null; then
+    # Backup images don't need the init script.
     echo "CONTAINER=$CONTAINER" >> $DOCKER_CONFIG
   else
-    CONTAINER=""
+    echo -e "Running initialization script inside the container:\e[2m"
+    if docker exec -it \
+        -e "SSH_AUTH_SOCK=/mnt/parent$SSH_AUTH_SOCK" \
+        "$CONTAINER" \
+        /opt/ondemand/facebook/hhvm/init-container.sh "$VERSION"; then
+      # only persist the container ID if init-container.sh succeeds
+      echo "CONTAINER=$CONTAINER" >> $DOCKER_CONFIG
+    else
+      CONTAINER=""
+    fi
+    echo -e '\e[22m'
   fi
-  echo -e '\e[22m'
 fi
 
 # We're out of the critical section (it is OK to have multiple terminals

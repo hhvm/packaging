@@ -27,6 +27,9 @@ mkdir -p /home/ubuntu/.cache
 chown ubuntu:ubuntu /home/ubuntu/.cache
 touch /home/ubuntu/.cache/motd.legal-displayed
 touch /home/ubuntu/.sudo_as_admin_successful
+touch /home/ubuntu/.touchme
+
+echo "33 3 * * * $DIR/cleanup.sh >>/root/cleanup.log 2>&1" | crontab -
 
 cat $DIR/bashrc.inc.sh >> /home/ubuntu/.bashrc
 cat >> /home/ubuntu/.bashrc <<ANALBUMCOVER
