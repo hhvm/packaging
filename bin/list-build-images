@@ -24,11 +24,18 @@ function dump_builds() {
 
 echo "Failed builds:"
 
-dump_builds hhvm-failed-builds
+FAILED=$(dump_builds hhvm-failed-builds)
+echo "$FAILED" | grep -v :backup || true
 
 echo "Succeeded builds:"
 
-dump_builds hhvm-successful-builds
+SUCCEEDED=$(dump_builds hhvm-successful-builds)
+echo "$SUCCEEDED" | grep -v :backup || true
+
+echo "OnDemand backups:"
+
+echo "$FAILED" | grep :backup || true
+echo "$SUCCEEDED" | grep :backup || true
 
 echo "To use an image:"
 
