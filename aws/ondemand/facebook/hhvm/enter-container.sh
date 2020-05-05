@@ -72,10 +72,14 @@ if [ -z "$IMAGE" ]; then
   echo "--------------------------------"
   echo
   echo "Failed builds:"
-  printf '  %s\n' "${FAILED[@]}" | sort -r
+  printf '  %s\n' "${FAILED[@]}" | grep -v :backup | sort -r
   echo
   echo "Successful builds:"
-  printf '  %s\n' "${SUCCESSFUL[@]}" | sort -r
+  printf '  %s\n' "${SUCCESSFUL[@]}" | grep -v :backup | sort -r
+  echo
+  echo "OnDemand backups:"
+  printf '  %s\n' "${FAILED[@]}" | grep :backup | sort -r
+  printf '  %s\n' "${SUCCESSFUL[@]}" | grep :backup | sort -r
   echo
 fi
 
