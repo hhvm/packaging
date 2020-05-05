@@ -19,7 +19,7 @@ function dump_builds() {
     --query 'imageDetails[*].[imagePushedAt,imageTags[0]]' \
     --output text \
     | sort -r \
-    | awk '{ print "\t"strftime("%Y-%m-%d-%H:%M:%S", $1)"\t""'${IMAGE_NAME}':"$2 }'
+    | awk '{ print "\t"$1"\t'${IMAGE_NAME}':"$2 }'
 }
 
 echo "Failed builds:"
