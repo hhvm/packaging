@@ -11,6 +11,8 @@ set -ex
 DIR=/home/ubuntu/.ondemand
 source $DIR/common.inc.sh
 
+touch /home/ubuntu/.touchme
+
 log "Configuring Git checkout..."
 touch /home/ubuntu/.ssh/known_hosts
 ssh-keyscan github.com >> /home/ubuntu/.ssh/known_hosts
