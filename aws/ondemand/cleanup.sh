@@ -6,7 +6,13 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
+echo
+echo ---------------------------------------------------------------------------
+echo
+
 set -ex
+
+date
 
 FILE=/home/ubuntu/.touchme
 if [ ! -f "$FILE" ]; then
@@ -27,6 +33,8 @@ fi
 source /home/ubuntu/.ondemand/config.inc.sh
 BACKUP_NAME="${GITHUB_USER}_$(date +%Y-%m-%d_%H-%M-%S)"
 
+aws configure set default.region us-west-2
+
 # backup home directory
 tar cz /home/ubuntu | aws s3 cp - "s3://ondemand-backup/$BACKUP_NAME.tar.gz"
 
@@ -45,4 +53,4 @@ if which docker; then
 fi
 
 # backup was successful, kill the instance
-shutdown -h now
+/sbin/shutdown -h now

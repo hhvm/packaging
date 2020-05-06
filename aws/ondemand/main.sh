@@ -50,7 +50,7 @@ if $CLONE_TO_HOME; then
 fi
 
 log "Installing required .deb packages..."
-ALL_PACKAGES="lolcat"
+ALL_PACKAGES="awscli lolcat"
 
 maybe_source $DIR/$TEAM/packages.inc.sh
 ALL_PACKAGES="$ALL_PACKAGES $PACKAGES"
