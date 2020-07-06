@@ -69,7 +69,7 @@ Package: hhvm-nightly
 Architecture: any
 Conflicts: hhvm
 Depends: tzdata, lsof, ${shlibs:Depends}, ${misc:Depends}
-Description: HHVM virtual machine, runtime, and JIT for the PHP and Hack languages
+Description: HHVM virtual machine, runtime, and JIT for the Hack language
 
 Package: hhvm-nightly-dbg
 Architecture: any
