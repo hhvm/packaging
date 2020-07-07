@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+if [ -z "$1" ] || [ ! -d "$1" ]; then
+  echo "Usage: $0 <hhvm dir>"
+  echo
+  echo "Removes files that are not needed in the source tarball (.git dirs, docs, tests),"
+  echo "freeing several GB of space (several hundred MB after compression)."
+  exit 1
+fi
+
+pushd "$1"
+
+find . -name .git -print0 | xargs -0 rm -rf
+# ~ 500mb here
+rm -rf third-party/fb-mysql/mysql-5.6/{rocksdb,xtrabackup,rqg,mysql-test}
+# ~ 250mb here
+rm -rf hphp/test/{slow,quick,zend,zend7}
+# ~ 200mb each here
+rm -rf third-party/boost/boost/libs/*/{doc,test}
+rm -rf third-party/fb-mysql/mysql-5.6/boost/libs/*/{doc,test}
+
+popd
