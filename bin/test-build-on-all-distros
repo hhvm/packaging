@@ -46,12 +46,7 @@ WORK_DIR="$(mktemp -dt hhvm.XXXXXXXX)"
   cp -r "$SOURCE_DIR" "$WORK_DIR/hhvm-$VERSION"
 )
 
-pushd "$WORK_DIR/hhvm-$VERSION" >/dev/null
-find . -name .git -print0 | xargs -0 rm -rf
-rm -rf third-party/fb-mysql/mysql-5.6/{rocksdb,xtrabackup,rqg,mysql-test}
-rm -rf hphp/test/{slow,quick,zend,zend7}
-rm -rf third-party/boost/boost/libs/*/{doc,test}
-popd >/dev/null
+"$(dirname "$0")/prune-source-tree" "$WORK_DIR/hhvm-$VERSION"
 
 pushd "$WORK_DIR" >/dev/null
 (
