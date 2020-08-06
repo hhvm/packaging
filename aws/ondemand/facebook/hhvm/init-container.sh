@@ -99,6 +99,8 @@ if [ ! -e "$BUILD_DIR/.git" ]; then
   git config user.name "$GIT_NAME"
   git config user.email "$GIT_EMAIL"
   git remote set-url origin "git@github.com:$GITHUB_USER/$REPO.git"
+  git remote add facebook https://github.com/facebook/hhvm.git
+  git remote add staging git@github.com:hhvm/hhvm-staging.git
   mv .git "$BUILD_DIR/.git"
   rsync -a --ignore-existing hphp/test/ "$BUILD_DIR/hphp/test/"
   popd
