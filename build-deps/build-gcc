@@ -49,7 +49,7 @@ $(pwd)/../gcc-$VERSION/configure \
   --disable-multilib \
   --with-default-libstdcxx-abi=gcc4-compatible \
   --disable-libstdcxx-dual-abi
-make -j8
+make -j16
 make install "DESTDIR=${PKG_DIR}"
 
 cd "${PKG_DIR}"
