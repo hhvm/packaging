@@ -12,6 +12,7 @@ EXEC="$PREFIX:execution:one-state-machine-to-rule-them-all"
 
 SHOW_LIST=true
 SHOW_OUTPUT=true
+FOLLOW=false
 VERBOSE=false
 NAME=""
 
@@ -20,6 +21,10 @@ while (( "$#" )); do
     l|list|-l|--list)
       # show list only
       SHOW_OUTPUT=false
+      ;;
+    f|follow|-f|--follow)
+      # print status every 2 minutes until build finishes
+      FOLLOW=true
       ;;
     v|verbose|-v|--verbose)
       VERBOSE=true
@@ -60,15 +65,24 @@ if [ -z "$NAME" ]; then
   )
 fi
 
-JSON=$(aws stepfunctions describe-execution --execution-arn "$EXEC:$NAME")
-STATUS=$(echo "$JSON" | jq -r .status)
+while true; do
+  JSON=$(aws stepfunctions describe-execution --execution-arn "$EXEC:$NAME")
+  STATUS=$(echo "$JSON" | jq -r .status)
 
-echo
-echo "Execution '$NAME' $STATUS."
-echo
+  echo
+  echo "Execution '$NAME' $STATUS."
+  echo
 
-# This Python script prints out the list of finished and unfinished tasks.
-"$(dirname "$0")/../aws/hhvm1/execution_status.py" "$EXEC:$NAME"
+  # This Python script prints out the list of finished and unfinished tasks.
+  "$(dirname "$0")/../aws/hhvm1/execution_status.py" "$EXEC:$NAME"
+
+  if $FOLLOW && [ "$STATUS" == "RUNNING" ]; then
+    sleep 120
+    clear
+  else
+    break
+  fi
+done
 
 if [ "$STATUS" == "SUCCEEDED" ]; then
   FULL_OUTPUT=$(echo "$JSON" | jq -r .output | jq .)
