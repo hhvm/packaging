@@ -12,19 +12,42 @@ ROOT="$(realpath "$(dirname $0)/..")"
 
 VERSION=$1
 if [ -z "$VERSION" ]; then
-  echo "Usage: $0 VERSION1 [VERSION2 [VERSION3 ...]]"
+  echo "Usage: $0 [-r|--rebuild REBUILD_NUM] VERSION1 [VERSION2 [VERSION3 ...]]"
   exit 1
 fi
+
+REBUILD_NUM=""
+VERSIONS=()
+while (( "$#" )); do
+  case "$1" in
+    -r|--rebuild)
+      shift
+      REBUILD_NUM="$1"
+      if [ -z "$REBUILD_NUM" ]; then
+        echo "You must specify rebuild number after -r|--rebuild"
+        exit 1
+      fi
+      ;;
+    *)
+      VERSIONS+=("$1")
+      ;;
+  esac
+  shift
+done
+
+echo "Rebuild number: $REBUILD_NUM"
+echo "Version(s): ${VERSIONS[*]}"
+echo
 
 if ! which az >/dev/null; then
   echo "Install 'az' (usually from the 'azure-cli' package) and try again."
   exit 1
 fi
 
-for VERSION in "$@"; do
+for VERSION in "${VERSIONS[@]}"; do
   echo ">>> Starting ${VERSION}... <<<"
   az pipelines build queue \
-    --variables hhvm.version=$VERSION \
+    --variables "hhvm.version=$VERSION hhvm.rebuild_num=$REBUILD_NUM" \
     --definition-name hhvm-oss-builds-CI \
     -o table
 done
