@@ -47,7 +47,7 @@ fi
 for VERSION in "${VERSIONS[@]}"; do
   echo ">>> Starting ${VERSION}... <<<"
   az pipelines build queue \
-    --variables "hhvm.version=$VERSION hhvm.rebuild_num=$REBUILD_NUM" \
+    --variables "hhvm.version=$VERSION" "hhvm.rebuild_num=$REBUILD_NUM" \
     --definition-name hhvm-oss-builds-CI \
     -o table
 done
