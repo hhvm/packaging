@@ -25,6 +25,7 @@ if $CLONE_TO_HOME; then
   cd "/home/ubuntu/$REPO"
   git checkout -b "ondemand_$(date +%Y-%m-%d_%H%M)" master
   git remote set-url origin "git@github.com:$GITHUB_USER/$REPO.git"
+  git remote add upstream "git@github.com:$TEAM/$REPO.git"
 fi
 ok
 
