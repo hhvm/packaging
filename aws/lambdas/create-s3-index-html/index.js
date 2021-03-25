@@ -35,9 +35,15 @@ function handle_s3_response(err, data, event, callback, acc) {
   publish_indices(event, acc, callback);
 }
 
-function publish_indices(event, objs, callback) {
+function publish_indices(event, all_objs, callback) {
+  const month_ago = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const filtered_objs = all_objs.filter(obj =>
+    !obj.Key.endsWith('/index.html') &&
+    obj.LastModified.getTime() > month_ago
+  );
+
   let dirs = new Set(['']);
-  objs.forEach(obj => {
+  filtered_objs.forEach(obj => {
     let parts = obj.Key.split('/');
     parts.pop();
     while (parts.length > 0) {
@@ -51,7 +57,7 @@ function publish_indices(event, objs, callback) {
   const s3 = new AWS.S3();
   const s3_upload_promises = dirs.map(dir => s3.putObject({
       ContentType: 'text/html',
-      Body: get_index_html_string(dir, objs),
+      Body: get_index_html_string(dir, all_objs),
       Bucket: event.bucket,
       Key: (dir+'/index.html').replace(/^\/+/, '')
   }).promise());
@@ -92,6 +98,8 @@ function publish_indices(event, objs, callback) {
 }
 
 function get_index_html_string(dir, objs) {
+  console.log(dir);
+
   const parent_dir_row  = dir === '' ? null : (
     <tr key="parent"><td>{FOLDER_EMOJI} <a href={('/' + path.dirname(dir)).replace(/^\/.$/, '/')}>..</a></td></tr>
   );
