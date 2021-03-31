@@ -21,7 +21,6 @@ class Config:
   macos_versions = {
     # key: name as reported by build_statuses()
     # value: version as reported by sw_vers -productVersion | cut -d . -f 1,2
-    'macos-mojave': '10.14',
     'macos-catalina': '10.15',
   }
 

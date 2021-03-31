@@ -143,12 +143,12 @@ class Test(unittest.TestCase):
       ['debian-10-buster', 'ubuntu-19.04-disco'],
     )
     # incompatible platforms are excluded
-    input = {'platforms': ['ubuntu-19.10-eoan', 'ubuntu-14.04-trusty']}
+    input = {'platforms': ['ubuntu-20.04-focal', 'ubuntu-14.04-trusty']}
     self.assertEqual(
       get_platforms_for_version.lambda_handler(
         {'version': '2019.10.10', 'buildInput': input}
       ),
-      ['ubuntu-19.10-eoan'],
+      ['ubuntu-20.04-focal'],
     )
     self.assertEqual(
       get_platforms_for_version.lambda_handler(
@@ -764,7 +764,7 @@ class Test(unittest.TestCase):
     execution_arn = (
       'arn:aws:states:us-west-2:223121549624:execution:'
       'one-state-machine-to-rule-them-all:'
-      '4.43.0-jjergus-2020-02-03-09-33'
+      '4962b666-0d65-debf-ad45-552d610877f6_24de7839-b273-a4e9-5057-2586b7033ab5'
     )
     self.assertEqual(
       health_check.lambda_handler({
@@ -816,7 +816,7 @@ class Test(unittest.TestCase):
 
   def test_build_and_publish_macos(self):
     future = (date.today() + timedelta(days=2)).strftime('%Y.%m.%d')
-    macos1, macos2 = list(Config.macos_versions.keys())[:2]
+    macos1 = list(Config.macos_versions.keys())[0]
 
     activity = activities.BuildAndPublishMacOS(
       {'version': future, 'buildInput': {'platforms': []}}
@@ -826,7 +826,12 @@ class Test(unittest.TestCase):
       Config.macos_versions.keys()
     )
     self.assertEqual(activity.should_run(), True)
-    self.assertEqual(activity.task_env(), {})
+    self.assertEqual(
+      activity.task_env(),
+      {'PLATFORM': Config.macos_versions[macos1]}
+        if len(Config.macos_versions) == 1
+        else {}
+    )
 
     activity = activities.BuildAndPublishMacOS(
       {'version': future, 'buildInput': {'platforms': [macos1, 'ubuntu']}}
@@ -838,12 +843,14 @@ class Test(unittest.TestCase):
       {'PLATFORM': Config.macos_versions[macos1]}
     )
 
-    activity = activities.BuildAndPublishMacOS(
-      {'version': future, 'buildInput': {'platforms': [macos1, macos2]}}
-    )
-    self.assertEqual(activity.platforms_to_build(), {macos1, macos2})
-    self.assertEqual(activity.should_run(), True)
-    self.assertEqual(activity.task_env(), {})
+    if len(Config.macos_versions) > 1:
+      macos2 = list(Config.macos_versions.keys())[1]
+      activity = activities.BuildAndPublishMacOS(
+        {'version': future, 'buildInput': {'platforms': [macos1, macos2]}}
+      )
+      self.assertEqual(activity.platforms_to_build(), {macos1, macos2})
+      self.assertEqual(activity.should_run(), True)
+      self.assertEqual(activity.task_env(), {})
 
     activity = activities.BuildAndPublishMacOS(
       {'version': future, 'buildInput': {'platforms': ['ubuntu']}}
@@ -852,13 +859,13 @@ class Test(unittest.TestCase):
     self.assertEqual(activity.platforms_to_build(), set())
 
     activity = activities.BuildAndPublishMacOS(
-      {'version': '4.29.0', 'buildInput': {'platforms': []}}
+      {'version': '4.102.0', 'buildInput': {'platforms': []}}
     )
     self.assertEqual(activity.platforms_to_build(), set())
     self.assertEqual(activity.should_run(), False)
 
     activity = activities.BuildAndPublishMacOS(
-      {'version': '4.29.0', 'buildInput': {'platforms': [macos1]}}
+      {'version': '4.102.0', 'buildInput': {'platforms': [macos1]}}
     )
     self.assertEqual(activity.platforms_to_build(), set())
     self.assertEqual(activity.should_run(), False)
@@ -873,17 +880,22 @@ class Test(unittest.TestCase):
       Config.macos_versions.keys()
     )
     self.assertEqual(activity.should_run(), True)
-    self.assertEqual(activity.task_env(), {'SKIP_PUBLISH': '1'})
+    self.assertEqual(
+      activity.task_env(),
+      {'PLATFORM': Config.macos_versions[macos1], 'SKIP_PUBLISH': '1'}
+        if len(Config.macos_versions) == 1
+        else {'SKIP_PUBLISH': '1'}
+    )
 
     activity = activities.BuildAndPublishMacOS({
       'version': future,
-      'buildInput': {'debug': 'test_build', 'platforms': [macos2]}
+      'buildInput': {'debug': 'test_build', 'platforms': [macos1]}
     })
-    self.assertEqual(activity.platforms_to_build(), {macos2})
+    self.assertEqual(activity.platforms_to_build(), {macos1})
     self.assertEqual(activity.should_run(), True)
     self.assertEqual(
       activity.task_env(),
-      {'SKIP_PUBLISH': '1', 'PLATFORM': Config.macos_versions[macos2]}
+      {'SKIP_PUBLISH': '1', 'PLATFORM': Config.macos_versions[macos1]}
     )
 
 
