@@ -14,6 +14,13 @@ if [ ! -e hphp/runtime/version.h ]; then
 fi
 
 VERSION="$1"
+
+if [ "$VERSION" = "--help" ]; then
+  echo "Usage: $0 [X.Y.Z]"
+  echo "  Version is inferred if not specified."
+  exit 1
+fi
+
 INFERRED_VERSION="$(awk \
   '/HHVM_VERSION_MAJOR [0-9]+$/ { MAJOR = $NF };
    /HHVM_VERSION_MINOR [0-9]+$/ { MINOR = $NF };
