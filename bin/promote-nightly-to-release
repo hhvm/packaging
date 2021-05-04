@@ -11,7 +11,7 @@ NIGHTLY="$1"
 VERSION="$2"
 
 if [ -z "$NIGHTLY" -o -z "$VERSION" -o "$1" == "--help" ]; then
-  echo "Usage: $0 YYYY.MM.DD MAJOR.MINOR"
+  echo "Usage: $0 YYYY.MM.DD MAJOR.MINOR [--already-tagged]"
   exit 1
 fi
 if ! echo "$VERSION" | grep -q -e '^[0-9]\+\.[0-9]\+$'; then
@@ -32,6 +32,12 @@ git fetch >/dev/null
 if ! git diff --exit-code origin/master..HEAD >/dev/null; then
   echo "Current branch is out of sync with origin/master, bailing out."
   exit 1
+fi
+
+shift; shift
+ALREADY_TAGGED=false
+if [ "$1" = "--already-tagged" ]; then
+  ALREADY_TAGGED=true
 fi
 
 MAJOR=$(echo "$VERSION" | cut -f1 -d.)
@@ -81,16 +87,20 @@ statusline "Working in ${SCRATCHDIR}..."
 
 cd "$SCRATCHDIR"
 
-statusline "Cloning hhvm..."
-git clone git@github.com:hhvm/hhvm-staging.git hhvm-${VERSION}
-(
-  statusline "Tagging and pushing HHVM..."
-  cd hhvm-$VERSION
-  git remote add staging git@github.com:hhvm/hhvm-staging.git
-  git checkout -b "HHVM-${VERSION}"
-  git reset --hard "nightly-${NIGHTLY}"
-  "$PKGDIR/bin/hhvm-tag-and-push" "${VERSION}.0"
-)
+if $ALREADY_TAGGED; then
+  statusline "Not cloning HHVM, already tagged."
+else
+  statusline "Cloning hhvm..."
+  git clone git@github.com:hhvm/hhvm-staging.git "hhvm-${VERSION}"
+  (
+    statusline "Tagging and pushing HHVM..."
+    cd "hhvm-$VERSION"
+    git remote add staging git@github.com:hhvm/hhvm-staging.git
+    git checkout -b "HHVM-${VERSION}"
+    git reset --hard "nightly-${NIGHTLY}"
+    "$PKGDIR/bin/hhvm-tag-and-push" "${VERSION}.0"
+  )
+fi
 
 statusline "Cloning hhvm-docker..."
 git clone git@github.com:hhvm/hhvm-docker.git
