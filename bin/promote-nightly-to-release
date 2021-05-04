@@ -11,7 +11,7 @@ NIGHTLY="$1"
 VERSION="$2"
 
 if [ -z "$NIGHTLY" -o -z "$VERSION" -o "$1" == "--help" ]; then
-  echo "Usage: $0 YYYY.MM.DD MAJOR.MINOR [--already-tagged]"
+  echo "Usage: $0 (YYYY.MM.DD|existing-tag) MAJOR.MINOR"
   exit 1
 fi
 if ! echo "$VERSION" | grep -q -e '^[0-9]\+\.[0-9]\+$'; then
@@ -32,12 +32,6 @@ git fetch >/dev/null
 if ! git diff --exit-code origin/master..HEAD >/dev/null; then
   echo "Current branch is out of sync with origin/master, bailing out."
   exit 1
-fi
-
-shift; shift
-ALREADY_TAGGED=false
-if [ "$1" = "--already-tagged" ]; then
-  ALREADY_TAGGED=true
 fi
 
 MAJOR=$(echo "$VERSION" | cut -f1 -d.)
@@ -87,7 +81,7 @@ statusline "Working in ${SCRATCHDIR}..."
 
 cd "$SCRATCHDIR"
 
-if $ALREADY_TAGGED; then
+if [ "$NIGHTLY" = "existing-tag" ]; then
   statusline "Not cloning HHVM, already tagged."
 else
   statusline "Cloning hhvm..."
