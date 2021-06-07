@@ -25,7 +25,6 @@ Build-Depends:
   libcurl4-openssl-dev,
   libdwarf-dev,
   libedit-dev,
-  libeditline-dev,
   libelf-dev,
   libevent-dev,
   libexpat-dev,
