@@ -76,7 +76,7 @@ class Activity:
         else ''
     )
     return {
-      'ImageId': 'ami-6e1a0117',  # ubuntu 16.04
+      'ImageId': 'ami-03d5c68bab01f3496',  # ubuntu 20.04
       'MaxCount': 1,
       'MinCount': 1,
       'InstanceType': 't2.micro',
