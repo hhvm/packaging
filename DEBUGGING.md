@@ -5,19 +5,46 @@ CloudWatch log group, and are available via the CloudWatch web UI.
 
 ## Listing available logs via CLI
 
-Log stream names are `BUILD_DATE/hhvm-VERSION_DISTRO_EC2-INSTANCE-ID`;
+Log stream names are `BUILD_DATE/w_EC2-INSTANCE-ID`:
 
 ```
-$ bin/list-build-logs
-2019/08/22/hhvm-2019.08.22_debian-8-jessie_i-0441d0e0f080021fd
-2019/08/22/hhvm-2019.08.22_debian-8-jessie_i-08a53d39a3c2ae539
-2019/08/22/hhvm-2019.08.22_debian-8-jessie_i-0ca36208f86e6a198
-2019/08/23/hhvm-2019.08.23_debian-8-jessie_i-0e79e0b5c07530107
-2019/08/23/hhvm-2019.08.23_debian-9-stretch_i-0fb0b6fded99c16da
-2019/08/23/hhvm-2019.08.23_ubuntu-16.04-xenial_i-097efd02691fbc546
-2019/08/23/hhvm-2019.08.23_ubuntu-18.04-bionic_i-090752a6c30ed87dd
-2019/08/23/hhvm-2019.08.23_ubuntu-18.10-cosmic_i-0464e77ca4066150f
-2019/08/23/hhvm-2019.08.23_ubuntu-19.04-disco_i-0332fc4967f5d763b
+$ bin/list-build-logs | head
+2021-06-07-12:25:39	2021/06/07/w_i-0f456bda6e984b976
+2021-06-07-12:22:59	2021/05/28/w_i-0dad52efaf60c6982
+2021-06-07-12:22:53	2021/05/25/w_i-0c7683e5a49b11fea
+2021-06-07-12:15:57	2021/06/07/w_i-0ee499aacd2925004
+2021-06-06-22:01:01	2021/06/07/w_i-0a0ae840bb4c7f1e2
+2021-06-06-21:52:34	2021/06/07/w_i-05e1a1a3ab88fe1ed
+2021-06-06-21:50:59	2021/06/07/w_i-0527af8a61949f942
+2021-06-06-21:46:21	2021/06/07/w_i-0df5fbf3b91a31622
+2021-06-06-21:37:36	2021/06/07/w_i-08361e376625befbe
+2021-06-06-21:35:35	2021/06/07/w_i-0d974edb7d50b0583
+```
+
+The EC2 instance ID can be found in the AWS console, or from
+`bin/aws-build-status` for any failed build steps:
+
+```
+$ bin/aws-build-status 2021.06.07-jjergus-2021-06-07-12-28
+
+Execution '2021.06.07-jjergus-2021-06-07-12-28' FAILED.
+
+Finished tasks:
+  ParseInput (0:00:00.486)
+  GetPlatformsForVersion 2021.06.07 (0:00:00.636)
+  FAILED: MakeBinaryPackage 2021.06.07 ubuntu-21.04-hirsute (0:17:53.631)
+  VersionNormalizeResults 2021.06.07 (0:00:00.46)
+  CheckIfReposChanged (0:00:00.46)
+  NormalizeResults (0:00:00.047)
+
+Unfinished tasks:
+  CheckForFailures
+
+The following steps have failed:
+
+MakeBinaryPackage 2021.06.07 ubuntu-21.04-hirsute {"ec2":"i-0511cc318a06d72f7","time_sec":"143"}
+
+Use -v (--verbose) to see full build output.
 ```
 
 ## Fetching a log via CLI

@@ -57,8 +57,8 @@ Creating a new .z release
 1. from your hhvm checkout, run
   `/path/to/packaging/checkout/bin/hhvm-tag-and-push`; this will update
   `version.h`, update the branch on github, and create the tag
-1. from this repository, run `bin/make-all-packages-on-aws 4.y.z`, e.g.
-  `bin/make-all-packages-on-aws 4.16.1`
+1. from this repository, run `bin/build-on-aws 4.y.z`, e.g.
+  `bin/build-on-aws 4.16.1`
 1. The AWS step functions are now running; proceed with release notes and MacOS
    builds as for `.0` releases; do not update `version.h` in master.
 

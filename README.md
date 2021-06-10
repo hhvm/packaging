@@ -3,6 +3,30 @@ Next Generation HHVM Binary Packaging
 
 All linux builds will be in Docker containers, on AWS.
 
+TLDR
+====
+
+- [RELEASE_PROCESS.md](RELEASE_PROCESS.md) has all the information you need,
+  if everything goes well
+- if everything doesn't go well, start with [DEBUGGING.md](DEBUGGING.md)
+- the text below describes the build system in general + an overview of our AWS
+  setup
+- [aws/hhvm1/README.md](aws/hhvm1/README.md) describes our current AWS setup in
+  more detail
+
+Commonly needed scripts (run them to see usage instructions):
+
+- `bin/promote-nightly-to-release` for regular weekly releases
+  (see [RELEASE_PROCESS.md](RELEASE_PROCESS.md))
+- `bin/hhvm-tag-and-push` and `bin/build-on-aws` for unscheduled releases
+  (see [RELEASE_PROCESS.md](RELEASE_PROCESS.md#creating-a-new-z-release))
+- `bin/aws-build-status -f` to monitor progress (shows the status of the most
+  recently started build, refreshed every 2 minutes until the build ends)
+- `bin/list-build-logs` and `bin/fetch-build-log` for [debugging](DEBUGGING.md)
+- `bin/test-build-on-all-distros <path to HHVM checkout>` to test any local
+  changes using our standard build system (make sure to run
+  `git submodule update --init --recursive` in the HHVM checkout first!)
+
 Configuration
 =============
 
