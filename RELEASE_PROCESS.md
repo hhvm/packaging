@@ -21,10 +21,15 @@ Releases are generally on Mondays, from Sunday's nightly builds.
    - Builds should have succeeded for all
      supported platforms (e.g. see https://hhvm.com/api/build-status/2019.07.22)
    - Tools and libraries should be passing on the nightlies (see
-     https://travis-ci.org/hhvm)
+     https://fburl.com/hhvm_oss_ci)
 1. Create the tags and start the builds:
    `bin/promote-nightly-to-release YYYY.MM.DD 4.x` - note that it's `4.x`, not
    `4.x.0`. For example, `bin/promote-nightly-to-release 2019.07.22 4.15`
+   - Note: The version number in `version.h` in the nightly build you're
+     promoting must match the `4.x` tag you're promoting it to. This should
+     happen automatically (see last step below) but it can occasionally fail, so
+     it is worth double-checking here. If the version number doesn't match,
+     update it and wait for the next nightly build.
 1. You can track progress in the AWS step functions dashboard. MacOS build
    output is available in the Azure web interface (see below). Output of
    finished (successful or failed) builds can also be fetched using
@@ -45,6 +50,10 @@ Releases are generally on Mondays, from Sunday's nightly builds.
 1. Update the `version.h` header in master; use
    `fbcode/hphp/facebook/update_version_header.sh`. Feel free to skip unit test
    runs etc.
+   - There should be an automatically generated (FB-internal) diff in
+     Phabricator that you can just accept (it's generated weekly, every Sunday
+     night). If you do, the diff should land automatically, but make sure to
+     check later that this actually happened.
 
 Creating a new .z release
 =========================
