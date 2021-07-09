@@ -181,5 +181,12 @@ while true; do
   echo "No more tasks for me, good bye."
   cleanup  # init script may declare this
   shutdown -h +1
-  exit 0
+
+  # Sometimes the scheduled shutdown doesn't happen for some reason. I'm not
+  # sure if retrying it will help, but it's probably worth a try. This one also
+  # uses "now" instead of "+1" in case the time offset is causing the problem.
+  while true; do
+    sleep 120
+    shutdown -h now
+  done
 done
