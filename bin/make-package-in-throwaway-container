@@ -6,12 +6,17 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-ROOT="$(realpath "$(dirname $0)/..")"
+ROOT="$(realpath "$(dirname "$0")/..")"
 OUT="$ROOT/out/"
 NODIST="$ROOT/nodist/"
-DISTRO=${1:-"debian-8-jessie"}
+DISTRO="$1"
 DOCKER_BASE="$(<"${ROOT}/${DISTRO}/DOCKER_BASE")"
 IS_NIGHTLY=${IS_NIGHTLY:-true}
+
+if [ -z "$1" ]; then
+  echo "Must specify a distribution."
+  exit 1
+fi
 
 if [ ! -d "${ROOT}/${DISTRO}" ]; then
   echo "Unsupported distro: ${DISTRO}"
