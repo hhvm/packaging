@@ -58,6 +58,7 @@ Build-Depends:
   libxslt1-dev,
   libyaml-dev,
   python3,
+  re2c,
   rsync,
   tzdata,
   unzip,
