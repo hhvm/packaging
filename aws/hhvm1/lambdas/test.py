@@ -162,7 +162,7 @@ class Test(unittest.TestCase):
       {'version': '4.26.1', 'platform': 'ubuntu-18.04-bionic'}
     ).ec2_params()
     self.assertEqual(ec2_params['MinCount'], 1)
-    self.assertEqual(ec2_params['InstanceType'], 'm5.2xlarge')
+    self.assertEqual(ec2_params['InstanceType'], 'm5.4xlarge')
     self.assertEqual(
       ec2_params['BlockDeviceMappings'][0]['DeviceName'],
       '/dev/sda1',
