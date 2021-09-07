@@ -21,7 +21,8 @@ if ! ./test.py; then
   fi
 fi
 
-ZIP="$(mktemp --dry-run --suffix=.zip)"
+ZIP="$(mktemp XXXXXX.zip)"
+rm $ZIP
 zip "$ZIP" $(ls *.py | grep -v test.py)
 
 # Each AWS lambda is configured to run a different Python function, so we just
