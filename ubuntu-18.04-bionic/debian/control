@@ -13,6 +13,7 @@ Build-Depends:
   cmake,
   curl,
   debhelper (>= 9),
+  flex,
   g++,
   gawk,
   git,
