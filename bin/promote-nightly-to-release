@@ -7,39 +7,171 @@
 # LICENSE file in the root directory of this source tree.
 
 set -e
-NIGHTLY="$1"
-VERSION="$2"
 
-if [ -z "$NIGHTLY" -o -z "$VERSION" -o "$1" == "--help" ]; then
-  echo "Usage: $0 (YYYY.MM.DD|existing-tag) MAJOR.MINOR"
+function show_help() {
+  cat<<EOF
+Usage: $0 [OPTIONS] (YYYY.MM.DD|existing-tag) MAJOR.MINOR"
+Options:
+  --help
+      Show this page
+  --previous=PREV_MAJOR.PREV_MINOR
+      (default: MAJOR.(MINOR - 1))
+      Manually specify the previous release. Useful when a release has been
+      skipped.
+  --dry-run
+      Only show the versions that would be used, don't actually do anything.
+  --force
+      Skip safety checks:
+      - allow uncommitted changes to this repository
+      - do not require that the local checkout is in sync with upstream
+EOF
+}
+
+if [ "$#" == "0" ]; then
+  show_help;
+  exit 1;
+fi
+
+FORCE=false
+DRY_RUN=false
+POSITIONAL_ARGUMENTS=()
+while (($#)); do
+  case "$1" in
+    --help)
+      show_help
+      exit
+      ;;
+    --force)
+      FORCE=true
+      shift
+      ;;
+    --dry-run)
+      DRY_RUN=true
+      shift
+      ;;
+    --previous)
+      shift
+      if ! (($#)); then
+        echo "'--previous' requires a value."
+        show_help
+        exit 1
+      fi
+      PREVIOUS_VERSION="$1"
+      shift
+      ;;
+    --previous=*)
+      PREVIOUS_VERSION="${1#--previous=}"
+      if [ -z "${PREVIOUS_VERSION}" ]; then
+        echo "'--previous' requires a value."
+        show_help
+        exit 1
+      fi
+      shift
+      ;;
+    --)
+      shift
+      POSITIONAL_ARGUMENTS=("${POSITIONAL_ARGUMENTS[@]}" "$@")
+      break
+      ;;
+    --*)
+      echo "Unrecognized option: $1"
+      show_help
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGUMENTS+=("$1")
+      shift
+      ;;
+  esac
+done
+
+if [ "${#POSITIONAL_ARGUMENTS[@]}" != "2" ]; then
+  echo "Expected two arguments, got ${#POSITIONAL_ARGUMENTS[@]}:"
+  echo "  ${POSITIONAL_ARGUMENTS[*]}"
+  show_help
   exit 1
 fi
-if ! echo "$VERSION" | grep -q -e '^[0-9]\+\.[0-9]\+$'; then
-  echo "Only specify MAJOR.MINOR version, not MAJOR.MINOR.RELEASE"
+
+NIGHTLY="${POSITIONAL_ARGUMENTS[0]}"
+VERSION="${POSITIONAL_ARGUMENTS[1]}"
+
+if [ -z "$NIGHTLY" -o -z "$VERSION" ]; then
+  echo "Missing nightly $NIGHTLY or version $VERSION"
+  show_help
   exit 1
 fi
+
+function check_version() {
+  local VERSION="$1"
+  if ! echo "$VERSION" | grep -q -e '^[0-9]\+\.[0-9]\+$'; then
+    echo "Only specify MAJOR.MINOR version, not MAJOR.MINOR.RELEASE"
+    exit 1
+  fi
+}
+
+check_version "$VERSION"
+
+if [ -z "${PREVIOUS_VERSION}" ]; then
+  MAJOR=$(echo "$VERSION" | cut -f1 -d.)
+  MINOR=$(echo "$VERSION" | cut -f2 -d.)
+  PREVIOUS_VERSION="${PREVIOUS_VERSION:-"${MAJOR}.$((MINOR-1))"}"
+fi
+check_version "$PREVIOUS_VERSION"
+
+if [ "$#" -gt 2 ]; then
+  echo "Options must come before positional arguments."
+  show_help
+  exit 1
+fi
+
+cat <<EOF
+----------------
+--- Versions ---
+----------------
+Nightly build:
+  ${NIGHTLY}
+Previous version:
+  ${PREVIOUS_VERSION}
+Tagging version:
+  ${VERSION}
+----------------
+EOF
+
+if $DRY_RUN; then
+  exit 0
+fi
+
+if $FORCE; then
+  FORCEABLE='[WARNING - FORCED]'
+else
+  FORCEABLE='[FORCEABLE ERROR]'
+fi
+
+PKGDIR="$(pwd)"
+if [ ! -e "$PKGDIR/bin/$(basename "$0")" ]; then
+  echo "This script must be ran from the root of the packaging repository."
+  exit 1
+fi
+
 if [ "$(<.git/HEAD)" != "ref: refs/heads/master" ]; then
-  echo "Run from master branch."
-  exit 1
+  echo "${FORCEABLE} Run from master branch."
+  $FORCE || exit 1
 fi
 if ! git diff --exit-code >/dev/null; then
-  echo "Uncommitted changes, bailing out."
-  exit 1
+  echo "${FORCEABLE} Uncommitted changes."
+  $FORCE || exit 1
 fi
 
 echo "Fetching any updates to packaging repo..."
 git fetch >/dev/null
 if ! git diff --exit-code origin/master..HEAD >/dev/null; then
-  echo "Current branch is out of sync with origin/master, bailing out."
-  exit 1
+  echo "${FORCEABLE} Current branch is out of sync with origin/master"
+  $FORCE || exit 1
 fi
-
-MAJOR=$(echo "$VERSION" | cut -f1 -d.)
-MINOR=$(echo "$VERSION" | cut -f2 -d.)
 
 SED=$(if [ "$(uname -s)" == "Darwin" ]; then echo gsed; else echo sed; fi)
 
-if ! which $SED >/dev/null; then
+if ! which "$SED" >/dev/null; then
   echo "'$SED' is required."
   if [ "$SED" == "gsed" ]; then
     echo "Try: brew install gnu-sed"
@@ -47,16 +179,10 @@ if ! which $SED >/dev/null; then
   exit 1
 fi
 
-PKGDIR="$(pwd)"
-if [ ! -e "$PKGDIR/bin/$(basename $0)" ]; then
-  echo "This script must be ran from the root of the packaging repository."
-  exit 1
-fi
-
 GIT_ORIGIN="$(git remote get-url origin)"
 if [ "$GIT_ORIGIN" != "git@github.com:hhvm/packaging.git" ]; then
-  echo "Git origin must be set to hhvm/packaging (not a fork)."
-  exit 1
+  echo "${FORCEABLE} Git origin must be set to hhvm/packaging (not a fork)."
+  $FORCE || exit 1
 fi
 
 function statusline() {
@@ -71,8 +197,8 @@ function statusline() {
 statusline "Creating packaging branch..."
 git checkout -b "HHVM-${VERSION}"
 statusline "Marking support for new DISTRO apt repo.."
-echo "DISTRO-${MAJOR}.${MINOR}" >> DEBIAN_REPOSITORIES
-git commit DEBIAN_REPOSITORIES -m "Adding DISTRO-${MAJOR}.${MINOR} apt repositories"
+echo "DISTRO-${VERSION}" >> DEBIAN_REPOSITORIES
+git commit DEBIAN_REPOSITORIES -m "Adding DISTRO-${VERSION} apt repositories"
 statusline "Pushing packaging branch..."
 git push -u origin "HEAD:HHVM-${VERSION}"
 
@@ -101,7 +227,7 @@ git clone git@github.com:hhvm/hhvm-docker.git
 (
   cd hhvm-docker
   statusline "Removing 'latest' from previous release branch tags..."
-  git checkout "HHVM-${MAJOR}.$(($MINOR - 1))"
+  git checkout "HHVM-${PREVIOUS_VERSION}"
   $SED -i '/^latest$/d' EXTRA_TAGS
   git commit EXTRA_TAGS -m "Removing 'latest' tag"
   git push
