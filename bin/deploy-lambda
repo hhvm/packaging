@@ -8,7 +8,7 @@
 
 set -e
 
-ROOT="$(realpath "$(dirname $0)/..")"
+ROOT="$(realpath "$(dirname "$0")/..")"
 
 LAMBDA="$1"
 if [ -z "$LAMBDA" ]; then
@@ -21,17 +21,17 @@ if [ ! -d "$LAMBDA_ROOT" ]; then
   echo "Usage: $0 LAMBDA"
   exit 1
 fi
-cd $LAMBDA_ROOT
+cd "$LAMBDA_ROOT"
 
-INPUTS=index.js
+INPUTS=(index.js)
 if [ -e package.json ]; then
   yarn
   if [ -e .babelrc ]; then
     yarn build
-    INPUTS=build-out/index.js
+    INPUTS+=(build-out/index.js)
   fi
-  INPUTS="$INPUTS node_modules"
+  INPUTS+=(node_modules)
 fi
 rm -f lambda.zip
-zip -r lambda.zip $INPUTS
+zip -r lambda.zip "${INPUTS[@]}"
 aws lambda update-function-code --function-name "$LAMBDA" --zip-file "fileb://$(pwd)/lambda.zip" --publish --region us-west-2

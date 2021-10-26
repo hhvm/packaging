@@ -5,7 +5,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-if [ "$1" != "debian" -a "$1" != "ubuntu" ]; then
+if [ "$1" != "debian" ] && [ "$1" != "ubuntu" ]; then
   echo "USAGE: $0 debian|ubuntu"
   exit 1
 fi
@@ -38,7 +38,7 @@ for DISTRO_DIR in "$INCOMING_DIR/$DISTRO_BASE-"*; do
   DISTRO="$(<"/opt/hhvm-packaging/$(basename "$DISTRO_DIR")/DISTRIBUTION")"
   (
     cd "$REPO_DIR"
-    for REPREPRO_DISTRO in $(sed "s/DISTRO/$DISTRO/" /opt/hhvm-packaging/DEBIAN_REPOSITORIES); do
+    sed "s/DISTRO/$DISTRO/" /opt/hhvm-packaging/DEBIAN_REPOSITORIES | while read -r REPREPRO_DISTRO; do
       reprepro --keepunreferencedfiles --keepunusednewfiles --ignore=wrongdistribution include "$REPREPRO_DISTRO" "$DISTRO_DIR"/*.changes
     done
   )
@@ -56,5 +56,5 @@ for DISTRO_DIR in "$INCOMING_DIR/$DISTRO_BASE-"*; do
     continue;
   fi
   DISTRO=$(basename "$DISTRO_DIR")
-  aws s3 rm --recursive s3://hhvm-scratch/$VERSION/$DISTRO
+  aws s3 rm --recursive "s3://hhvm-scratch/$VERSION/$DISTRO"
 done

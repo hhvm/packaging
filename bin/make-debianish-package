@@ -9,7 +9,8 @@
 set -ex
 
 export DEBIAN_FRONTEND=noninteractive
-export DEB_BUILD_OPTIONS="parallel=$(egrep -c '^processor' /proc/cpuinfo)"
+DEB_BUILD_OPTIONS="parallel=$(grep -E -c '^processor' /proc/cpuinfo)"
+export DEB_BUILD_OPTIONS
 
 if $IS_NIGHTLY; then
   PKGBASE="hhvm-nightly"
@@ -34,10 +35,10 @@ apt-get clean
 apt-get install -y devscripts equivs
 
 # Source extraction
-cp /var/out/${PKGBASE}-$VERSION.tar.gz ${PKGBASE}_$VERSION.orig.tar.gz
-tar zxf ${PKGBASE}_$VERSION.orig.tar.gz
-cd ${PKGBASE}-$VERSION
-cp -R $DISTRO_ROOT/debian/ debian/
+cp "/var/out/${PKGBASE}-$VERSION.tar.gz" "${PKGBASE}_$VERSION.orig.tar.gz"
+tar zxf "${PKGBASE}_$VERSION.orig.tar.gz"
+cd "${PKGBASE}-$VERSION"
+cp -R "$DISTRO_ROOT/debian/" debian/
 cp -R /opt/hhvm-packaging/skeleton/ debian/skeleton
 
 if ! $IS_NIGHTLY; then
@@ -45,12 +46,12 @@ if ! $IS_NIGHTLY; then
   sed -i 's/hhvm-nightly/hhvm/' debian/control
   sed -i 's/hhvm-nightly/hhvm/' debian/rules
   for file in debian/hhvm-nightly*; do
-    mv "$file" "$(echo $file | sed 's/hhvm-nightly/hhvm/')"
+    mv "$file" "${$file//hhvm-nightly/hhvm}"
   done
 fi
 
 # Add debian changelog entry
-dch --create -v $VERSION-$PKGVER --package ${PKGBASE} --controlmaint --distribution "$DISTRIBUTION" --force-distribution --empty
+dch --create -v "$VERSION-$PKGVER" --package ${PKGBASE} --controlmaint --distribution "$DISTRIBUTION" --force-distribution --empty
 
 # Build debian package that depends on build-depends, and install it
 mk-build-deps
@@ -61,15 +62,18 @@ mv "$BUILD_DEPS_NEW" "$OUT" || rm "$BUILD_DEPS_OLD"
 # Build the actual debian packages
 PREBUILD="$DISTRO_ROOT/make-package.prebuild"
 if [ -x "$PREBUILD" ]; then
+  #shellcheck disable=SC1090
   source $PREBUILD
 fi
 debuild -us -uc
 cd ..
-FILES=$(awk '/^Files:/ { files=1; next } /^[^ ]/ { files=0; next } files==1 { print $NF }' *.changes)
+FILES=$(awk '/^Files:/ { files=1; next } /^[^ ]/ { files=0; next } files==1 { print $NF }' ./*.changes)
 if [ -z "$FILES" ]; then
   echo "Failed to identify neccessary files"
   exit 1
 fi
-cp *.changes $FILES "$OUT"
+# FILES is one-per-line, but SC2086 wants to disable that expansion
+#shellcheck disable=SC2086
+cp ./*.changes $FILES "$OUT"
 set +ex
 echo "Build tree: $TEMP"

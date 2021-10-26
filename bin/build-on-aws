@@ -10,7 +10,7 @@ echo "ONE STATE MACHINE TO RULE THEM ALL"
 echo "Runs any subset of build steps for any combination of versions + distros."
 echo
 
-if [ -z "$1" -o "$1" == "--help" ]; then
+if [ -z "$1" ] || [ "$1" == "--help" ]; then
   echo "Usage: $0 [--skip-ec2|--fake-ec2] <versions> <distros> <steps>"
   echo
   echo "Each version will be built for each specified distro that it supports."
@@ -22,6 +22,7 @@ if [ -z "$1" -o "$1" == "--help" ]; then
   echo " --fake-ec2  launched EC2 instances will succeed without doing anything"
   echo
   echo "Available steps:"
+  #shellcheck disable=SC2038
   find "$(dirname "$0")/../" -name activities.py \
     | xargs grep '^class [a-zA-Z]*.Activity.:$' \
     | grep -o ' [a-zA-Z]*'

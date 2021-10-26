@@ -95,7 +95,7 @@ fi
 NIGHTLY="${POSITIONAL_ARGUMENTS[0]}"
 VERSION="${POSITIONAL_ARGUMENTS[1]}"
 
-if [ -z "$NIGHTLY" -o -z "$VERSION" ]; then
+if [ -z "$NIGHTLY" ] || [ -z "$VERSION" ]; then
   echo "Missing nightly $NIGHTLY or version $VERSION"
   show_help
   exit 1
@@ -171,7 +171,7 @@ fi
 
 SED=$(if [ "$(uname -s)" == "Darwin" ]; then echo gsed; else echo sed; fi)
 
-if ! which "$SED" >/dev/null; then
+if ! command -v "$SED" >/dev/null; then
   echo "'$SED' is required."
   if [ "$SED" == "gsed" ]; then
     echo "Try: brew install gnu-sed"

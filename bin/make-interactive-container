@@ -6,7 +6,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-ROOT="$(realpath "$(dirname $0)/..")"
+ROOT="$(realpath "$(dirname "$0")/..")"
 OUT="$ROOT/out/"
 NODIST="$ROOT/nodist/"
 DISTRO=${1:-"debian-8-jessie"}

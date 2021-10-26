@@ -8,7 +8,7 @@
 
 set -ex
 
-ROOT="$(realpath "$(dirname $0)/..")"
+ROOT="$(realpath "$(dirname "$0")/..")"
 if [ "$ROOT" == "/opt/hhvm-packaging" ]; then
   OUT=/var/out
 else
@@ -22,13 +22,15 @@ TAR=${TAR:-tar}
 cd "$TEMPDIR"
 
 if "${IS_AWS:-false}"; then
+  # Intentionally doing unsafe (and potentially multiple) things with this eval
+  #shellcheck disable=SC2046
   eval $(ssh-agent)
   KEYFILE=$(mktemp)
   aws kms decrypt \
     --region us-west-2 \
     --ciphertext-blob "fileb://${ROOT}/aws/staging-repo-key.kms-ciphertext" \
     --query Plaintext --output text \
-    | base64 --decode > $KEYFILE
+    | base64 --decode > "$KEYFILE"
   ssh-add "$KEYFILE"
 
   echo "github.com,192.30.253.113 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" >> ~/.ssh/known_hosts
@@ -44,9 +46,9 @@ else
   HEAD=HHVM-${VERSION}
 fi
 
-git clone ${REPO} ${PREFIX}-${VERSION}
-cd ${PREFIX}-$VERSION
-git checkout $HEAD
+git clone ${REPO} "${PREFIX}-${VERSION}"
+cd "${PREFIX}-$VERSION"
+git checkout "$HEAD"
 if "${IS_AWS:-false}" && $IS_NIGHTLY; then
   TAG="nightly-${VERSION}"
   # Tag may already exist from previous failed runs.

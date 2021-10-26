@@ -14,7 +14,7 @@ if [ -z "$1" ] || [ ! -d "$1" ]; then
   exit 1
 fi
 
-pushd "$1"
+pushd "$1" || exit
 
 find . -name .git -print0 | xargs -0 rm -rf
 # ~ 1100mb here
@@ -24,4 +24,4 @@ rm -rf hphp/test/{slow,quick,zend,zend7}
 # ~ 200mb here
 rm -rf third-party/boost/boost/libs/*/{doc,test}
 
-popd
+popd || exit

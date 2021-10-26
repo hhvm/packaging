@@ -32,7 +32,7 @@ if [ -z "$VERSION" ]; then
   VERSION="${INFERRED_VERSION}"
   echo "It looks like you want to tag >>> $VERSION <<<"
   echo "Hit ^C to cancel, or enter to continue"
-  read
+  read -r
 elif [ "$VERSION" != "${INFERRED_VERSION}" ]; then
   echo "Requested version ($VERSION) does not match expected ($INFERRED_VERSION)."
   exit 1
@@ -45,15 +45,16 @@ if [ "$(< .git/HEAD)" != "ref: refs/heads/HHVM-$(echo "$VERSION" | cut -f1-2 -d.
 fi
 
 SED=$(if [ "$(uname -s)" == "Darwin" ]; then echo gsed; else echo sed; fi)
-
-NEXT="$(echo "$VERSION" | $SED -E 's/(^.+\.)([0-9]+)$/echo "\1$((\2 + 1))"/e')"
+#shellcheck disable=SC2016
+NEXT="$(echo "$VERSION" | "$SED" -E 's/(^.+\.)([0-9]+)$/echo "\1$((\2 + 1))"/e')"
 
 $SED -i 's/HHVM_VERSION_SUFFIX "-dev"$/HHVM_VERSION_SUFFIX ""/' \
   hphp/runtime/version.h
 git commit hphp/runtime/version.h -m "Releasing $VERSION"
-git tag HHVM-$VERSION
+git tag "HHVM-$VERSION"
 $SED -i 's/HHVM_VERSION_SUFFIX ""$/HHVM_VERSION_SUFFIX "-dev"/' \
   hphp/runtime/version.h
+#shellcheck disable=SC2016
 $SED -i -E 's/^(.+HHVM_VERSION_PATCH )([0-9]+)$/echo "\1$((\2+1))"/e' \
   hphp/runtime/version.h
 git commit hphp/runtime/version.h -m "Targetting $NEXT"

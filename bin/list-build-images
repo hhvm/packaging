@@ -19,7 +19,7 @@ function dump_builds() {
     --query 'imageDetails[*].[imagePushedAt,imageTags[0]]' \
     --output text \
     | sort -r \
-    | awk '{ print "\t"$1"\t'${IMAGE_NAME}':"$2 }'
+    | awk '{ print "\t"$1"\t'"${IMAGE_NAME}"':"$2 }'
 }
 
 echo "Failed builds:"
@@ -39,6 +39,7 @@ echo "$SUCCEEDED" | grep :backup || true
 
 echo "To use an image:"
 
+#shellcheck disable=SC2016
 echo '  $(aws ecr get-login --no-include-email)'
 echo '  docker pull IMAGE_NAME'
 echo '  docker run -it IMAGE_NAME /bin/bash -l'

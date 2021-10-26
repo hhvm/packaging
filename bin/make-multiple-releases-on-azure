@@ -8,8 +8,6 @@
 
 set -e
 
-ROOT="$(realpath "$(dirname $0)/..")"
-
 VERSION=$1
 if [ -z "$VERSION" ]; then
   echo "Usage: $0 [-r|--rebuild REBUILD_NUM] VERSION1 [VERSION2 [VERSION3 ...]]"
@@ -39,7 +37,7 @@ echo "Rebuild number: $REBUILD_NUM"
 echo "Version(s): ${VERSIONS[*]}"
 echo
 
-if ! which az >/dev/null; then
+if ! command -v az >/dev/null; then
   echo "Install 'az' (usually from the 'azure-cli' package) and try again."
   exit 1
 fi

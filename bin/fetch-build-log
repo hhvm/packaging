@@ -13,7 +13,6 @@ if [ -z "${STREAM}" ]; then
   echo "Usage: $0 LOG_NAME"
   exit 1
 fi
-LIMIT="${2:-100}"
 
 aws logs get-log-events \
   --log-group-name hhvm-binary-package-builds/cloud-init-output.log \
