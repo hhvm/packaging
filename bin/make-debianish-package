@@ -46,7 +46,7 @@ if ! $IS_NIGHTLY; then
   sed -i 's/hhvm-nightly/hhvm/' debian/control
   sed -i 's/hhvm-nightly/hhvm/' debian/rules
   for file in debian/hhvm-nightly*; do
-    mv "$file" "${$file//hhvm-nightly/hhvm}"
+    mv "$file" "${file//hhvm-nightly/hhvm}"
   done
 fi
 
