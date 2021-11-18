@@ -29,3 +29,5 @@ IMAGE_NAME="${DOCKER_REPOSITORY}/${IMAGE_NAME}:${VERSION}_${DISTRO}_${EC2_INSTAN
 docker commit "${CONTAINER_ID}" "${IMAGE_NAME}"
 # Push to ECR so we can download later
 docker push "${IMAGE_NAME}"
+docker rmi "${IMAGE_NAME}"
+docker rm "${CONTAINER_ID}"
