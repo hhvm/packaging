@@ -181,7 +181,7 @@ fi
 
 GIT_ORIGIN="$(git remote get-url origin)"
 if [ "$GIT_ORIGIN" != "git@github.com:hhvm/packaging.git" ]; then
-  echo "${FORCEABLE} Git origin must be set to hhvm/packaging (not a fork)."
+  echo "${FORCEABLE} Git origin must be set to git@github.com:hhvm/packaging.git (actual $GIT_ORIGIN)."
   $FORCE || exit 1
 fi
 
