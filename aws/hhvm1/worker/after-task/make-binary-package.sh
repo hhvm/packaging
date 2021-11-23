@@ -11,10 +11,7 @@ if $SUCCESS; then
 else
   IMAGE_NAME=hhvm-failed-builds
   aws s3 cp /var/log/cloud-init-output.log "s3://hhvm-scratch/build-failure-${VERSION}-${DISTRO}-${EC2_INSTANCE_ID}.cloud-init-output.log"
-  # Use /dev/shm to increase chances of succeeding when the disk is full
-  DMESG=$(mktemp -p /dev/shm dmesg-log-XXXXXX)
-  dmesg > "$DMESG"
-  aws s3 cp "$DMESG" "s3://hhvm-scratch/build-failure-${VERSION}-${DISTRO}-${EC2_INSTANCE_ID}.dmesg.log"
+  aws s3 cp /var/log/kern.log "s3://hhvm-scratch/build-failure-${VERSION}-${DISTRO}-${EC2_INSTANCE_ID}.dmesg.log"
   rm "$DMESG"
 fi
 
