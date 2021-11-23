@@ -159,7 +159,7 @@ class MakeBinaryPackage(Activity):
         'DeviceName': '/dev/sda1',
         'Ebs': {
           'DeleteOnTermination': True,
-          'VolumeSize': 95,  # GB
+          'VolumeSize': 256,  # GB
           'VolumeType': 'gp2',
         },
       }],
