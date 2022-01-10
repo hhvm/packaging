@@ -11,6 +11,14 @@ set -x
 echo "alias t='tail -n 100 -f /var/log/cloud-init-output.log'" \
   >> /home/ubuntu/.bashrc
 
+# This package attempts to install upgrades on shutdown, which:
+# - is unneeded, as when we shutdown, the instances are destroyed
+# - cancels the shutdown, but does not reliably schedule a new one
+#
+# This is particularly problematic for workers that mount EBS, as each EBS
+# volume can only be mounted by one worker at a time.
+DEBIAN_FRONTEND=noninteractive apt-get remove -y unattended-upgrades || true
+
 # Shut down if we don't reach the main loop in 10 minutes.
 shutdown -h +10
 
