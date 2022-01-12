@@ -88,7 +88,7 @@ git config --global core.excludesfile /root/.gitignore_global
 
 if [ ! -e "$BUILD_DIR/.git" ]; then
   TMP_DIR="$(mktemp -d)/hhvm"
-  git clone git://github.com/facebook/hhvm.git "$TMP_DIR"
+  git clone https://github.com/facebook/hhvm.git "$TMP_DIR"
   pushd "$TMP_DIR"
   git fetch --all --tags
   # This may fail if running a test build with a fake version number, in which

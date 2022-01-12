@@ -45,7 +45,7 @@ ok
 
 if $CLONE_TO_HOME; then
   log "Cloning Git repository..."
-  sudo -i -u ubuntu git clone git://github.com/$TEAM/$REPO.git
+  sudo -i -u ubuntu git clone https://github.com/$TEAM/$REPO.git
   ok
 fi
 
