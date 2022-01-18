@@ -3,5 +3,10 @@
     "hhvm": "^4.0",
     "hhvm/hhvm-autoload": "^3.0",
     "hhvm/hsl": "^4.0"
+  },
+  "config": {
+    "allow-plugins": {
+      "hhvm/hhvm-autoload": true
+    }
   }
 }
