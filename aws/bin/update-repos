@@ -7,6 +7,26 @@
 # LICENSE file in the root directory of this source tree.
 
 set -ex
+if mount | grep -q '^/dev/xvdf on /mnt/dl.hhvm.com'
+then
+  echo 'Skipping mounting /mnt/dl.hhvm.com because it was previously mounted'
+else
+  INSTANCE_ID=$(curl --retry 5 http://169.254.169.254/latest/meta-data/instance-id)
+
+  # We keep a shared XFS volume as the source of truth to avoid having to
+  # redownload from S3 every day, which can take a *really* long time.
+  VOLUME_ID="vol-096d2c45d13d3a865"
+
+  aws ec2 attach-volume \
+    --device /dev/sdf \
+    --instance-id "$INSTANCE_ID" \
+    --volume-id "$VOLUME_ID"
+
+  sleep 10 # wait for EC2 to attach
+
+  mkdir -p /mnt/dl.hhvm.com
+  mount /dev/xvdf /mnt/dl.hhvm.com
+fi
 
 apt-get update -y
 apt-get install -y reprepro awscli
