@@ -154,7 +154,7 @@ class MakeBinaryPackage(Activity):
   def ec2_params(self):
     params = super().ec2_params()
     params.update({
-      'InstanceType': 'm5.4xlarge',  # 16 cores, 64GB RAM
+      'InstanceType': 'r6i.4xlarge',  # 16 cores, 128GB RAM
       'BlockDeviceMappings': [{
         'DeviceName': '/dev/sda1',
         'Ebs': {
