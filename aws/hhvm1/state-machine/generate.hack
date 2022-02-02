@@ -162,10 +162,10 @@ abstract final class Config {
   const dict<A, int> TIMEOUT_SEC = dict[
     A::MakeSourceTarball => 30 * 60,
     A::MakeBinaryPackage => 4 * 60 * 60,
-    A::PublishBinaryPackages => 180 * 60,
-    A::PublishDockerImages => 180 * 60,
+    A::PublishBinaryPackages => 240 * 60,
+    A::PublishDockerImages => 240 * 60,
     A::PublishSourceTarball => 30 * 60,
-    A::BuildAndPublishMacOS => 180 * 60,
+    A::BuildAndPublishMacOS => 240 * 60,
   ];
 
   /**
