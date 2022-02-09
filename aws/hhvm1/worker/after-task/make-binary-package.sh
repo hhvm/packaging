@@ -6,13 +6,16 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-set -ex
-
 if $SUCCESS; then
   IMAGE_NAME=hhvm-successful-builds
 else
   IMAGE_NAME=hhvm-failed-builds
+  aws s3 cp /var/log/cloud-init-output.log "s3://hhvm-scratch/build-failure-${VERSION}-${DISTRO}-${EC2_INSTANCE_ID}.cloud-init-output.log"
+  aws s3 cp /var/log/kern.log "s3://hhvm-scratch/build-failure-${VERSION}-${DISTRO}-${EC2_INSTANCE_ID}.dmesg.log"
+  rm "$DMESG"
 fi
+
+set -ex
 
 # On modern systems, this should just be:
 #   $(aws ecr get-login --no-include-email --region us-west-2)
@@ -29,3 +32,5 @@ IMAGE_NAME="${DOCKER_REPOSITORY}/${IMAGE_NAME}:${VERSION}_${DISTRO}_${EC2_INSTAN
 docker commit "${CONTAINER_ID}" "${IMAGE_NAME}"
 # Push to ECR so we can download later
 docker push "${IMAGE_NAME}"
+docker rmi "${IMAGE_NAME}"
+docker rm "${CONTAINER_ID}"

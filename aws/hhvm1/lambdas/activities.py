@@ -159,7 +159,7 @@ class MakeBinaryPackage(Activity):
         'DeviceName': '/dev/sda1',
         'Ebs': {
           'DeleteOnTermination': True,
-          'VolumeSize': 95,  # GB
+          'VolumeSize': 256,  # GB
           'VolumeType': 'gp2',
         },
       }],
@@ -171,7 +171,6 @@ class PublishBinaryPackages(Activity):
   ec2_iam_arn = 'arn:aws:iam::223121549624:instance-profile/hhvm-repo-builders'
   activity_arn = 'arn:aws:states:us-west-2:223121549624:activity:hhvm-publish-binary-packages'
   script_name = 'update-repos.sh'
-  init_script = 'aws/hhvm1/worker/init/update-repos.sh'
 
   def task_env(self):
     return {'REPOS_ONLY': '1'}

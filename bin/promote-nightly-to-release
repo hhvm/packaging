@@ -137,10 +137,6 @@ Tagging version:
 ----------------
 EOF
 
-if $DRY_RUN; then
-  exit 0
-fi
-
 if $FORCE; then
   FORCEABLE='[WARNING - FORCED]'
 else
@@ -162,6 +158,23 @@ if ! git diff --exit-code >/dev/null; then
   $FORCE || exit 1
 fi
 
+REQUIRED_GIT_ORIGIN="git@github.com:hhvm/packaging.git"
+GIT_ORIGIN="$(git remote get-url --push origin)"
+
+if [ "$GIT_ORIGIN" != "$REQUIRED_GIT_ORIGIN" ]; then
+  echo "${FORCEABLE} Git origin push URL is unsupported:"
+  echo "  - Current value: ${GIT_ORIGIN}"
+  echo "  - Required value: ${REQUIRED_GIT_ORIGIN}"
+  echo "  - Fix: git remote set-url --push origin ${REQUIRED_GIT_ORIGIN}"
+  $FORCE || exit 1
+fi
+
+if $DRY_RUN; then
+  echo "Dry run - exiting."
+  exit 0
+fi
+
+
 echo "Fetching any updates to packaging repo..."
 git fetch >/dev/null
 if ! git diff --exit-code origin/master..HEAD >/dev/null; then
@@ -177,12 +190,6 @@ if ! command -v "$SED" >/dev/null; then
     echo "Try: brew install gnu-sed"
   fi
   exit 1
-fi
-
-GIT_ORIGIN="$(git remote get-url origin)"
-if [ "$GIT_ORIGIN" != "git@github.com:hhvm/packaging.git" ]; then
-  echo "${FORCEABLE} Git origin must be set to hhvm/packaging (not a fork)."
-  $FORCE || exit 1
 fi
 
 function statusline() {

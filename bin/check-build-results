@@ -1,0 +1,47 @@
+#!/bin/bash
+
+STEP_FUNCTION_ARN="arn:aws:states:us-west-2:223121549624:stateMachine:one-state-machine-to-rule-them-all"
+
+BUILD_DETAILS_JQ=$(mktemp)
+
+cat > "$BUILD_DETAILS_JQ" <<EOF
+.events[]
+| select(
+  .type == "TaskStateEntered"
+  and .stateEnteredEventDetails.name == "PrepareToPublishBinaryPackages")
+| .stateEnteredEventDetails.input
+| fromjson.results.ForEachPlatform[].results.MakeBinaryPackage
+| [
+  if (.success != null) then "SUCCEEDED" else "FAILED" end,
+  if (.success != null)
+    then .success.ec2
+    else .failure.Cause | fromjson | .ec2 end,
+  .taskInput.name]
+| join(" ")
+EOF
+function clean {
+  rm "$BUILD_DETAILS_JQ"
+}
+trap clean EXIT
+
+aws stepfunctions list-executions \
+  "--state-machine-arn=$STEP_FUNCTION_ARN" \
+  --query 'executions[].[executionArn,name,status,startDate,stopDate]' \
+  --max-items 5 \
+  --output text \
+| grep -ve "^None$" | while read -ra ROW; do
+  ARN="${ROW[0]}"
+  NAME="${ROW[1]}"
+  STATUS="${ROW[2]}"
+  START="${ROW[3]}"
+  STOP="${ROW[4]}"
+  echo "$STATUS: '$NAME'"
+  echo -e "\tStarted at:  $START"
+  echo -e "\tFinished at: $STOP"
+  echo -e "\tBuild jobs:"
+  aws stepfunctions get-execution-history --execution-arn "$ARN" \
+  | jq -r "$(<"$BUILD_DETAILS_JQ")" \
+  | while read -ra ROW; do
+    printf "\t\t%-8s\t%s\t%s\n" "${ROW[0]}:" "${ROW[1]}" "${ROW[2]}"
+  done
+done

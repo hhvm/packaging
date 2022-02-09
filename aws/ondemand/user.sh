@@ -23,7 +23,11 @@ git config --global core.excludesfile /home/ubuntu/.gitignore_global
 
 if $CLONE_TO_HOME; then
   cd "/home/ubuntu/$REPO"
-  git checkout -b "ondemand_$(date +%Y-%m-%d_%H%M)" master
+  BRANCH=main
+  if ! git rev-parse --verify --quiet $BRANCH --; then
+    BRANCH=master
+  fi
+  git checkout -b "ondemand_$(date +%Y-%m-%d_%H%M)" $BRANCH
   git remote set-url origin "git@github.com:$GITHUB_USER/$REPO.git"
   git remote add upstream "git@github.com:$TEAM/$REPO.git"
 fi

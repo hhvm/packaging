@@ -122,7 +122,8 @@ if [ -z "$CONTAINER" ]; then
       -v "$SRC_DIR:/opt/ondemand:ro" \
       -v "/:/mnt/parent" \
       -v "/home/ubuntu:/home/ubuntu" \
-      --security-opt "seccomp=$SRC_DIR/facebook/hhvm/seccomp.json" \
+      --cap-add=SYS_PTRACE \
+      --security-opt seccomp=unconfined \
       "$IMAGE" /bin/bash -l
   )"
   echo -e '\e[22m' # reset text color
