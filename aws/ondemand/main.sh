@@ -45,12 +45,12 @@ ok
 
 if $CLONE_TO_HOME; then
   log "Cloning Git repository..."
-  sudo -i -u ubuntu git clone git://github.com/$TEAM/$REPO.git
+  sudo -i -u ubuntu git clone https://github.com/$TEAM/$REPO.git
   ok
 fi
 
 log "Installing required .deb packages..."
-ALL_PACKAGES="awscli lolcat"
+ALL_PACKAGES="awscli lolcat gdb"
 
 maybe_source $DIR/$TEAM/packages.inc.sh
 ALL_PACKAGES="$ALL_PACKAGES $PACKAGES"
