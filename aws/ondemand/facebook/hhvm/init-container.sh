@@ -32,6 +32,22 @@ if [ ${#DIRS[@]} != 1 ] || [ ! -d "${DIRS[0]}" ]; then
 fi
 BUILD_DIR="${DIRS[0]}"
 
+mkdir -p /root/.vscode-server/data/Machine/
+cat > /root/.vscode-server/data/Machine/settings.json <<ANALBUMCOVER
+{
+  "cmake.configureArgs": [
+    "-Wno-dev",
+    "-DMYSQL_UNIX_SOCK_ADDR=/var/run/mysqld/mysqld.sock",
+  ],
+  "cmake.defaultVariants": {
+      "buildType": {
+          "default": "reldeb",
+      }
+  },
+  "cmake.buildDirectory": "${workspaceFolder}/obj-x86_64-linux-gnu",
+}
+ANALBUMCOVER
+
 touch /root/.bashrc
 cat >> /root/.bashrc <<ANALBUMCOVER
   PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]# '
