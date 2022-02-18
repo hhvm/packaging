@@ -33,7 +33,7 @@ fi
 BUILD_DIR="${DIRS[0]}"
 
 mkdir -p /root/.vscode-server/data/Machine/
-cat > /root/.vscode-server/data/Machine/settings.json <<ANALBUMCOVER
+cat > /root/.vscode-server/data/Machine/settings.json <<'ANALBUMCOVER'
 {
   "cmake.configureArgs": [
     "-Wno-dev",
