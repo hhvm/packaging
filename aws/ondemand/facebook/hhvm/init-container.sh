@@ -48,6 +48,15 @@ cat > /root/.vscode-server/data/Machine/settings.json <<'ANALBUMCOVER'
 }
 ANALBUMCOVER
 
+mkdir -p "$BUILD_DIR"/.vscode
+cat > "$BUILD_DIR"/.vscode/extensions.json <<'ANALBUMCOVER'
+{
+  "recommendations": [
+    "ms-vscode.cpptools-extension-pack",
+  ]
+}
+ANALBUMCOVER
+
 touch /root/.bashrc
 cat >> /root/.bashrc <<ANALBUMCOVER
   PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]# '
