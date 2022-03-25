@@ -43,7 +43,8 @@ WORK_DIR="$(mktemp -dt hhvm.XXXXXXXX)"
 
 (
   set -x
-  cp -r "$SOURCE_DIR" "$WORK_DIR/hhvm-$VERSION"
+  cd "$SOURCE_DIR"
+  git checkout-index -a -f --prefix="$WORK_DIR/hhvm-$VERSION/"
 )
 
 "$(dirname "$0")/prune-source-tree" "$WORK_DIR/hhvm-$VERSION"
