@@ -48,7 +48,7 @@ automation would bitrot or have unintended side effects more than help.
 1. Spin up an EC2 instance manually in the same availability zone as the volume,
    i.e. us-west-2a, not just us-west-2.
 1. Attach the volume to the instance; can not be done while any other EC2 instance - such as a
-   PublishBinaryPackages job - attached. This must be in the same 
+   PublishBinaryPackages job - attached.
 1. SSH to the EC2 instance
 1. Find the device name for the block device - this may be in the EC2 web UI,
    otherwise check `dmesg` and `/var/log/cloud-init-output.log`
