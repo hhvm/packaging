@@ -118,7 +118,7 @@ in mind when following/adapting these instructions in the future.
 1. `mkdir /mnt/dl.hhvm.com; mount /dev/xvdf /mnt/dl.hhvm.com`  (changing device as  needed)
 1. check `df -h` has the expected old size
 1. Open `man xfs_growfs` **inside the VM** to check the version you are using has
-  compatible arguments for all of the following command
+  compatible arguments for all of the following commands
 1. run `xfs_growfs -d /dev/xvdf -n` - `-d` is to resize **D**ata section to max size, `-n` is 'no change to the filesystem is to be made' - i.e. dry-run
 1. if the values look good, run again without `-n`: `xfs_growfs -d /dev/xvdf`
 1. It should print out the new data size
