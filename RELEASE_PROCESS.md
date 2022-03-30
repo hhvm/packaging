@@ -64,7 +64,7 @@ Creating a new .z release
 1. make sure there are no uncommitted changes
 1. check out the HHVM-x.y branch of this packaging repository
 1. from your hhvm checkout, run
-  `/path/to/packaging/bin/hhvm-tag-and-push`; this will update
+  `/path/to/the/worktree/of/hhvm/packaging/bin/hhvm-tag-and-push`; this will update
   `version.h`, update the branch on github, and create the tag
 1. from this repository, run `bin/build-on-aws 4.y.z`, e.g.
   `bin/build-on-aws 4.16.1`
