@@ -64,7 +64,7 @@ automation would bitrot or have unintended side effects more than help.
 
 These instructions are accurate as of 2022-03-30, but depend on third-party
 tools, APIs, and web interfaces; it is likely that it will not be possiible
-to follow them verbatim the next time this needs doing - keepG the context above
+to follow them verbatim the next time this needs doing - keep the context above
 in mind when following/adapting these instructions in the future.
 
 1. Connect to the AWS management console
