@@ -17,12 +17,22 @@ fi
 
 SOURCE_DIR="$1"
 shift
-
-pushd "$(dirname "$0")" >/dev/null
-MINOR=$(git branch -r | grep -Po '(?<=origin/HHVM-4.)[0-9]+' | sort -rn | head -1)
-popd >/dev/null
-if [ -z "$MINOR" ]; then
-  echo "Failed to get the latest packaging branch name."
+BRANCH=$(cd "$SOURCE_DIR" && git branch --show-current)
+if [[ "$BRANCH" =~ HHVM-4.([0-9]+) ]]
+then
+  MINOR="${BASH_REMATCH[1]}"
+else
+  for BRANCH in $(cd "$(dirname "$0")" && git branch -r --sort=-refname)
+  do
+    if [[ "$BRANCH" =~ HHVM-4.([0-9]+) && (-z "$MINOR" || "${BASH_REMATCH[1]}" -gt "$MINOR") ]]
+    then
+      MINOR="${BASH_REMATCH[1]}"
+    fi
+  done
+fi
+if [[ -z "$MINOR" ]]
+then
+  echo "Failed to get the latest packaging branch name." >&2
   exit 1
 fi
 
