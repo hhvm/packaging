@@ -41,18 +41,23 @@ fi
 
 WORK_DIR="$(mktemp -dt hhvm.XXXXXXXX)"
 
+if command -v gtar
+then
+  TAR=gtar # the executable of GNU Tar in Homebrew 
+else
+  TAR=tar
+fi
 (
   set -x
   cd "$SOURCE_DIR"
-  git checkout-index -a -f --prefix="$WORK_DIR/hhvm-$VERSION/"
+  git ls-files --recurse-submodules |
+  grep --invert-match -E -e '^"?hphp/test/(slow|quick|zend|zend7)/' |
+  "$TAR" caf "$WORK_DIR/hhvm-$VERSION.tar.gz" --xform "s,^,hhvm-$VERSION/,rSH" -T-
 )
-
-"$(dirname "$0")/prune-source-tree" "$WORK_DIR/hhvm-$VERSION"
 
 pushd "$WORK_DIR" >/dev/null
 (
   set -x
-  tar czf "hhvm-$VERSION.tar.gz" "hhvm-$VERSION"
   aws s3 cp "hhvm-$VERSION.tar.gz" s3://hhvm-scratch/
 )
 popd >/dev/null
