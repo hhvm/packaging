@@ -211,6 +211,10 @@ function statusline() {
   tput sgr0
 }
 
+statusline "Reading user name and email from .git/config if present, or the fallback values from ~/.gitconfig"
+USER_EMAIL="$(git config user.email)"
+USER_NAME="$(git config user.name)"
+
 statusline "Creating packaging branch..."
 git checkout -B "HHVM-${VERSION}"
 statusline "Marking support for new DISTRO apt repo.."
@@ -234,6 +238,8 @@ else
   (
     statusline "Tagging and pushing HHVM..."
     cd "hhvm-$VERSION"
+    git config user.email "$USER_EMAIL"
+    git config user.name "$USER_NAME"
     git remote add staging git@github.com:hhvm/hhvm-staging.git
     git checkout -b "HHVM-${VERSION}"
     git reset --hard "nightly-${NIGHTLY}"
@@ -245,6 +251,8 @@ statusline "Cloning hhvm-docker..."
 git clone git@github.com:hhvm/hhvm-docker.git
 (
   cd hhvm-docker
+  git config user.email "$USER_EMAIL"
+  git config user.name "$USER_NAME"
   statusline "Removing 'latest' from previous release branch tags..."
   git checkout "HHVM-${PREVIOUS_VERSION}"
   $SED -i '/^latest$/d' EXTRA_TAGS
