@@ -202,11 +202,13 @@ function statusline() {
 }
 
 statusline "Creating packaging branch..."
-git checkout -b "HHVM-${VERSION}"
+git checkout -B "HHVM-${VERSION}"
 statusline "Marking support for new DISTRO apt repo.."
 echo "DISTRO-${VERSION}" >> DEBIAN_REPOSITORIES
 git commit DEBIAN_REPOSITORIES -m "Adding DISTRO-${VERSION} apt repositories"
 statusline "Pushing packaging branch..."
+git rebase master
+git pull --rebase origin "HHVM-${VERSION}"
 git push -u origin "HEAD:HHVM-${VERSION}"
 
 SCRATCHDIR="$(mktemp -dt hhvm.XXXXXXXX)"
