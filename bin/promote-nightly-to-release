@@ -177,7 +177,7 @@ fi
 
 echo "Fetching any updates to packaging repo..."
 git fetch >/dev/null
-if ! git pull --ff origin master; then
+if ! git diff --exit-code origin/master..HEAD >/dev/null; then
   echo "${FORCEABLE} Current branch is out of sync with origin/master"
   $FORCE || exit 1
 fi
@@ -202,13 +202,11 @@ function statusline() {
 }
 
 statusline "Creating packaging branch..."
-git checkout -B "HHVM-${VERSION}"
+git checkout -b "HHVM-${VERSION}"
 statusline "Marking support for new DISTRO apt repo.."
 echo "DISTRO-${VERSION}" >> DEBIAN_REPOSITORIES
 git commit DEBIAN_REPOSITORIES -m "Adding DISTRO-${VERSION} apt repositories"
 statusline "Pushing packaging branch..."
-git rebase master
-git pull --rebase origin "HHVM-${VERSION}"
 git push -u origin "HEAD:HHVM-${VERSION}"
 
 SCRATCHDIR="$(mktemp -dt hhvm.XXXXXXXX)"
