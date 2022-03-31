@@ -10,7 +10,17 @@ set -e
 
 function show_help() {
   cat<<EOF
-Usage: $0 [OPTIONS] (YYYY.MM.DD|existing-tag) MAJOR.MINOR"
+Usage: $0 [OPTIONS] (YYYY.MM.DD|"existing-tag") MAJOR.MINOR
+
+Configures and starts the build for a new x.y.0 release.
+
+YYYY.MM.DD
+  The date of a nightly build
+"existing-tag"
+  The literal string 'existing-tag'. Requires an HHVM-MAJOR.MINOR branch
+  and an HHVM-MAJOR.MINOR.0 tag in the hhvm/staging repository. You will
+  usually want to use the 'hhvm-tag-and-push' script to create these.
+
 Options:
   --help
       Show this page
