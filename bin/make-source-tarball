@@ -46,9 +46,8 @@ else
   HEAD=HHVM-${VERSION}
 fi
 
-git clone ${REPO} "${PREFIX}-${VERSION}"
+git clone --depth 1 --branch "$HEAD" ${REPO} "${PREFIX}-${VERSION}"
 cd "${PREFIX}-$VERSION"
-git checkout "$HEAD"
 if "${IS_AWS:-false}" && $IS_NIGHTLY; then
   TAG="nightly-${VERSION}"
   # Tag may already exist from previous failed runs.
@@ -68,7 +67,7 @@ if "${IS_AWS:-false}" && $IS_NIGHTLY; then
     git push git@github.com:facebook/hhvm.git "${TAG}"
   fi
 fi
-git submodule update --init --recursive
+git submodule update --init --recursive --depth 1
 
 # Delete stuff we dont' need
 "$ROOT/bin/prune-source-tree" .
