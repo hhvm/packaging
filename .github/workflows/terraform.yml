@@ -11,6 +11,8 @@ permissions:
 jobs:
   deployment:
     runs-on: ubuntu-latest
+    env:
+      WORKSPACE_NAME: ${{github.ref_name}}
     steps:
       - uses: actions/checkout@v2.4.0
       - uses: aws-actions/configure-aws-credentials@v1
@@ -19,6 +21,7 @@ jobs:
           aws-region: us-west-2
       - uses: hashicorp/setup-terraform@v2
       - run: terraform init
+      - run: terraform workspace select "$WORKSPACE_NAME" || terraform workspace new "$WORKSPACE_NAME"
       - run: terraform apply -auto-approve
       - if: github.ref_type == 'branch'
         uses: peter-evans/create-pull-request@v4
