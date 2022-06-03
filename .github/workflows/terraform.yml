@@ -19,6 +19,7 @@ jobs:
           aws-region: us-west-2
       - uses: hashicorp/setup-terraform@v2
       - run: terraform init
+      - run: terraform apply -auto-approve
       - if: github.ref_type == 'branch'
         uses: peter-evans/create-pull-request@v4
         with:
