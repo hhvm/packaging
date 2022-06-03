@@ -3,9 +3,17 @@ on:
     branches:
       - "**"
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   deployment:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.4.0
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::223121549624:role/hhvm-packaging-github-actions
+          aws-region: us-west-2
       - uses: hashicorp/setup-terraform@v2
