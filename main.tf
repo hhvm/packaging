@@ -14,7 +14,7 @@ terraform {
 }
 module "base-network" {
   source                                      = "cn-terraform/networking/aws"
-  name_prefix                                 = "${terraform.workspace}-networking-nexus"
+  name_prefix                                 = "${terraform.workspace}-network"
   vpc_cidr_block                              = "192.168.0.0/16"
   availability_zones                          = ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
   public_subnets_cidrs_per_availability_zone  = ["192.168.0.0/19", "192.168.32.0/19", "192.168.64.0/19", "192.168.96.0/19"]
