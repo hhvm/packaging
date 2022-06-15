@@ -34,4 +34,5 @@ module "nexus" {
   availability_zones  = module.base-network.availability_zones
   public_subnets_ids  = module.base-network.public_subnets_ids
   private_subnets_ids = module.base-network.private_subnets_ids
+  enable_s3_logs      = false
 }
