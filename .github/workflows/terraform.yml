@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   deployment:
+    concurrency: ${{ github.ref }}
     runs-on: ubuntu-latest
     env:
       WORKSPACE_NAME: ${{github.ref_name}}
