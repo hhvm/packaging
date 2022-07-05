@@ -28,10 +28,10 @@ module "base-network" {
 
 module "nexus" {
   source              = "cn-terraform/nexus/aws"
+  version             = "2.0.0"
   name_prefix         = "nexus-${terraform.workspace}"
   region              = "us-west-2"
   vpc_id              = module.base-network.vpc_id
-  availability_zones  = module.base-network.availability_zones
   public_subnets_ids  = module.base-network.public_subnets_ids
   private_subnets_ids = module.base-network.private_subnets_ids
   enable_s3_logs      = false
