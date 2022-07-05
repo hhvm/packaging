@@ -53,6 +53,7 @@ module "ecs-fargate" {
 
   volumes = [
     {
+      host_path                = null
       name                     = "nexus-data"
       efs_volume_configuration = []
       docker_volume_configuration = [
