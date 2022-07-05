@@ -53,19 +53,11 @@ module "ecs-fargate" {
 
   volumes = [
     {
-      host_path                = null
-      name                     = "nexus-data"
-      efs_volume_configuration = []
-      docker_volume_configuration = [
+      host_path = null
+      name      = "nexus-data"
+      efs_volume_configuration = [
         {
-          labels        = {}
-          scope         = "shared"
-          autoprovision = true
-          driver        = "rexray/ebs"
-          driver_opts = {
-            volumetype = "gp2"
-            size       = 15
-          }
+          file_system_id = aws_efs_file_system.nexus-data.id
         }
       ]
     }
@@ -86,4 +78,11 @@ module "aws_cw_logs" {
   source    = "cn-terraform/cloudwatch-logs/aws"
   version   = "1.0.10"
   logs_path = "/ecs/service/nexus-${terraform.workspace}"
+}
+
+resource "aws_efs_file_system" "nexus-data" {
+  creation_token = "nexus-data-${terraform.workspace}"
+  tags = {
+    Name = "nexus-data-${local.production_name}"
+  }
 }
