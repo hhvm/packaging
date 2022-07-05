@@ -51,6 +51,25 @@ module "ecs-fargate" {
     }
   }
 
+  volumes = [
+    {
+      host_path                = "/nexus-data"
+      name                     = "nexus-data"
+      efs_volume_configuration = []
+      docker_volume_configuration = [
+        {
+          scope         = "shared"
+          autoprovision = true
+          driver        = "rexray/ebs"
+          driver_opts = {
+            volumetype = "gp2"
+            size       = 15
+          }
+        }
+      ]
+    }
+  ]
+
   log_configuration = {
     logDriver = "awslogs"
     options = {
