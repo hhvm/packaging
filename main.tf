@@ -83,6 +83,6 @@ module "aws_cw_logs" {
 resource "aws_efs_file_system" "nexus-data" {
   creation_token = "nexus-data-${terraform.workspace}"
   tags = {
-    Name = "nexus-data-${local.production_name}"
+    Name = "nexus-data-${terraform.workspace}"
   }
 }
