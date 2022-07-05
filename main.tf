@@ -46,8 +46,8 @@ module "ecs-fargate" {
 
   lb_http_ports = {
     default_http = {
-      listener_port         = 80
-      target_group_port     = 8081
+      listener_port     = 80
+      target_group_port = 8081
     }
   }
 
