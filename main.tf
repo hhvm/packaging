@@ -58,6 +58,7 @@ module "ecs-fargate" {
       efs_volume_configuration = []
       docker_volume_configuration = [
         {
+          labels        = []
           scope         = "shared"
           autoprovision = true
           driver        = "rexray/ebs"
