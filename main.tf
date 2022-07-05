@@ -11,7 +11,7 @@ module "networking" {
 
 module "ecs-fargate" {
   source  = "cn-terraform/ecs-fargate/aws"
-  version = "2.0.42"
+  version = "2.0.43"
 
   name_prefix                  = "nexus-${terraform.workspace}"
   vpc_id                       = module.networking.vpc_id
@@ -30,8 +30,15 @@ module "ecs-fargate" {
   lb_https_ports = {
     forward_https_to_http = {
       listener_port         = 443
-      target_group_port     = 80
+      target_group_port     = 8081
       target_group_protocol = "HTTP"
+    }
+  }
+
+  lb_http_port = {
+    default_http = {
+      listener_port         = 80
+      target_group_port     = 8081
     }
   }
 
