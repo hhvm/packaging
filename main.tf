@@ -49,7 +49,7 @@ module "ecs-fargate" {
   port_mappings = [
     {
       containerPort = 8081
-      hostPort      = 80
+      hostPort      = 8081
       protocol      = "tcp"
     }
   ]
@@ -57,8 +57,15 @@ module "ecs-fargate" {
   lb_https_ports = {
     forward_https_to_http = {
       listener_port         = 443
-      target_group_port     = 80
+      target_group_port     = 8081
       target_group_protocol = "HTTP"
+    }
+  }
+
+  lb_http_ports = {
+    default_http = {
+      listener_port     = 80
+      target_group_port = 8081
     }
   }
 
