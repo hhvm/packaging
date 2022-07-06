@@ -26,7 +26,23 @@ module "ecs-fargate" {
   health_check_grace_period_seconds = 120
 
   enable_execute_command = true
-  enable_s3_logs         = false
+  ecs_task_execution_role_custom_policies = [jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
+        ],
+        "Resource" : "*"
+      }
+    ]
+  })]
+
+  enable_s3_logs = false
 
   default_certificate_arn = "arn:aws:acm:us-west-2:223121549624:certificate/8f845b56-937f-49b8-adf4-64b69a3caf57"
 
@@ -87,6 +103,7 @@ module "ecs-fargate" {
     }
     secretOptions = null
   }
+
 }
 
 module "aws_cw_logs" {
