@@ -66,7 +66,7 @@ module "ecs-fargate" {
       docker_volume_configuration = []
       efs_volume_configuration = [
         {
-          file_system_id          = aws_efs_file_system.nexus-data.id
+          file_system_id          = module.efs.id
           root_directory          = null
           transit_encryption      = null
           transit_encryption_port = null
@@ -93,9 +93,13 @@ module "aws_cw_logs" {
   logs_path = "/ecs/service/nexus-${terraform.workspace}"
 }
 
-resource "aws_efs_file_system" "nexus-data" {
-  creation_token = "nexus-data-${terraform.workspace}"
-  tags = {
-    Name = "nexus-data-${terraform.workspace}"
-  }
+module "efs" {
+  source = "cloudposse/efs/aws"
+  version = "0.32.7"
+
+  stage     = terraform.workspace
+  name      = "nexus"
+  region    = "us-west-2"
+  vpc_id    = module.networking.vpc_id
+  subnets   = module.networking.private_subnets_ids
 }
