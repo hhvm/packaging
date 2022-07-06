@@ -102,5 +102,5 @@ module "efs" {
   name    = "nexus"
   region  = "us-west-2"
   vpc_id  = module.networking.vpc_id
-  subnets = module.networking.public_subnets_ids
+  subnets = module.networking.private_subnets_ids
 }
