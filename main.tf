@@ -32,6 +32,14 @@ module "ecs-fargate" {
       {
         "Effect" : "Allow",
         "Action" : [
+          "elasticfilesystem:ClientMount",
+          "elasticfilesystem:ClientWrite"
+        ],
+        "Resource" : module.efs.arn,
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
           "ssmmessages:CreateControlChannel",
           "ssmmessages:CreateDataChannel",
           "ssmmessages:OpenControlChannel",
