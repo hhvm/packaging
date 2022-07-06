@@ -88,7 +88,7 @@ module "ecs-fargate" {
           root_directory          = "/"
           transit_encryption      = null
           transit_encryption_port = null
-          authorization_config    = null
+          authorization_config    = []
         }
       ]
     }
