@@ -51,6 +51,13 @@ module "ecs-fargate" {
     }
   }
 
+  mount_points = [
+    {
+      sourceVolume  = "nexus-data"
+      containerPath = "/nexus-data"
+    }
+  ]
+
   volumes = [
     {
       host_path                   = null
