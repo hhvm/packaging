@@ -32,8 +32,7 @@ module "ecs-fargate" {
       {
         "Effect" : "Allow",
         "Action" : [
-          "elasticfilesystem:ClientMount",
-          "elasticfilesystem:ClientWrite"
+          "elasticfilesystem:*"
         ],
         "Resource" : module.efs.arn,
       },
