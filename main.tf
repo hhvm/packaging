@@ -24,7 +24,8 @@ module "ecs-fargate" {
   container_memory             = 8192
   container_memory_reservation = null
 
-  enable_s3_logs = false
+  enable_execute_command = true
+  enable_s3_logs         = false
 
   default_certificate_arn = "arn:aws:acm:us-west-2:223121549624:certificate/8f845b56-937f-49b8-adf4-64b69a3caf57"
 
@@ -94,12 +95,12 @@ module "aws_cw_logs" {
 }
 
 module "efs" {
-  source = "cloudposse/efs/aws"
+  source  = "cloudposse/efs/aws"
   version = "0.32.7"
 
-  stage     = terraform.workspace
-  name      = "nexus"
-  region    = "us-west-2"
-  vpc_id    = module.networking.vpc_id
-  subnets   = module.networking.public_subnets_ids
+  stage   = terraform.workspace
+  name    = "nexus"
+  region  = "us-west-2"
+  vpc_id  = module.networking.vpc_id
+  subnets = module.networking.public_subnets_ids
 }
