@@ -69,8 +69,8 @@ module "ecs-fargate" {
       efs_volume_configuration = [
         {
           file_system_id          = module.efs.id
-          root_directory          = "/nexus-data"
-          transit_encryption      = null
+          root_directory          = "/"
+          transit_encryption      = "ENABLED"
           transit_encryption_port = null
           authorization_config = [{
             access_point_id = module.efs.access_point_ids["nexus-data"]
@@ -109,7 +109,7 @@ module "efs" {
   subnets                    = module.networking.public_subnets_ids
   allowed_security_group_ids = [module.ecs-fargate.ecs_tasks_sg_id]
   access_points = {
-    "nexus-data" = {
+    "" = {
       posix_user = {
         gid            = "1001"
         uid            = "5000"
