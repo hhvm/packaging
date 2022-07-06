@@ -55,6 +55,7 @@ module "ecs-fargate" {
     {
       sourceVolume  = "nexus-data"
       containerPath = "/nexus-data"
+      readOnly      = false
     }
   ]
 
