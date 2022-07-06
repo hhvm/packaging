@@ -86,9 +86,12 @@ module "ecs-fargate" {
         {
           file_system_id          = module.efs.id
           root_directory          = "/"
-          transit_encryption      = null
+          transit_encryption      = "ENABLED"
           transit_encryption_port = null
-          authorization_config    = null
+          authorization_config = [{
+            access_point_id = module.efs.access_point_ids["nexus-data"]
+            iam             = "DISABLED"
+          }]
         }
       ]
     }
@@ -122,4 +125,18 @@ module "efs" {
   vpc_id                     = module.networking.vpc_id
   subnets                    = module.networking.public_subnets_ids
   allowed_security_group_ids = [module.ecs-fargate.ecs_tasks_sg_id]
+  access_points = {
+    "nexus-data" = {
+      posix_user = {
+        gid            = "1001"
+        uid            = "5000"
+        secondary_gids = "1002,1003"
+      }
+      creation_info = {
+        gid         = "1001"
+        uid         = "5000"
+        permissions = "0755"
+      }
+    }
+  }
 }
