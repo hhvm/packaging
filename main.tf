@@ -53,11 +53,16 @@ module "ecs-fargate" {
 
   volumes = [
     {
-      host_path = null
-      name      = "nexus-data"
+      host_path                   = null
+      name                        = "nexus-data"
+      docker_volume_configuration = []
       efs_volume_configuration = [
         {
-          file_system_id = aws_efs_file_system.nexus-data.id
+          file_system_id          = aws_efs_file_system.nexus-data.id
+          root_directory          = null
+          transit_encryption      = null
+          transit_encryption_port = null
+          authorization_config    = []
         }
       ]
     }
