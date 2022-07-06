@@ -105,4 +105,9 @@ module "efs" {
   vpc_id                     = module.networking.vpc_id
   subnets                    = module.networking.public_subnets_ids
   allowed_security_group_ids = [module.ecs-fargate.ecs_tasks_sg_id]
+  access_points = {
+    "" = {
+      posix_user = null
+    }
+  }
 }
