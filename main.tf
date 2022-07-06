@@ -14,15 +14,16 @@ module "ecs-fargate" {
   source  = "cn-terraform/ecs-fargate/aws"
   version = "2.0.43"
 
-  name_prefix                  = "nexus-${terraform.workspace}"
-  vpc_id                       = module.networking.vpc_id
-  public_subnets_ids           = module.networking.public_subnets_ids
-  private_subnets_ids          = module.networking.private_subnets_ids
-  container_name               = "nexus-${terraform.workspace}"
-  container_image              = "sonatype/nexus3"
-  container_cpu                = 4096
-  container_memory             = 8192
-  container_memory_reservation = null
+  name_prefix                       = "nexus-${terraform.workspace}"
+  vpc_id                            = module.networking.vpc_id
+  public_subnets_ids                = module.networking.public_subnets_ids
+  private_subnets_ids               = module.networking.private_subnets_ids
+  container_name                    = "nexus-${terraform.workspace}"
+  container_image                   = "sonatype/nexus3"
+  container_cpu                     = 4096
+  container_memory                  = 8192
+  container_memory_reservation      = null
+  health_check_grace_period_seconds = 30
 
   enable_execute_command = true
   enable_s3_logs         = false
