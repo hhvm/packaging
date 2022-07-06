@@ -109,7 +109,7 @@ module "efs" {
   subnets                    = module.networking.public_subnets_ids
   allowed_security_group_ids = [module.ecs-fargate.ecs_tasks_sg_id]
   access_points = {
-    "" = {
+    "nexus-data" = {
       posix_user = {
         gid            = "1001"
         uid            = "5000"
