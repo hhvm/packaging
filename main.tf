@@ -98,9 +98,10 @@ module "efs" {
   source  = "cloudposse/efs/aws"
   version = "0.32.7"
 
-  stage   = terraform.workspace
-  name    = "nexus"
-  region  = "us-west-2"
-  vpc_id  = module.networking.vpc_id
-  subnets = module.networking.public_subnets_ids
+  stage                      = terraform.workspace
+  name                       = "nexus"
+  region                     = "us-west-2"
+  vpc_id                     = module.networking.vpc_id
+  subnets                    = module.networking.public_subnets_ids
+  allowed_security_group_ids = [module.ecs-fargate.aws_security_group_lb_access_sg_id]
 }
