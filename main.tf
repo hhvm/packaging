@@ -69,7 +69,7 @@ module "ecs-fargate" {
       efs_volume_configuration = [
         {
           file_system_id          = module.efs.id
-          root_directory          = null
+          root_directory          = "/nexus-data"
           transit_encryption      = null
           transit_encryption_port = null
           authorization_config    = []
