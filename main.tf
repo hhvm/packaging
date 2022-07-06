@@ -23,7 +23,7 @@ module "ecs-fargate" {
   container_cpu                     = 4096
   container_memory                  = 8192
   container_memory_reservation      = null
-  health_check_grace_period_seconds = 30
+  health_check_grace_period_seconds = 120
 
   enable_execute_command = true
   enable_s3_logs         = false
