@@ -125,7 +125,7 @@ module "efs" {
   version = "0.32.7"
 
   stage                      = terraform.workspace
-  name                       = "nexus"
+  name                       = "nexus-data"
   region                     = "us-west-2"
   vpc_id                     = module.networking.vpc_id
   subnets                    = module.networking.public_subnets_ids
