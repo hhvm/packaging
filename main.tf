@@ -1,1 +1,2 @@
+provider "aws" {}
 provider "random" {}
