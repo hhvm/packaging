@@ -108,15 +108,10 @@ module "ecs-fargate" {
       ]
     }
   ]
-
-  command = [
-    "sh", "-c", "echo '${random_password.nexus-admin-password.result}' > /nexus-data/admin.password && \"$SONATYPE_DIR/start-nexus-repository-manager.sh\""
-  ]
-
   environment = [
     {
-      name  = "NEXUS_SECURITY_RANDOMPASSWORD"
-      value = "false"
+      name  = "NEXUS_SECURITY_INITIAL_PASSWORD"
+      value = random_password.nexus-admin-password.result
     }
   ]
 
