@@ -9,6 +9,18 @@ module "networking" {
   private_subnets_cidrs_per_availability_zone = ["192.168.128.0/19", "192.168.160.0/19", "192.168.192.0/19", "192.168.224.0/19"]
   single_nat                                  = true
 }
+resource "random_password" "nexus-admin-password" {
+  length = 32
+}
+
+resource "aws_secretsmanager_secret" "nexus-admin-password" {
+  name = "nexus-admin-password-${terraform.workspace}"
+}
+
+resource "aws_secretsmanager_secret_version" "nexus-admin-password" {
+  secret_id     = aws_secretsmanager_secret.nexus-admin-password.id
+  secret_string = random_password.nexus-admin-password.result
+}
 
 module "ecs-fargate" {
   source  = "cn-terraform/ecs-fargate/aws"
@@ -94,6 +106,17 @@ module "ecs-fargate" {
           }]
         }
       ]
+    }
+  ]
+
+  command = [
+    "sh", "-c", "echo '${random_password.nexus-admin-password.result}' > /nexus-data/admin.password && \"$SONATYPE_DIR/start-nexus-repository-manager.sh\""
+  ]
+
+  environment = [
+    {
+      name  = "NEXUS_SECURITY_RANDOMPASSWORD"
+      value = "false"
     }
   ]
 
