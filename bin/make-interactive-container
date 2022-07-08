@@ -9,7 +9,7 @@
 ROOT="$(realpath "$(dirname "$0")/..")"
 OUT="$ROOT/out/"
 NODIST="$ROOT/nodist/"
-DISTRO=${1:-"debian-8-jessie"}
+DISTRO=${1:-"debian-11-bullseye"}
 DOCKER_BASE="$(<"${ROOT}/${DISTRO}/DOCKER_BASE")"
 
 if [ ! -d "${ROOT}/${DISTRO}" ]; then
