@@ -1,31 +1,39 @@
-Next Generation HHVM Binary Packaging
-=====================================
+# HHVM Packaging
 
-All linux builds will be in Docker containers, on AWS.
+This repository contains the source code of the HHVM packaging
+scripts.
 
-TLDR
-====
+HHVM is packaged by building insider Docker contains on AWS EC2. These
+workers are triggered by AWS Step Functions.
 
-- [RELEASE_PROCESS.md](RELEASE_PROCESS.md) has all the information you need,
-  if everything goes well
-- if everything doesn't go well, start with [DEBUGGING.md](DEBUGGING.md)
-- the text below describes the build system in general + an overview of our AWS
-  setup
-- [aws/hhvm1/README.md](aws/hhvm1/README.md) describes our current AWS setup in
-  more detail
+## Usage
 
-Commonly needed scripts (run them to see usage instructions):
+You will need Python and the [AWS
+CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html)
+installed on your local machine.
 
-- `bin/promote-nightly-to-release` for regular weekly releases
-  (see [RELEASE_PROCESS.md](RELEASE_PROCESS.md))
-- `bin/hhvm-tag-and-push` and `bin/build-on-aws` for unscheduled releases
-  (see [RELEASE_PROCESS.md](RELEASE_PROCESS.md#creating-a-new-z-release))
-- `bin/aws-build-status -f` to monitor progress (shows the status of the most
-  recently started build, refreshed every 2 minutes until the build ends)
-- `bin/list-build-logs` and `bin/fetch-build-log` for [debugging](DEBUGGING.md)
-- `bin/test-build-on-all-distros <path to HHVM checkout>` to test any local
-  changes using our standard build system (make sure to run
-  `git submodule update --init --recursive` in the HHVM checkout first!)
+You can then take a nightly build (e.g. the [the most
+recent](https://hhvm.com/api/build-status/nightly) or a [specific
+older version](https://hhvm.com/api/build-status/2022.05.01)) and
+promote it.
+
+```
+$ bin/promote-nightly-to-release 2019.07.22 4.15
+```
+
+See [RELEASE_PROCESS.md](RELEASE_PROCESS.md) for more details and
+instructions on patch releases. If you encounter issues, see
+[DEBUGGING.md](DEBUGGING.md).
+
+### Testing HHVM Changes
+
+If you've made local changes to HHVM and want to see how they affect
+the build, we provide a helper script. Make sure you've run
+`git submodule update --init --recursive` in the HHVM checkout first.
+
+```
+$ bin/test-build-on-all-distros <path to HHVM checkout>
+```
 
 Configuration
 =============
