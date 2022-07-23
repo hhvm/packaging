@@ -32,7 +32,6 @@ enum A: string as string {
   PublishBinaryPackages = 'PublishBinaryPackages';
   PublishSourceTarball = 'PublishSourceTarball';
   PublishDockerImages = 'PublishDockerImages';
-  BuildAndPublishMacOS = 'BuildAndPublishMacOS';
 }
 
 // State names/name parts
@@ -154,9 +153,6 @@ abstract final class Config {
     A::PublishDockerImages =>
       'arn:aws:states:us-west-2:223121549624:activity:'.
       'hhvm-publish-docker-images',
-    A::BuildAndPublishMacOS =>
-      'arn:aws:states:us-west-2:223121549624:activity:'.
-      'hhvm-build-and-publish-macos',
   ];
 
   const dict<A, int> TIMEOUT_SEC = dict[
@@ -165,7 +161,6 @@ abstract final class Config {
     A::PublishBinaryPackages => 240 * 60,
     A::PublishDockerImages => 240 * 60,
     A::PublishSourceTarball => 30 * 60,
-    A::BuildAndPublishMacOS => 240 * 60,
   ];
 
   /**
@@ -438,19 +433,6 @@ function linux_branch(): StateMachine {
   );
 }
 
-function macos_branch(): StateMachine {
-  return nested_state_machine(
-    A::BuildAndPublishMacOS,
-    null,
-    states_for_activity(
-      keyset[P::Version],
-      A::BuildAndPublishMacOS,
-      A::BuildAndPublishMacOS.S::End,
-      A::BuildAndPublishMacOS.S::End,
-    ),
-  );
-}
-
 /**
  * The complete state machine is this main branch + a small branch that does
  * periodic health checks.
@@ -469,14 +451,14 @@ function main_branch(): StateMachine {
             states_for_activity(
               keyset[P::Version],
               A::MakeSourceTarball,
-              S::BuildAndPublishLinux.S::And.A::BuildAndPublishMacOS,
+              S::BuildAndPublishLinux.S::And,
               S::Version.S::NormalizeResults,
             ),
             dict[
-              S::BuildAndPublishLinux.S::And.A::BuildAndPublishMacOS => dict[
+              S::BuildAndPublishLinux.S::And => dict[
                 F::Type => T::Parallel,
                 F::Parameters => params(P::BuildInput, P::Version),
-                F::Branches => vec[linux_branch(), macos_branch()],
+                F::Branches => vec[linux_branch()],
               ],
               S::Version.S::NormalizeResults => dict[
                 F::Type => T::Task,
