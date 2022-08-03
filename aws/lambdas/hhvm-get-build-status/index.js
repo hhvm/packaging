@@ -29,24 +29,8 @@ async function get_distros(branch) {
 exports.handler = async (event) => {
   const {nightly, version, branch} = get_version_info(event);
 
-  const maj = parseInt(version.split('.')[0]);
-  const min = parseInt(version.split('.')[1]);
-  const maj_min = maj+'.'+min;
-  const macos_prefix = nightly
-    ? 'hhvm-nightly-'+version
-    : maj_min === '3.30'
-      ? 'hhvm@3.30-lts-'+version
-      : 'hhvm-'+maj_min+'-'+version;
-  const src_prefix = nightly ? macos_prefix : ('hhvm-'+version);
-  const paths = {
-    'macos-catalina':
-      'homebrew-bottles/'+macos_prefix+'.catalina.bottle.tar.gz',
-  };
-  if (nightly && version < '2021.04.01' || !nightly && (maj < 4 || min < 104)) {
-    paths['macos-mojave'] =
-      'homebrew-bottles/'+macos_prefix+'.mojave.bottle.tar.gz';
-  }
-
+  const src_prefix = nightly ? ('hhvm-nightly-'+version) : ('hhvm-'+version);
+  const paths = {};
   const scratch_paths = {};
   if (nightly) {
     paths.source = 'source/nightlies/'+src_prefix+'.tar.gz';
