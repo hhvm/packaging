@@ -3,3 +3,5 @@ debian-11-bullseye
 ubuntu-20.04-focal
 ubuntu-21.04-hirsute
 ubuntu-21.10-impish
+ubuntu-22.04-jammy
+ubuntu-22.10-kinetic
