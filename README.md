@@ -12,7 +12,7 @@ You will need Python and the [AWS
 CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html)
 installed on your local machine.
 
-You can then take a nightly build (e.g. the [the most
+You can then take a nightly build (e.g. the [most
 recent](https://hhvm.com/api/build-status/nightly) or a [specific
 older version](https://hhvm.com/api/build-status/2022.05.01)) and
 promote it.
