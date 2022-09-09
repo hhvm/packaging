@@ -41,6 +41,7 @@ NAMES=(
 for NAME in "${NAMES[@]}"; do
   echo "Deploying $NAME..."
   aws lambda update-function-code \
+    --no-cli-pager \
     --function-name "$NAME" \
     --zip-file "fileb://$ZIP"
 done
