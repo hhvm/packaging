@@ -9,7 +9,7 @@ import json
 from urllib import request
 
 import common
-
+import subprocess
 
 class Activity:
   # Subclasses must override these.
@@ -228,20 +228,18 @@ class PublishDockerImages(Activity):
   def task_env(self):
     return {'DOCKER_ONLY': '1'}
 
-  def docker_tags(self, repo):
-    return {
-      tag['name'] for tag in json.loads(
-        request
-          .urlopen(f'https://index.docker.io/v1/repositories/hhvm/{repo}/tags')
-          .read()
-          .decode('ascii')
-      )
-    }
+  def is_docker_tag_absent(self, repo):
+    docker_subprocess = subprocess.run(('docker', 'manifest', 'inspect', f'hhvm/hhvm:{self.version()}'), capture_output=True)
+    if docker_subprocess.returncode == 1 and docker_subprocess.stderr.startswith(b'no such manifest'):
+      return True
+    else:
+      docker_subprocess.check_returncode()
+      return False
 
   def should_run(self):
     return (
-      self.version() not in self.docker_tags('hhvm') or
-      self.version() not in self.docker_tags('hhvm-proxygen')
+      self.is_docker_tag_absent('hhvm') or
+      self.is_docker_tag_absent('hhvm-proxygen')
     )
 
 

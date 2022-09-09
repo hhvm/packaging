@@ -286,7 +286,7 @@ class Test(unittest.TestCase):
     )
 
   def test_should_run(self):
-    past = (date.today() - timedelta(days=2)).strftime('%Y.%m.%d')
+    past = (date.today() - timedelta(days=42)).strftime('%Y.%m.%d')
     future = (date.today() + timedelta(days=2)).strftime('%Y.%m.%d')
 
     self.assertEqual(
