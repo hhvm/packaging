@@ -228,21 +228,8 @@ class PublishDockerImages(Activity):
   def task_env(self):
     return {'DOCKER_ONLY': '1'}
 
-  def docker_tags(self, repo):
-    return {
-      tag['name'] for tag in json.loads(
-        request
-          .urlopen(f'https://index.docker.io/v1/repositories/hhvm/{repo}/tags')
-          .read()
-          .decode('ascii')
-      )
-    }
-
   def should_run(self):
-    return (
-      self.version() not in self.docker_tags('hhvm') or
-      self.version() not in self.docker_tags('hhvm-proxygen')
-    )
+    return True
 
 
 class BuildAndPublishMacOS(Activity):
