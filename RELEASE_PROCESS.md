@@ -90,7 +90,7 @@ Releases are generally on Mondays, from Sunday's nightly builds.
 Creating a new .z release
 =========================
 
-1. Check out the HHVM-x.y branch (e.g. `HHVM-4.16)
+1. Check out the HHVM-x.y branch (e.g. `HHVM-4.16`)
    of the hhvm-staging repository
 1. cherry-pick or otherwise apply your changes
 1. make sure there are no uncommitted changes
