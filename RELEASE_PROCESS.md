@@ -3,8 +3,6 @@ Prerequisites:
 - Write access to the HHVM staging repository
 - Write access to the hhvm.com repository
 - Write access to the hhvm-docker repository
-- correctly configured Azure DevOps CLI client (optional, to track progress or
-  deal with issues)
 - access to HHVM FB page and Twitter accounts
 
 Overview of the repositories
