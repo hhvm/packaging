@@ -205,24 +205,6 @@ class Test(unittest.TestCase):
       expected_prefix
     )
 
-    # overrides worker_env()
-    ec2_params = activities.BuildAndPublishMacOS({}).ec2_params()
-    expected_prefix = (
-      '#!/bin/bash\n'
-      '        ACTIVITY_ARN="arn:aws:states:us-west-2:223121549624:activity:'
-        'hhvm-build-and-publish-macos"\n'
-      f'        SCRIPT_URL="https://raw.githubusercontent.com/{org}/packaging/'
-        f'{branch}/aws/userdata/trigger-macos-builds.sh"\n'
-      '        INIT_URL=""\n'
-      '        AFTER_TASK_URL=""\n'
-      '        SKIP_SEND_TASK_SUCCESS="1"\n'
-      '        #!/bin/bash\n'
-    )
-    self.assertEqual(
-      ec2_params['UserData'][:len(expected_prefix)],
-      expected_prefix
-    )
-
     # fake_ec2 (should change SCRIPT_URL and remove AFTER_TASK_URL)
     ec2_params = activities.MakeBinaryPackage({
       'buildInput': {'debug': 'fake_ec2'},

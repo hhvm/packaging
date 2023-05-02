@@ -16,7 +16,6 @@ Overview of the repositories
 * https://github.com/hhvm/hhvm-staging - a private fork of facebook/hhvm. This is the source of truth for tags and release branches. This allows us to prepare security updates in private in a repository accessible by AWS and Azure
 * https://github.com/hhvm/hhvm.com - public repository containing the hhvm.com (http://hhvm.com/) website and all blog posts
 * https://github.com/hhvm/packaging - public repository containing the overall public CI infrastructure, and the public linux build configurations/scripts
-* https://github.com/hhvm/homebrew-hhvm - public repository containing MacOS-specific public CI infrastructure; used by hhvm/packaging. This is a separate repository as homebrew dictates the repository name and structure.
 * https://github.com/hhvm/hhvm-docker - public repository containing the templates for our docker (container) images. This could be merged. It is a separate repository as it is self-contained and comparatively straightforward, but there is no need for it to be.
 
 **Security releases**: nothing should be done in any public repository - and no build steps should be ran that operate in/write to public repositories - until the planned disclosure date.
@@ -33,7 +32,7 @@ In the master branch, hphp/runtime/version.h always sets version to something li
 * CodemodConfigUpdateHHVMVersionHeader creates a diff once a week to update the version header, removing the need for this manual work. If there are test failures, a Meta employee must take ownership of the diff in order to land it.
 * Codemods are usually disabled during code freezes; when this is the case, the version number must be updated manually, or via the script.
 * The "-dev" needs to be removed from version.h in the release branch
-* nightly builds have a distinct YYYY.MM.DD package version number (e.g. .deb and homebrew), but this is not part of version.h or the included executables; hhvm --version will report the 4.x.0-dev string, no YYYY.MM.DD
+* nightly builds have a distinct YYYY.MM.DD package version number (e.g. .deb), but this is not part of version.h or the included executables; hhvm --version will report the 4.x.0-dev string, no YYYY.MM.DD
     * nightly-YYYY.MM.DD tags are automatically created and pushed to both facebook/hhvm and hhvm/staging, which makes it easy to identify the specific github commit used for a nightly build
 
 
